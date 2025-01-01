@@ -1,0 +1,31 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Django
+*.sqlite3
+db.sqlite3
+
+# Virtual Environment
+env/
+venv/
+ENV/
+.venv/
+
+# Local configuration files
+*.env
+
+# VS Code settings
+.vscode/
+
+# Mac system files
+.DS_Store
+
+# Node modules (for your React frontend)
+node_modules/
+
+# Build directory (React frontend)
+dist/
+build/
