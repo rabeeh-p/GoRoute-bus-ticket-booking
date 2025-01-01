@@ -10,7 +10,13 @@ db.sqlite3
 
 # Virtual Environment
 # env/
-env/
+# env/
+# GoRoute-backend/env/
+# ../env/
+# GoRoute-backend/env/
+
+
+
 
 venv/
 ENV/
