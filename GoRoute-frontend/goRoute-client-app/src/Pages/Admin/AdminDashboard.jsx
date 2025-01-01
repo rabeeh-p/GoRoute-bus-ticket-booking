@@ -1,21 +1,18 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { clearUserData } from "../../slice/userSlicer"; // Adjust the path as needed
-import { useNavigate } from "react-router-dom"; // For redirection
+import { clearUserData } from "../../slice/userSlicer";  
+import { useNavigate } from "react-router-dom";  
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Clear Redux user data
     dispatch(clearUserData());
 
-    // Clear localStorage (optional, if you're storing tokens there)
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
 
-    // Redirect to login page
     navigate("/admin-login");
   };
 
@@ -24,6 +21,7 @@ const AdminDashboard = () => {
       <header className="bg-gradient-to-r from-red-600 to-red-800 text-white py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6">
           <div className="flex items-center space-x-2">
+            
             <span className="text-2xl font-bold text-white">GoRoute</span>
           </div>
           <div>

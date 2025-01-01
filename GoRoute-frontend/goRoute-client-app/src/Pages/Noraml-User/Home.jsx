@@ -5,6 +5,7 @@ import SearchForm from '../../Components/Normal/SearchForm'
 
 const Home = () => {
     console.log('hello');
+
     
   return (
     <div className="min-h-screen bg-gray-100">
