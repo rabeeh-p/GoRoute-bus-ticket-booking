@@ -7,9 +7,9 @@ from django.contrib.auth import get_user_model
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ['username', 'password', 'role']  # Fields for CustomUser
+        fields = ['username', 'password', 'role']   
         extra_kwargs = {
-            'password': {'write_only': True}  # Password should be write-only
+            'password': {'write_only': True}   
         }
 
     def create(self, validated_data):
@@ -17,7 +17,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return user
 
 
-# BusOwner Serializer
 class BusOwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusOwnerModel
