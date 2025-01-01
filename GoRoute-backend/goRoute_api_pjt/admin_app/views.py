@@ -47,28 +47,33 @@ class UserAndBusOwnerRegisterView(APIView):
 
 
 
+
 class LoginView(APIView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
 
         user = authenticate(request, username=username, password=password)
-        
+
         if user is None:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        if hasattr(user, 'bus_owner'):  
-            bus_owner = user.bus_owner.first()   
-            if bus_owner and not bus_owner.is_approved:   
+        
+        if hasattr(user, 'bus_owner'):
+            bus_owner = user.bus_owner.first()
+            if bus_owner and not bus_owner.is_approved:
                 return Response({"error": "Your account is pending approval. Please wait for admin approval."}, status=status.HTTP_403_FORBIDDEN)
+            user_type = 'bus_owner'
+        
+        else:
+            user_type = 'normal_user'
 
         refresh = RefreshToken.for_user(user)
         return Response({
             'access': str(refresh.access_token),
             'refresh': str(refresh),
+            'userType': user_type   
         }, status=status.HTTP_200_OK)
-    
-
 
 
 
@@ -89,4 +94,5 @@ class AdminLoginView(APIView):
         return Response({
             'access': str(refresh.access_token),
             'refresh': str(refresh),
+            'user_type': user.role
         }, status=status.HTTP_200_OK)
