@@ -9,7 +9,7 @@ __pycache__/
 db.sqlite3
 
 # Virtual Environment
-env/
+../env/
 venv/
 ENV/
 .venv/
