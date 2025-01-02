@@ -3,6 +3,10 @@ from .models import BusOwnerModel
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueValidator
 
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+import re
+from datetime import date
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -40,3 +44,46 @@ class BusOwnerSerializer(serializers.ModelSerializer):
         if len(value) < 3:
             raise serializers.ValidationError("Travel name should be at least 3 characters long.")
         return value
+    
+
+
+
+
+
+class UserSignupSerializer(serializers.Serializer):
+    first_name = serializers.CharField(max_length=100)
+    last_name = serializers.CharField(max_length=100)
+    phone_number = serializers.CharField(max_length=15)
+    gender = serializers.ChoiceField(choices=[('male', 'Male'), ('female', 'Female'), ('other', 'Other')])
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True, style={'input_type': 'password'})
+    email = serializers.EmailField()
+    date_of_birth = serializers.DateField()
+
+    def validate_email(self, value):
+        if get_user_model().objects.filter(email=value).exists():
+            raise ValidationError("Email already exists.")
+        return value
+
+    def validate_username(self, value):
+        if get_user_model().objects.filter(username=value).exists():
+            raise ValidationError("Username already exists.")
+        return value
+
+    def validate_phone_number(self, value):
+        if not re.match(r'^\d{10,15}$', value):
+            raise ValidationError("Phone number must be between 10 and 15 digits.")
+        return value
+    
+    def validate_date_of_birth(self, value):
+        today = date.today()
+        if today.year - value.year < 18 or (today.year - value.year == 18 and (today.month, today.day) < (value.month, value.day)):
+            raise serializers.ValidationError("You must be at least 18 years old.")
+        return value
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if 'date_of_birth' in representation:
+            representation['date_of_birth'] = representation['date_of_birth'].strftime('%Y-%m-%d')
+        return representation
+    
