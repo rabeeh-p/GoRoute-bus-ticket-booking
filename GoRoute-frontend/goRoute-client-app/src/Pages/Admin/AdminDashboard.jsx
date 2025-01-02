@@ -1,7 +1,10 @@
 import React from "react";
+import { Route, Routes } from "react-router-dom";  
 import { useDispatch } from "react-redux";
 import { clearUserData } from "../../slice/userSlicer";  
 import { useNavigate } from "react-router-dom";  
+import UsersList from "./UsersList";  
+import Dashboard from "./Dashboard";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -9,11 +12,10 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     dispatch(clearUserData());
-
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-
     navigate("/admin-login");
+    
   };
 
   return (
@@ -21,11 +23,9 @@ const AdminDashboard = () => {
       <header className="bg-gradient-to-r from-red-600 to-red-800 text-white py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6">
           <div className="flex items-center space-x-2">
-            
             <span className="text-2xl font-bold text-white">GoRoute</span>
           </div>
           <div>
-            {/* Logout Button */}
             <button
               onClick={handleLogout}
               className="bg-white text-red-600 py-2 px-4 rounded-lg hover:bg-gray-200 transition duration-300"
@@ -46,7 +46,7 @@ const AdminDashboard = () => {
             <ul className="space-y-4">
               <li>
                 <a
-                  href="#dashboard"
+                onClick={() => {navigate('/admin-home/dashboard')}}
                   className="block py-2 px-4 hover:bg-red-700 rounded-lg transition duration-300"
                 >
                   Dashboard
@@ -54,26 +54,10 @@ const AdminDashboard = () => {
               </li>
               <li>
                 <a
-                  href="#users-list"
+                  onClick={() => navigate('/admin-home/users-list')} 
                   className="block py-2 px-4 hover:bg-red-700 rounded-lg transition duration-300"
                 >
                   Users List
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#bus-owner-request"
-                  className="block py-2 px-4 hover:bg-red-700 rounded-lg transition duration-300"
-                >
-                  Bus Owner Request
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#wallet"
-                  className="block py-2 px-4 hover:bg-red-700 rounded-lg transition duration-300"
-                >
-                  Wallet
                 </a>
               </li>
             </ul>
@@ -88,33 +72,14 @@ const AdminDashboard = () => {
               Use the sidebar to navigate through the different sections of the admin panel.
             </p>
 
-            {/* Dashboard Section */}
-            <section id="dashboard" className="mt-10">
-              <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
-                  <h3 className="text-xl font-semibold">Total Users</h3>
-                  <p className="text-gray-600 mt-2 text-lg">1,234</p>
-                </div>
-                <div className="p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
-                  <h3 className="text-xl font-semibold">Total Buses</h3>
-                  <p className="text-gray-600 mt-2 text-lg">567</p>
-                </div>
-                <div className="p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
-                  <h3 className="text-xl font-semibold">Pending Requests</h3>
-                  <p className="text-gray-600 mt-2 text-lg">12</p>
-                </div>
-                <div className="p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
-                  <h3 className="text-xl font-semibold">Total Earnings</h3>
-                  <p className="text-gray-600 mt-2 text-lg">$45,678</p>
-                </div>
-              </div>
-            </section>
+            <Routes>
+              <Route path="users-list" element={<UsersList />} />
+              <Route path="dashboard" element={<Dashboard />} />
+            </Routes>
           </div>
         </main>
       </div>
     </div>
-
   );
 };
 

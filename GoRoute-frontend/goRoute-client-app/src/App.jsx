@@ -8,6 +8,8 @@ import UserLogin from './Pages/Noraml-User/UserLogin';
 import SignUp from './Pages/Noraml-User/SignUp';
 import OTPVerification from './Pages/Noraml-User/OTPVerification';
 import TripBooking from './Pages/Noraml-User/TripBooking';
+import UsersList from './Pages/Admin/UsersList';
+import Dashboard from './Pages/Admin/Dashboard';
 function App() {
   return (
     <BrowserRouter>
@@ -18,11 +20,16 @@ function App() {
         <Route path="/signUp" element={<SignUp />} />
         <Route path="/otp" element={<OTPVerification />} />
 
+        <Route path="/trip-booking" element={<TripBooking />} />
 
 
         <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/admin-home" element={<AdminDashboard />} />
-        <Route path="/trip-booking" element={<TripBooking />} />
+        <Route path="/admin-home" element={<AdminDashboard />} >
+          <Route path="users-list" element={<UsersList />} />
+          <Route path="dashboard" element={<Dashboard />} />
+
+        </Route>
+        <Route path="/users-list" element={<UsersList />} />
 
 
 
