@@ -35,7 +35,7 @@ const UserLogin = () => {
 
                         if (userType === 'bus_owner') {
                             navigate('/busowner-home');
-                        } else if (userType === 'normal') {
+                        } else if (userType === 'normal_user') {
                             navigate('/user_home');
                         }
                     } else {
