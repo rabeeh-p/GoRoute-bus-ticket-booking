@@ -67,12 +67,32 @@ class LoginView(APIView):
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
         
-        if hasattr(user, 'bus_owner'):
-            bus_owner = user.bus_owner.first()
-            if bus_owner and not bus_owner.is_approved:
-                return Response({"error": "Your account is pending approval. Please wait for admin approval."}, status=status.HTTP_403_FORBIDDEN)
+        # if hasattr(user, 'bus_owner'):
+        #     bus_owner = user.bus_owner.first()
+        #     if bus_owner and not bus_owner.is_approved:
+        #         return Response({"error": "Your account is pending approval. Please wait for admin approval."}, status=status.HTTP_403_FORBIDDEN)
+        #     user_type = 'bus_owner'
+        
+        # else:
+        #     user_type = 'normal_user'
+
+        user_role = user.role
+
+        # Handle the different roles (Super Admin, Bus Owner, or Normal User)
+        if user_role == 'bus_owner':
+            # Check if bus_owner is approved
+            try:
+                bus_owner = user.bus_owner.first()
+                if bus_owner and not bus_owner.is_approved:
+                    return Response({"error": "Your account is pending approval. Please wait for admin approval."}, status=status.HTTP_403_FORBIDDEN)
+            except BusOwnerModel.DoesNotExist:
+                return Response({"error": "Bus owner data not found."}, status=status.HTTP_400_BAD_REQUEST)
+            
             user_type = 'bus_owner'
         
+        elif user_role == 'super_admin':
+            user_type = 'super_admin'
+
         else:
             user_type = 'normal_user'
 
