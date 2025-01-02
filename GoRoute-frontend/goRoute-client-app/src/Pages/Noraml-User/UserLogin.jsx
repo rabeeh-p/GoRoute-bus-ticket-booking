@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import Navbar from '../../Components/Normal/Navbar';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';   
-import { setUserType,setToken } from '../../slice/userSlicer';
+import { useDispatch } from 'react-redux';
+import { setUserType, setToken } from '../../slice/userSlicer';
 import axios from 'axios';
 
 const UserLogin = () => {
@@ -10,13 +10,13 @@ const UserLogin = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const dispatch = useDispatch();  
+    const dispatch = useDispatch();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(username,'user');
-        console.log(password,'pass');
-        
+        console.log(username, 'user');
+        console.log(password, 'pass');
+
 
         if (!username || !password) {
             setError('Please fill in all fields');
@@ -43,7 +43,11 @@ const UserLogin = () => {
                     }
                 })
                 .catch((error) => {
-                    setError('Something went wrong. Please try again later.');
+                    if (error.response && error.response.data.error) {
+                        setError(error.response.data.error);
+                    } else {
+                        setError('Something went wrong. Please try again later.');
+                    }
                     console.error(error);
                 });
 
@@ -51,6 +55,9 @@ const UserLogin = () => {
             setUsername('');
             setPassword('');
         }
+
+
+
     }
 
     return (
@@ -118,15 +125,44 @@ const UserLogin = () => {
                                 </div>
                             </div>
 
-                            <div className="mt-6 grid grid-cols-2 gap-3">
-                                 
+                            <div className="mt-6 space-y-3">
+                                {/* Google Button */}
+                                <button
+                                    type="button"
+                                    className="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+                                >
+                                    <svg
+                                        className="w-5 h-5 mr-2"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        aria-hidden="true"
+                                        focusable="false"
+                                        viewBox="0 0 488 512"
+                                    >
+                                        <path
+                                            fill="currentColor"
+                                            d="M488 261.8c0 141.4-115.3 256-256 256S-24 403.3-24 261.8 91.3 5.8 232.3 5.8c63.7 0 117.4 21.9 160.8 57.8L318.8 141C294.7 122.5 260.9 108 232.3 108c-97.8 0-176.9 79-176.9 176s79 176 176.9 176c95.5 0 154.7-61.5 162-120H232.3v-88.2h255.7v8.2z"
+                                        />
+                                    </svg>
+                                    Continue with Google
+                                </button>
+
+                                {/* Register Button */}
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/signUp')}
+                                    className="w-full flex items-center justify-center py-2 px-4 border border-transparent rounded-md shadow-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                >
+                                    Create an Account
+                                </button>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
     );
+
 
 }
 
