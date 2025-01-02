@@ -44,3 +44,11 @@ class NormalUserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+
+
+class OTP(models.Model):
+    username = models.CharField(max_length=150)   
+    otp_code = models.CharField(max_length=6)   
+    created_at = models.DateTimeField(auto_now_add=True)   
+    verified = models.BooleanField(default=False) 

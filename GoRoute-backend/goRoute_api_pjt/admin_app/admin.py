@@ -6,4 +6,5 @@ from .models import *
 admin.site.register(CustomUser)
 admin.site.register(BusOwnerModel)
 admin.site.register(NormalUserProfile)
+admin.site.register(OTP)
 

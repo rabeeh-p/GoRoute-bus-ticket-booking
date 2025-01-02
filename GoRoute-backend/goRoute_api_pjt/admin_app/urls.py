@@ -11,6 +11,7 @@ urlpatterns = [
 
     path('register/', UserSignupView.as_view(), name='register'),
     path('otp/', OtpVerificationView.as_view(), name='otp'),
+    
 
     path('admin-login/', AdminLoginView.as_view(), name='admin-login'),
 

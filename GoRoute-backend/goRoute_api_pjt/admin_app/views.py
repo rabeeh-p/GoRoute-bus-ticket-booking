@@ -13,6 +13,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 import random
 import time
+from django.utils import timezone
+from datetime import timedelta
+
+
 # Create your views here.
 
 def hello(request):
@@ -107,21 +111,19 @@ class AdminLoginView(APIView):
 class UserSignupView(APIView):
     def post(self, request):
         serializer = UserSignupSerializer(data=request.data)
-        print(serializer,'seria')
-
         if not serializer.is_valid():
             return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         user_data = serializer.validated_data
-        print(user_data,'data')
         user_data['date_of_birth'] = user_data['date_of_birth'].strftime('%Y-%m-%d')
-        request.session['user_data'] = user_data   
-        request.session['email'] = user_data['email']
-        request.session['username'] = user_data['username']
 
         otp_code = random.randint(100000, 999999)
-        request.session['otp_code'] = otp_code
-        request.session['otp_time'] = time.time()   
+
+        otp_entry = OTP.objects.create(
+            username=user_data['username'],
+            otp_code=str(otp_code),
+            verified=False   
+        )
 
         send_mail(
             subject="Your OTP for Registration",
@@ -129,7 +131,6 @@ class UserSignupView(APIView):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user_data['email']],
         )
-
 
         return Response({"message": "OTP sent to your email. Please verify."}, status=status.HTTP_200_OK)
 
@@ -139,39 +140,54 @@ class UserSignupView(APIView):
 class OtpVerificationView(APIView):
     def post(self, request):
         otp = request.data.get("otp")
-        session_otp = request.session.get('otp_code')
-        session_time = request.session.get('otp_time')
+        username = request.data.get("username")
+        email = request.data.get("email")
+        password = request.data.get("password")
+        first_name = request.data.get("first_name")
+        last_name = request.data.get("last_name")
+        date_of_birth = request.data.get("date_of_birth")
+        phone_number = request.data.get("phone_number")
+        gender = request.data.get("gender")
 
-        if not otp or not session_otp:
-            return Response({"error": "OTP is required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not otp or not username or not email or not password or not first_name or not last_name or not date_of_birth or not phone_number or not gender:
+            return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if otp != str(session_otp):
-            return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
+        otp_entry = OTP.objects.filter(username=username, otp_code=otp, verified=False).first()
+        
+        if not otp_entry:
+            return Response({"error": "Invalid or expired OTP."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if time.time() - session_time > 300:   
+        if timezone.now() - otp_entry.created_at > timedelta(minutes=5):
+            otp_entry.delete()   
             return Response({"error": "OTP has expired."}, status=status.HTTP_400_BAD_REQUEST)
 
-        user_data = request.session.get('user_data')
-        if not user_data:
-            return Response({"error": "Session expired."}, status=status.HTTP_400_BAD_REQUEST)
+        otp_entry.verified = True
+        otp_entry.save()
+
+        otp_entry.delete()
 
         user = get_user_model().objects.create_user(
-            username=user_data['username'],
-            email=user_data['email'],
-            password=user_data['password'],
+            username=username,
+            email=email,
+            password=password,
         )
-        
+
         profile = NormalUserProfile.objects.create(
             user=user,
-            first_name=user_data['first_name'],
-            last_name=user_data['last_name'],
-            date_of_birth=user_data['date_of_birth'],
-            phone_number=user_data['phone_number'],
-            gender=user_data['gender']
+            first_name=first_name,
+            last_name=last_name,
+            date_of_birth=date_of_birth,
+            phone_number=phone_number,
+            gender=gender
+
         )
 
-        del request.session['user_data']
-        del request.session['otp_code']
-        del request.session['otp_time']
+        return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
 
-        return Response({"message": "User registered successfully."}, status=status.HTTP_201_CREATED)
+
+
+
+
+
+
+
