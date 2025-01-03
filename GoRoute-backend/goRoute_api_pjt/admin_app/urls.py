@@ -15,7 +15,9 @@ urlpatterns = [
 
     path('admin-login/', AdminLoginView.as_view(), name='admin-login'),
 
+    # USERS
     path('user-profiles/', UserProfileListView.as_view(), name='user-profile-list'),
+    path('profile/<int:user_id>/', UserProfileDetailView.as_view(), name='user_profile_detail'),
 
 
 

@@ -18,6 +18,7 @@ from datetime import timedelta
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.exceptions import NotFound
 
 
 # Create your views here.
@@ -217,3 +218,21 @@ class UserProfileListView(APIView):
         profiles = NormalUserProfile.objects.all()
         serializer = NormalUserProfileSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+
+
+class UserProfileDetailView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id, *args, **kwargs):
+        print('is working')
+        try:
+            
+            profile = NormalUserProfile.objects.get(user__id=user_id)
+            serializer = NormalUserProfileSerializer(profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except NormalUserProfile.DoesNotExist:
+            raise NotFound("User profile not found.")
