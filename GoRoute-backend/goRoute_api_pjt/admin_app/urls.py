@@ -25,6 +25,7 @@ urlpatterns = [
     path('approved-bus-owners/', ApprovedBusOwnersView.as_view(), name='approved_bus_owners'),
     path('bus-owner-requests/', BusOwnerRequestListView.as_view(), name='bus-owner-requests'),
     path('bus-owner-details/<int:id>/', BusOwnerDetailView.as_view(), name='bus-owner-details'),
+    path('accept-bus-owner/<int:id>/', AcceptBusOwnerView.as_view(), name='accept-bus-owner'),
 
 
 

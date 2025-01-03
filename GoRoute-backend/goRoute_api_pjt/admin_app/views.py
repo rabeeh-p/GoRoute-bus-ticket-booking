@@ -304,6 +304,39 @@ class BusOwnerDetailView(APIView):
         
 
 
+class AcceptBusOwnerView(APIView):
+    authentication_classes = [JWTAuthentication]  
+    permission_classes = [IsAuthenticated]  
+
+
+    def post(self, request, id, *args, **kwargs):
+        
+        try:
+            print('acpet is working')
+            user = CustomUser.objects.get(id=id)
+
+            bus_owner = BusOwnerModel.objects.get(user=user)
+            print(bus_owner,'buss3')
+
+            bus_owner.is_approved = True   
+            bus_owner.save()
+
+            return Response(
+                {"message": f"Bus owner request for {bus_owner.travel_name} has been accepted."},
+                status=status.HTTP_200_OK
+            )
+
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        except BusOwnerModel.DoesNotExist:
+            return Response({"error": "Bus owner not found for this user."}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response(
+                {"error": f"An unexpected error occurred: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 

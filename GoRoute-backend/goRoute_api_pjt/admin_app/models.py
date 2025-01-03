@@ -20,7 +20,9 @@ class CustomUser(AbstractUser):
 
 
 class BusOwnerModel(models.Model):  
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,related_name='bus_owner')
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='bus_owner')
+
+    
     travel_name = models.CharField(max_length=100, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
     contact_number = models.CharField(max_length=15, blank=True, null=True)
