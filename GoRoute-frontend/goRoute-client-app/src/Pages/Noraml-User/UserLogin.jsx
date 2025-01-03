@@ -34,7 +34,7 @@ const UserLogin = () => {
                         localStorage.setItem('userType', userType);
 
                         if (userType === 'bus_owner') {
-                            navigate('/busowner-home');
+                            navigate('/busowner-dashboard/busowner-dashboard2');
                         } else if (userType === 'normal_user') {
                             navigate('/user_home');
                         }

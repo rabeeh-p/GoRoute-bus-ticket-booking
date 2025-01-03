@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Pages/Noraml-User/Home'
 import AdminLogin from './Pages/Admin/AdminLogin';
 import AdminDashboard from './Pages/Admin/AdminDashboard';
-import BusOwner_Home from './Pages/Bus_owners/BusOwner_Home';
 import UserLogin from './Pages/Noraml-User/UserLogin';
 import SignUp from './Pages/Noraml-User/SignUp';
 import OTPVerification from './Pages/Noraml-User/OTPVerification';
@@ -14,9 +13,12 @@ import UserDetails from './Pages/Admin/UserDetails';
 import BusOwnersList from './Pages/Admin/BusOwnersList';
 import RequestBusOwner from './Pages/Admin/RequestBusOwner';
 import BusOwnerDetails from './Pages/Admin/BusOwnerDetails';
+import BusOwnerDashboard from './Pages/Bus_owners/BusOwnerDashboard';
+import BDashboard from './Pages/Bus_owners/BDashboard';
+import OwnerProfile from './Pages/Bus_owners/OwnerProfile';
 function App() {
-  
-  
+
+
   return (
     <BrowserRouter>
 
@@ -40,12 +42,17 @@ function App() {
 
 
         </Route>
+
         <Route path="/users-list" element={<UsersList />} />
 
 
 
 
-        <Route path="/busowner-home" element={<BusOwner_Home />} />
+        <Route path="/busowner-dashboard" element={<BusOwnerDashboard />} >
+          <Route path="busowner-dashboard2" element={<BDashboard />} />
+          <Route path="owner-profile" element={<OwnerProfile />} />
+
+        </Route>
       </Routes>
 
 
