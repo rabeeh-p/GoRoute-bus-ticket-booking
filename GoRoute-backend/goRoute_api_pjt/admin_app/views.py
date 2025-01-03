@@ -236,3 +236,28 @@ class UserProfileDetailView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except NormalUserProfile.DoesNotExist:
             raise NotFound("User profile not found.")
+        
+
+
+
+class ToggleUserStatusView(APIView):
+    authentication_classes = [JWTAuthentication]   
+    permission_classes = [IsAuthenticated]   
+
+    def post(self, request, user_id):
+        try:
+            user_profile = NormalUserProfile.objects.get(user__id=user_id)
+
+            user_profile.status = not user_profile.status
+            user_profile.save()
+
+            return Response(
+                {"status": user_profile.status, "message": "User status updated successfully!"},
+                status=status.HTTP_200_OK
+            )
+
+        except NormalUserProfile.DoesNotExist:
+            return Response(
+                {"error": "User profile not found!"},
+                status=status.HTTP_404_NOT_FOUND
+            )

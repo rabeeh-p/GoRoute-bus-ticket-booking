@@ -18,6 +18,7 @@ urlpatterns = [
     # USERS
     path('user-profiles/', UserProfileListView.as_view(), name='user-profile-list'),
     path('profile/<int:user_id>/', UserProfileDetailView.as_view(), name='user_profile_detail'),
+    path('toggle-status/<int:user_id>/', ToggleUserStatusView.as_view(), name='toggle_user_status'),
 
 
 
