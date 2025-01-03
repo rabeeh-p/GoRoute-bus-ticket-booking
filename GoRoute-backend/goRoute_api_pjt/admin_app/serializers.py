@@ -38,7 +38,7 @@ class BusOwnerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BusOwnerModel
-        fields = ['user', 'travel_name', 'address', 'contact_number']
+        fields = ['user', 'travel_name', 'address', 'contact_number','logo_image']
 
     def validate_travel_name(self, value):
         if len(value) < 3:

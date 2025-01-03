@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'admin_app',
+    'bus_owner_app'
 ]
 
 MIDDLEWARE = [

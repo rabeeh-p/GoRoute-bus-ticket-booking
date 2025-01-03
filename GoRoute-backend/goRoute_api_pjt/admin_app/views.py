@@ -74,7 +74,7 @@ class LoginView(APIView):
 
         if user_role == 'bus_owner':
             try:
-                bus_owner = user.bus_owner.first()
+                bus_owner = user.bus_owner
                 if bus_owner and not bus_owner.is_approved:
                     return Response({"error": "Your account is pending approval. Please wait for admin approval."}, status=status.HTTP_403_FORBIDDEN)
             except BusOwnerModel.DoesNotExist:
