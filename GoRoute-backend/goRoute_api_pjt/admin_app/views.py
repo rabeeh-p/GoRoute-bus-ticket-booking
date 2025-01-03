@@ -70,21 +70,9 @@ class LoginView(APIView):
         if user is None:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        
-        # if hasattr(user, 'bus_owner'):
-        #     bus_owner = user.bus_owner.first()
-        #     if bus_owner and not bus_owner.is_approved:
-        #         return Response({"error": "Your account is pending approval. Please wait for admin approval."}, status=status.HTTP_403_FORBIDDEN)
-        #     user_type = 'bus_owner'
-        
-        # else:
-        #     user_type = 'normal_user'
-
         user_role = user.role
 
-        # Handle the different roles (Super Admin, Bus Owner, or Normal User)
         if user_role == 'bus_owner':
-            # Check if bus_owner is approved
             try:
                 bus_owner = user.bus_owner.first()
                 if bus_owner and not bus_owner.is_approved:
@@ -131,6 +119,8 @@ class AdminLoginView(APIView):
     
 
 
+
+# -------------------- ADMIN USER SECTION------------------------------------------------
 
 class UserSignupView(APIView):
     def post(self, request):
@@ -261,3 +251,63 @@ class ToggleUserStatusView(APIView):
                 {"error": "User profile not found!"},
                 status=status.HTTP_404_NOT_FOUND
             )
+        
+
+# --------------------------------- ADMIN USER SECTION END -----------------------
+
+
+
+
+# ---------------------- BUS OWNER SECTION -----------------------------------------
+
+class ApprovedBusOwnersView(APIView):
+    authentication_classes = [JWTAuthentication]   
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        approved_bus_owners = BusOwnerModel.objects.filter(is_approved=True)
+        
+        serializer = BusOwnerSerializer2(approved_bus_owners, many=True)
+        
+        return Response(serializer.data)
+    
+
+
+class BusOwnerRequestListView(APIView):
+    authentication_classes = [JWTAuthentication]   
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        bus_owners = BusOwnerModel.objects.filter(is_approved=False)  
+        serializer = BusOwnerSerializer2(bus_owners, many=True)  
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class BusOwnerDetailView(APIView):
+    authentication_classes = [JWTAuthentication]  
+    permission_classes = [IsAuthenticated]  
+
+   
+    def get(self, request, id, *args, **kwargs):
+        try:
+            user = CustomUser.objects.get(id=id)
+            bus_owner = BusOwnerModel.objects.get(user=user)
+            serializer = BusOwnerSerializer2(bus_owner)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        except BusOwnerModel.DoesNotExist:
+            return Response({"error": "Bus owner not found for this user"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+
+
+
+
+
+
+# ------------------------------------ BUS OWNER SECTION END --------------------------

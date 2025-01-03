@@ -21,6 +21,12 @@ urlpatterns = [
     path('toggle-status/<int:user_id>/', ToggleUserStatusView.as_view(), name='toggle_user_status'),
 
 
+    # BUS
+    path('approved-bus-owners/', ApprovedBusOwnersView.as_view(), name='approved_bus_owners'),
+    path('bus-owner-requests/', BusOwnerRequestListView.as_view(), name='bus-owner-requests'),
+    path('bus-owner-details/<int:id>/', BusOwnerDetailView.as_view(), name='bus-owner-details'),
+
+
 
     path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),

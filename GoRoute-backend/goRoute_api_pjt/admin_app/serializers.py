@@ -94,3 +94,12 @@ class NormalUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = NormalUserProfile
         fields = ['user', 'first_name', 'last_name', 'phone_number', 'profile_picture', 'date_of_birth', 'gender','status']
+
+
+
+
+
+class BusOwnerSerializer2(serializers.ModelSerializer):
+    class Meta:
+        model = BusOwnerModel
+        fields = ['user','travel_name', 'address', 'contact_number', 'logo_image', 'created_date']
