@@ -11,6 +11,9 @@ import TripBooking from './Pages/Noraml-User/TripBooking';
 import UsersList from './Pages/Admin/UsersList';
 import Dashboard from './Pages/Admin/Dashboard';
 import UserDetails from './Pages/Admin/UserDetails';
+import BusOwnersList from './Pages/Admin/BusOwnersList';
+import RequestBusOwner from './Pages/Admin/RequestBusOwner';
+import BusOwnerDetails from './Pages/Admin/BusOwnerDetails';
 function App() {
   
   
@@ -31,6 +34,9 @@ function App() {
           <Route path="users-list" element={<UsersList />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="user-details/:id" element={<UserDetails />} />
+          <Route path="busowners-list" element={<BusOwnersList />} />
+          <Route path="request-busowner" element={<RequestBusOwner />} />
+          <Route path="busowner-details/:id" element={<BusOwnerDetails />} />
 
 
         </Route>

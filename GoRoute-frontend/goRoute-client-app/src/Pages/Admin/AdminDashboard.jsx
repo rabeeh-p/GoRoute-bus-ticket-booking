@@ -6,6 +6,10 @@ import { useNavigate } from "react-router-dom";
 import UsersList from "./UsersList";  
 import Dashboard from "./Dashboard";
 import UserDetails from "./UserDetails";
+import BusOwners_list from "./BusOwnersList";
+import BusOwnersList from "./BusOwnersList";
+import RequestBusOwner from "./RequestBusOwner";
+import BusOwnerDetails from "./BusOwnerDetails";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -61,6 +65,22 @@ const AdminDashboard = () => {
                   Users List
                 </a>
               </li>
+              <li>
+                <a
+                  onClick={() => navigate('/admin-home/busowners-list')} 
+                  className="block py-2 px-4 hover:bg-red-700 rounded-lg transition duration-300"
+                >
+                  Bus owners list
+                </a>
+              </li>
+              <li>
+                <a
+                  onClick={() => navigate('/admin-home/request-busowner')} 
+                  className="block py-2 px-4 hover:bg-red-700 rounded-lg transition duration-300"
+                >
+                  Requests 
+                </a>
+              </li>
              
             </ul>
           </nav>
@@ -69,15 +89,15 @@ const AdminDashboard = () => {
         {/* Main Content */}
         <main className="flex-1 p-6">
           <div className="text-gray-800">
-            <h1 className="text-3xl font-bold mb-6">Welcome to the Admin Panel</h1>
-            <p className="text-lg">
-              Use the sidebar to navigate through the different sections of the admin panel.
-            </p>
+            
 
             <Routes>
               <Route path="users-list" element={<UsersList />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="user-details/:id" element={<UserDetails />} />
+              <Route path="busowners-list" element={<BusOwnersList />} />
+              <Route path="request-busowner" element={<RequestBusOwner />} />
+              <Route path="busowner-details/:id" element={<BusOwnerDetails />} />
             </Routes>
           </div>
         </main>

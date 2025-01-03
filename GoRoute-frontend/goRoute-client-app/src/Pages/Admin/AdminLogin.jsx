@@ -29,7 +29,7 @@ const AdminLogin = () => {
       localStorage.setItem("refreshToken", refresh);
 
       if (user_type === "super_admin") {
-        window.location.href = "/admin-home";  
+        window.location.href = "admin-home/dashboard";  
       }
     } catch (err) {
       console.error(err);
