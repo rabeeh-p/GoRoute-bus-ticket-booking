@@ -78,7 +78,7 @@ const UsersList = () => {
                 <td className="px-6 py-4 text-sm text-gray-900">{user.gender}</td>
                 <td className="px-6 py-4 text-sm">
                   <button
-                    onClick={() => navigate(`/user-details/${user.user}`)}
+                    onClick={() => navigate(`/admin-home/user-details/${user.user}`)} 
                     className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg"
                   >
                     View Details

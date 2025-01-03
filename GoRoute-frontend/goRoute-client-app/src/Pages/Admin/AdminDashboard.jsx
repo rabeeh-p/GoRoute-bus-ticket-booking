@@ -5,6 +5,7 @@ import { clearUserData } from "../../slice/userSlicer";
 import { useNavigate } from "react-router-dom";  
 import UsersList from "./UsersList";  
 import Dashboard from "./Dashboard";
+import UserDetails from "./UserDetails";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -60,6 +61,7 @@ const AdminDashboard = () => {
                   Users List
                 </a>
               </li>
+             
             </ul>
           </nav>
         </aside>
@@ -75,6 +77,7 @@ const AdminDashboard = () => {
             <Routes>
               <Route path="users-list" element={<UsersList />} />
               <Route path="dashboard" element={<Dashboard />} />
+              <Route path="user-details/:id" element={<UserDetails />} />
             </Routes>
           </div>
         </main>

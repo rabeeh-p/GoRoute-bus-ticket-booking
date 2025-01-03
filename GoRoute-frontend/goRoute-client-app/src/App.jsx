@@ -10,6 +10,7 @@ import OTPVerification from './Pages/Noraml-User/OTPVerification';
 import TripBooking from './Pages/Noraml-User/TripBooking';
 import UsersList from './Pages/Admin/UsersList';
 import Dashboard from './Pages/Admin/Dashboard';
+import UserDetails from './Pages/Admin/UserDetails';
 function App() {
   
   
@@ -29,6 +30,8 @@ function App() {
         <Route path="/admin-home" element={<AdminDashboard />} >
           <Route path="users-list" element={<UsersList />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="user-details/:id" element={<UserDetails />} />
+
 
         </Route>
         <Route path="/users-list" element={<UsersList />} />
