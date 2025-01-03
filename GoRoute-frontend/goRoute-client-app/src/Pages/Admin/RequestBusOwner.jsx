@@ -9,6 +9,7 @@ const RequestBusOwner = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedOwner, setSelectedOwner] = useState(null);
   const navigate = useNavigate();
+  console.log(busOwners,'busowner idddd issue')
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -34,6 +35,8 @@ const RequestBusOwner = () => {
   }, [navigate]);
 
   const handleAccept = (ownerId) => {
+    console.log(ownerId,'iddddd');
+    
     setSelectedOwner(ownerId);
     setShowConfirmModal(true);
   };
@@ -47,7 +50,7 @@ const RequestBusOwner = () => {
 
     axiosInstance
       .post(
-        `/accept-bus-owner/${selectedOwner}/`,
+        `accept-bus-owner/${selectedOwner}/`,
         {},
         {
           headers: {
@@ -57,7 +60,7 @@ const RequestBusOwner = () => {
       )
       .then((response) => {
         setBusOwners((prevOwners) =>
-          prevOwners.filter((owner) => owner.id !== selectedOwner)
+          prevOwners.filter((owner) => owner.user !== selectedOwner)
         );
         setShowConfirmModal(false);
       })
@@ -106,7 +109,7 @@ const RequestBusOwner = () => {
                 <td className="px-4 py-2 border">{new Date(owner.created_date).toLocaleDateString()}</td>
                 <td className="px-4 py-2 border">
                   <button
-                    onClick={() => handleAccept(owner.id)}
+                    onClick={() => handleAccept(owner.user)}
                     className="px-4 py-2 bg-green-500 text-white rounded-lg"
                   >
                     Accept
