@@ -16,6 +16,7 @@ from pathlib import Path
 
 from decouple import config
 
+from datetime import timedelta
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -68,6 +69,13 @@ REST_FRAMEWORK = {
 }
 
 
+SIMPLE_JWT = {
+    # 'ACCESS_TOKEN_LIFETIME': timedelta(hours=12),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+
 ROOT_URLCONF = 'goRoute_api_pjt.urls'
 
 TEMPLATES = [
@@ -96,11 +104,11 @@ WSGI_APPLICATION = 'goRoute_api_pjt.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),       # Replace with your PostgreSQL database name
-        'USER': config('DB_USER'),       # Replace with your PostgreSQL username
-        'PASSWORD': config('DB_PASSWORD'),  # Replace with your PostgreSQL password
-        'HOST': config('DB_HOST'),         # Default to localhost
-        'PORT': config('DB_PORT', default=5432),              # Default PostgreSQL port
+        'NAME': config('DB_NAME'),        
+        'USER': config('DB_USER'),       
+        'PASSWORD': config('DB_PASSWORD'),   
+        'HOST': config('DB_HOST'),          
+        'PORT': config('DB_PORT', default=5432),              
     }
 }
 

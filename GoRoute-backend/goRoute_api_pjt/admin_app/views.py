@@ -16,6 +16,9 @@ import time
 from django.utils import timezone
 from datetime import timedelta
 
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 
 # Create your views here.
 
@@ -207,7 +210,10 @@ class OtpVerificationView(APIView):
 
 
 
-
-
-
-
+class UserProfileListView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        profiles = NormalUserProfile.objects.all()
+        serializer = NormalUserProfileSerializer(profiles, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

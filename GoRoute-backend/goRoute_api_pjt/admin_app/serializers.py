@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import BusOwnerModel
+from .models import *
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueValidator
 
@@ -87,3 +87,10 @@ class UserSignupSerializer(serializers.Serializer):
             representation['date_of_birth'] = representation['date_of_birth'].strftime('%Y-%m-%d')
         return representation
     
+
+
+
+class NormalUserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NormalUserProfile
+        fields = ['user', 'first_name', 'last_name', 'phone_number', 'profile_picture', 'date_of_birth', 'gender']
