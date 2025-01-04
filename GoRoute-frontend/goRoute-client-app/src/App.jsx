@@ -16,6 +16,7 @@ import BusOwnerDetails from './Pages/Admin/BusOwnerDetails';
 import BusOwnerDashboard from './Pages/Bus_owners/BusOwnerDashboard';
 import BDashboard from './Pages/Bus_owners/BDashboard';
 import OwnerProfile from './Pages/Bus_owners/OwnerProfile';
+import BSignUp from './Pages/Bus_owners/BSignUp';
 function App() {
 
 
@@ -46,7 +47,7 @@ function App() {
         <Route path="/users-list" element={<UsersList />} />
 
 
-
+        <Route path="/b-signup" element={<BSignUp />} />
 
         <Route path="/busowner-dashboard" element={<BusOwnerDashboard />} >
           <Route path="busowner-dashboard2" element={<BDashboard />} />

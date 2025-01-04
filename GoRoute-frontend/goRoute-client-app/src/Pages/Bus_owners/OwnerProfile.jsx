@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axiosInstance from './../../axios/axios';  // Your axios instance
-import { useNavigate } from 'react-router-dom';  // Use navigate hook
+import axiosInstance from './../../axios/axios';   
+import { useNavigate } from 'react-router-dom';   
 
 const OwnerProfile = () => {
     const navigate = useNavigate();
@@ -14,13 +14,11 @@ const OwnerProfile = () => {
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken');
 
-        // Check if access token is available, if not redirect to login
         if (!accessToken) {
             navigate('/admin-login');
             return;
         }
 
-        // Fetch owner data
         axiosInstance.get('bus-owner-detail/', {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -32,18 +30,16 @@ const OwnerProfile = () => {
             })
             .catch(err => {
                 if (err.response && err.response.status === 401) {
-                    // If token is expired, clear local storage and redirect to login
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('refreshToken');
                     navigate('/login');
                     setError('Session expired. Please log in again.');
                 } else {
-                    // Other errors
                     setError('Failed to fetch owner data');
                 }
                 setLoading(false);
             });
-    }, [navigate]); // Dependency array to re-run on navigate changes
+    }, [navigate]);  
 
     if (loading) {
         return <div>Loading...</div>;

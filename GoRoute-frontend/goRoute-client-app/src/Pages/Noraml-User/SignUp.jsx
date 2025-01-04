@@ -221,6 +221,12 @@ const SignUp = () => {
                         >
                             Sign up
                         </button>
+                        <button
+                        onClick={()=>navigate('/b-signup')}
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-500 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                        >
+                            Bus owner
+                        </button>
                     </form>
                 </div>
             </div>
