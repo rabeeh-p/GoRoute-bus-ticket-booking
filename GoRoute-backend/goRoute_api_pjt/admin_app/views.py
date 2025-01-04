@@ -41,6 +41,9 @@ class UserAndBusOwnerRegisterView(APIView):
     def post(self, request):
         user_data = request.data.get('user')
         bus_owner_data = request.data.get('bus_owner')
+        print("Request data:", request.data)
+        
+
 
         user_serializer = CustomUserSerializer(data=user_data)
         if user_serializer.is_valid():
@@ -147,6 +150,7 @@ class UserSignupView(APIView):
         )
 
         return Response({"message": "OTP sent to your email. Please verify."}, status=status.HTTP_200_OK)
+
 
 
 
