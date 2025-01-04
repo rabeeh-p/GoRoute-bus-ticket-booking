@@ -62,7 +62,7 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <button onClick={() => navigate('/profile')} className="hidden md:block bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
+                <button onClick={() => navigate('/profile-dashboard/user-dashboard')} className="hidden md:block bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
                   Profile
                 </button>
                 <button onClick={handleLogout} className="hidden md:block bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">

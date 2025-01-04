@@ -17,6 +17,8 @@ import BusOwnerDashboard from './Pages/Bus_owners/BusOwnerDashboard';
 import BDashboard from './Pages/Bus_owners/BDashboard';
 import OwnerProfile from './Pages/Bus_owners/OwnerProfile';
 import BSignUp from './Pages/Bus_owners/BSignUp';
+import ProfileDashboard from './Pages/Noraml-User/Profile/ProfileDashboard';
+import UserDashboard from './Pages/Noraml-User/Profile/UserDashboard';
 function App() {
 
 
@@ -28,6 +30,15 @@ function App() {
         <Route path="/login" element={<UserLogin />} />
         <Route path="/signUp" element={<SignUp />} />
         <Route path="/otp" element={<OTPVerification />} />
+
+        {/* USER PROFILE SECTION */}
+
+        <Route path="/profile-dashboard" element={<ProfileDashboard />} >
+
+          <Route path="user-dashboard" element={<UserDashboard />} />
+        </Route>
+
+
 
         <Route path="/trip-booking" element={<TripBooking />} />
 
