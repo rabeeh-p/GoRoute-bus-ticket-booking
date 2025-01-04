@@ -39,12 +39,10 @@ class GoogleLoginAPIView(APIView):
 
     def post(self, request):
         token = request.data.get("token")
-        print('token',token)
         client_id = config('SOCIAL_AUTH_GOOGLE_CLIENT_ID')   
         
         try:
             idinfo = id_token.verify_oauth2_token(token, requests.Request(), client_id)
-            print('info',idinfo)
             email = idinfo['email']
             name = idinfo['name']
 
