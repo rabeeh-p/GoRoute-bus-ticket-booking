@@ -9,3 +9,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = NormalUserProfile
         fields = ['user', 'first_name', 'last_name', 'phone_number', 'profile_picture', 'date_of_birth', 'gender', 'status']
+
+
+
+
+
