@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUserType, setToken } from '../../slice/userSlicer';
 import axios from 'axios';
+import { GoogleLogin } from '@react-oauth/google';
 
 const UserLogin = () => {
     const [username, setUsername] = useState('');
@@ -59,6 +60,62 @@ const UserLogin = () => {
 
 
     }
+
+   
+    
+    // const handleGoogleLogin = async (response) => {
+    //     const idToken = response.credential;
+    //     console.log(idToken); // Log the token to verify it's valid
+     
+    //     try {
+    //         const res = await axios.post("http://127.0.0.1:8000/google-login/", { token: idToken });
+    //         if (res.status === 200) {
+    //             console.log("Google login successful:", res.data);
+    //             // Handle successful login (dispatching state, redirect, etc.)
+    //         } else {
+    //             console.error("Google login failed:", res.data.error);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error during Google login:", error.response ? error.response.data : error);
+    //         // Show an error message to the user
+    //     }
+    // };
+    
+    const handleGoogleLogin = async (response) => {
+        const idToken = response.credential;
+        console.log(idToken); // Log the token to verify it's valid
+    
+        try {
+            const res = await axios.post("http://127.0.0.1:8000/google-login/", { token: idToken });
+            if (res.status === 200) {
+                console.log("Google login successful:", res.data);
+    
+                // Dispatch actions to update Redux state
+                dispatch(setToken({ token: res.data.tokens.access }));
+                dispatch(setUserType({ userType: 'normal_user' }));
+
+                console.log('acces token',res.data.tokens.access);
+                console.log('type',res.data.user.user_type);
+                
+    
+                // Save the token and user info in localStorage (optional)
+                localStorage.setItem("accessToken", res.data.tokens.access);
+                localStorage.setItem("refresh_token", res.data.tokens.refresh);
+                localStorage.setItem("userType",'normal_user' );
+                // localStorage.setItem("user_info", JSON.stringify(res.data.user));
+    
+                // Redirect to the dashboard or home page
+                navigate('/') // Or your desired route
+            } else {
+                console.error("Google login failed:", res.data.error);
+            }
+        } catch (error) {
+            console.error("Error during Google login:", error.response ? error.response.data : error);
+            // Show an error message to the user
+        }
+    };
+   
+    
 
     return (
         <div>
@@ -127,24 +184,14 @@ const UserLogin = () => {
 
                             <div className="mt-6 space-y-3">
                                 {/* Google Button */}
-                                <button
-                                    type="button"
-                                    className="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
-                                >
-                                    <svg
-                                        className="w-5 h-5 mr-2"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        aria-hidden="true"
-                                        focusable="false"
-                                        viewBox="0 0 488 512"
-                                    >
-                                        <path
-                                            fill="currentColor"
-                                            d="M488 261.8c0 141.4-115.3 256-256 256S-24 403.3-24 261.8 91.3 5.8 232.3 5.8c63.7 0 117.4 21.9 160.8 57.8L318.8 141C294.7 122.5 260.9 108 232.3 108c-97.8 0-176.9 79-176.9 176s79 176 176.9 176c95.5 0 154.7-61.5 162-120H232.3v-88.2h255.7v8.2z"
-                                        />
-                                    </svg>
-                                    Continue with Google
-                                </button>
+                                {/* Google Login Button */}
+                                <GoogleLogin
+                                    onSuccess={handleGoogleLogin}
+                                    onError={() => console.log('Google login failed')}
+                                    useOneTap
+                                    clientId="95471622345-6mrooku1asdkjvraoqdr18k4jfo5gakf.apps.googleusercontent.com"
+                                    redirectUri="http://localhost:3000/callback"
+                                />
 
                                 {/* Register Button */}
                                 <button
