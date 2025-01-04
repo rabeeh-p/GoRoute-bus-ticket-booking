@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { clearUserData } from '../../../slice/userSlicer';
 
 const menuItems = [
-  { icon: FaUser, text: 'Profile', path: '/' },
+  { icon: FaUser, text: 'Profile', path: '/profile-dashboard/profile' },
   { icon: FaTicketAlt, text: 'My Tickets', path: '/tickets' },
   { icon: FaWallet, text: 'Wallet', path: '/wallet' },
   { icon: FaHistory, text: 'Travel History', path: '/history' },
@@ -48,7 +48,7 @@ export default function Sidebar() {
       <div className={`fixed top-0 left-0 h-full bg-white shadow-lg transition-transform duration-300 ease-in-out transform 
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 w-64`}>
         <div className="p-5">
-          <div className="flex items-center justify-center mb-8">
+          <div className="flex items-center justify-center mb-8" onClick={()=>navigate('/profile-dashboard/user-dashboard')}>
             <img
               src="https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg"
               alt="Profile"

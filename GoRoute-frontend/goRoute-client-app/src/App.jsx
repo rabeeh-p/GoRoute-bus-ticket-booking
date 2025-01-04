@@ -19,6 +19,7 @@ import OwnerProfile from './Pages/Bus_owners/OwnerProfile';
 import BSignUp from './Pages/Bus_owners/BSignUp';
 import ProfileDashboard from './Pages/Noraml-User/Profile/ProfileDashboard';
 import UserDashboard from './Pages/Noraml-User/Profile/UserDashboard';
+import ProfileDetails from './Pages/Noraml-User/Profile/ProfileDetails';
 function App() {
 
 
@@ -33,9 +34,10 @@ function App() {
 
         {/* USER PROFILE SECTION */}
 
-        <Route path="/profile-dashboard" element={<ProfileDashboard />} >
+        <Route path="/profile-dashboard/" element={<ProfileDashboard />} >
 
           <Route path="user-dashboard" element={<UserDashboard />} />
+          <Route path="profile" element={<ProfileDetails />} />
         </Route>
 
 
