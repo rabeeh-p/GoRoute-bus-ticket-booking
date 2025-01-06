@@ -39,9 +39,27 @@ def get_bus_stations(request):
 
 class UserAndBusOwnerRegisterView(APIView):
     def post(self, request):
-        user_data = request.data.get('user')
-        bus_owner_data = request.data.get('bus_owner')
-        print("Request data:", request.data)
+        
+
+        user_data = {
+            "username": request.data.get("username"),
+            "password": request.data.get("password"),
+            "role": request.data.get("role"),
+            "email": request.data.get("email"),
+        }
+        bus_owner_data = {
+            "travel_name": request.data.get("travel_name"),
+            "address": request.data.get("address"),
+            "contact_number": request.data.get("contact_number"),
+        }
+
+
+
+        logo_image = request.FILES.get("logo_image")
+        print('lgo image',logo_image)
+
+        if logo_image:
+            bus_owner_data['logo_image'] = logo_image
         
 
 
@@ -58,6 +76,7 @@ class UserAndBusOwnerRegisterView(APIView):
             return Response(bus_owner_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
 
 
 
@@ -348,3 +367,14 @@ class AcceptBusOwnerView(APIView):
 
 
 # ------------------------------------ BUS OWNER SECTION END --------------------------
+
+
+
+
+
+
+
+
+
+
+
