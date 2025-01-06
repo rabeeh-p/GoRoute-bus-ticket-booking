@@ -18,6 +18,7 @@ const AdminDashboard = () => {
     dispatch(clearUserData());
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem('userType');
     navigate("/admin-login");
     
   };

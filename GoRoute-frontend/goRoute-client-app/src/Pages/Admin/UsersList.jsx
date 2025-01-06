@@ -64,15 +64,13 @@ const UsersList = () => {
             {users.map(user => (
               <tr key={user.user} className="border-t">
                 <td className="px-6 py-4 text-sm text-gray-900">
-                  {user.profile_picture ? (
+                  
                      <img
-                     src={`http://127.0.0.1:8000${user.profile_picture}`} 
+                     src={`https://cdn-icons-png.flaticon.com/512/2815/2815428.png`} 
                      alt="Profile"
                      className="w-12 h-12 rounded-full"
                    />
-                  ) : (
-                    <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-white">No Image</div>
-                  )}
+                  
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900">{user.first_name}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{user.gender}</td>

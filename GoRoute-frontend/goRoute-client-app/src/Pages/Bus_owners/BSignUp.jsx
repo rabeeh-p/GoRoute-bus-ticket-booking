@@ -86,6 +86,117 @@ const BusOwnerSignup = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  
+  //   if (!validateForm()) {
+  //     return;
+  //   }
+  
+  //   const payload = {
+  //     user: {
+  //       username: formData.username,
+  //       password: formData.password,
+  //       role: "bus_owner",
+  //       email: formData.email,
+  //     },
+  //     bus_owner: {
+  //       travel_name: formData.travelName,
+  //       address: formData.address,
+  //       contact_number: formData.contactNumber,
+  //     },
+  //   };
+
+  //   console.log(formData.logoImage,'logo imggggggggggggggggg');
+    
+  
+  //   if (formData.logoImage) {
+  //     const formDataWithLogo = new FormData();
+  //     formDataWithLogo.append("user.username", formData.username);
+  //     formDataWithLogo.append("user.password", formData.password);
+  //     formDataWithLogo.append("user.role", "bus_owner");
+  //     formDataWithLogo.append("user.email", formData.email);
+  //     formDataWithLogo.append("bus_owner.travel_name", formData.travelName);
+  //     formDataWithLogo.append("bus_owner.address", formData.address);
+  //     formDataWithLogo.append("bus_owner.contact_number", formData.contactNumber);
+  //     formDataWithLogo.append("bus_owner.logo_image", formData.logoImage);
+  
+
+      
+  //     try {
+  //       setLoading(true);
+  //       const response = await axios.post(
+  //         "http://127.0.0.1:8000/bus_owner/register/",
+  //         formDataWithLogo,
+  //         {
+  //           headers: {
+  //             "Content-Type": "multipart/form-data",
+  //           },
+  //         }
+  //       );
+  
+  //       if (response.status === 201) {
+  //         setSuccessMessage("Registration successful!");
+  //         setErrors({});
+  //         setFormData({
+  //           username: "",
+  //           email: "",
+  //           password: "",
+  //           confirmPassword: "",
+  //           travelName: "",
+  //           address: "",
+  //           contactNumber: "",
+  //           logoImage: null,
+  //         });
+  //         setTimeout(() => navigate("/login"), 2000);
+  //       }
+  //     } catch (error) {
+  //       setErrors({
+  //         general:
+  //           error.response?.status === 400
+  //             ? "Invalid data provided."
+  //             : "Registration failed. Please try again.",
+  //       });
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   } else {
+  //     try {
+  //       setLoading(true);
+  //       const response = await axios.post(
+  //         "http://127.0.0.1:8000/bus_owner/register/",
+  //         payload
+  //       );
+  
+  //       if (response.status === 201) {
+  //         setSuccessMessage("Registration successful!");
+  //         setErrors({});
+  //         setFormData({
+  //           username: "",
+  //           email: "",
+  //           password: "",
+  //           confirmPassword: "",
+  //           travelName: "",
+  //           address: "",
+  //           contactNumber: "",
+  //           logoImage: null,
+  //         });
+  //         setTimeout(() => navigate("/login"), 2000);
+  //       }
+  //     } catch (error) {
+  //       setErrors({
+  //         general:
+  //           error.response?.status === 400
+  //             ? "Invalid data provided."
+  //             : "Registration failed. Please try again.",
+  //       });
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  // };
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -93,106 +204,55 @@ const BusOwnerSignup = () => {
       return;
     }
   
-    const payload = {
-      user: {
-        username: formData.username,
-        password: formData.password,
-        role: "bus_owner",
-        email: formData.email,
-      },
-      bus_owner: {
-        travel_name: formData.travelName,
-        address: formData.address,
-        contact_number: formData.contactNumber,
-      },
-    };
-
-    console.log(formData.logoImage,'logo imggggggggggggggggg');
-    
+    const formDataWithLogo = new FormData();
+    formDataWithLogo.append("username", formData.username);
+    formDataWithLogo.append("password", formData.password);
+    formDataWithLogo.append("role", "bus_owner");
+    formDataWithLogo.append("email", formData.email);
+    formDataWithLogo.append("travel_name", formData.travelName);
+    formDataWithLogo.append("address", formData.address);
+    formDataWithLogo.append("contact_number", formData.contactNumber);
   
     if (formData.logoImage) {
-      const formDataWithLogo = new FormData();
-      formDataWithLogo.append("user.username", formData.username);
-      formDataWithLogo.append("user.password", formData.password);
-      formDataWithLogo.append("user.role", "bus_owner");
-      formDataWithLogo.append("user.email", formData.email);
-      formDataWithLogo.append("bus_owner.travel_name", formData.travelName);
-      formDataWithLogo.append("bus_owner.address", formData.address);
-      formDataWithLogo.append("bus_owner.contact_number", formData.contactNumber);
-      formDataWithLogo.append("bus_owner.logo_image", formData.logoImage);
+      formDataWithLogo.append("logo_image", formData.logoImage);
+    }
   
-
-      
-      try {
-        setLoading(true);
-        const response = await axios.post(
-          "http://127.0.0.1:8000/bus_owner/register/",
-          formDataWithLogo,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-  
-        if (response.status === 201) {
-          setSuccessMessage("Registration successful!");
-          setErrors({});
-          setFormData({
-            username: "",
-            email: "",
-            password: "",
-            confirmPassword: "",
-            travelName: "",
-            address: "",
-            contactNumber: "",
-            logoImage: null,
-          });
-          setTimeout(() => navigate("/login"), 2000);
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        "http://127.0.0.1:8000/bus_owner/register/",
+        formDataWithLogo,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
-      } catch (error) {
-        setErrors({
-          general:
-            error.response?.status === 400
-              ? "Invalid data provided."
-              : "Registration failed. Please try again.",
-        });
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      try {
-        setLoading(true);
-        const response = await axios.post(
-          "http://127.0.0.1:8000/bus_owner/register/",
-          payload
-        );
+      );
   
-        if (response.status === 201) {
-          setSuccessMessage("Registration successful!");
-          setErrors({});
-          setFormData({
-            username: "",
-            email: "",
-            password: "",
-            confirmPassword: "",
-            travelName: "",
-            address: "",
-            contactNumber: "",
-            logoImage: null,
-          });
-          setTimeout(() => navigate("/login"), 2000);
-        }
-      } catch (error) {
-        setErrors({
-          general:
-            error.response?.status === 400
-              ? "Invalid data provided."
-              : "Registration failed. Please try again.",
+      if (response.status === 201) {
+        setSuccessMessage("Registration successful!");
+        setErrors({});
+        setFormData({
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          travelName: "",
+          address: "",
+          contactNumber: "",
+          logoImage: null,
         });
-      } finally {
-        setLoading(false);
+        setTimeout(() => navigate("/login"), 2000);
       }
+    } catch (error) {
+      setErrors({
+        general:
+          error.response?.status === 400
+            ? "Invalid data provided."
+            : "Registration failed. Please try again.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -311,12 +371,12 @@ const BusOwnerSignup = () => {
                   </p>
                 )}
 
-                {/* <input
+                <input
                   type="file"
                   name="logo_image"
                   onChange={handleFileChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                /> */}
+                />
               </div>
 
               <div className="mt-6">
