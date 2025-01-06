@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './Pages/Noraml-User/Home'
 import AdminLogin from './Pages/Admin/AdminLogin';
 import AdminDashboard from './Pages/Admin/AdminDashboard';
@@ -20,6 +20,10 @@ import BSignUp from './Pages/Bus_owners/BSignUp';
 import ProfileDashboard from './Pages/Noraml-User/Profile/ProfileDashboard';
 import UserDashboard from './Pages/Noraml-User/Profile/UserDashboard';
 import ProfileDetails from './Pages/Noraml-User/Profile/ProfileDetails';
+import AdminProtect from './Protect/AdminProtect';
+import NormalUserProtect from './Protect/NormalUserProtect';
+import HomeProtect from './Protect/HomeProtect';
+import BusOwnerProtect from './Protect/BusOwnerProtect';
 function App() {
 
 
@@ -27,15 +31,15 @@ function App() {
     <BrowserRouter>
 
       <Routes>
-        <Route path="/" element={<Home />} />
         <Route path="/login" element={<UserLogin />} />
         <Route path="/signUp" element={<SignUp />} />
         <Route path="/otp" element={<OTPVerification />} />
+        <Route path="/b-signup" element={<BSignUp />} />
 
         {/* USER PROFILE SECTION */}
-
-        <Route path="/profile-dashboard/" element={<ProfileDashboard />} >
-
+        <Route path="/" element={<HomeProtect><Home /></HomeProtect>} />
+        <Route path="/profile-dashboard/" element={<NormalUserProtect ><ProfileDashboard /></NormalUserProtect>}>
+          <Route index element={<Navigate to="user-dashboard" />} />
           <Route path="user-dashboard" element={<UserDashboard />} />
           <Route path="profile" element={<ProfileDetails />} />
         </Route>
@@ -46,7 +50,7 @@ function App() {
 
 
         <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/admin-home" element={<AdminDashboard />} >
+        <Route path="/admin-home" element={<AdminProtect><AdminDashboard /></AdminProtect>}>
           <Route path="users-list" element={<UsersList />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="user-details/:id" element={<UserDetails />} />
@@ -60,12 +64,10 @@ function App() {
         <Route path="/users-list" element={<UsersList />} />
 
 
-        <Route path="/b-signup" element={<BSignUp />} />
 
-        <Route path="/busowner-dashboard" element={<BusOwnerDashboard />} >
+        <Route path="/busowner-dashboard" element={<BusOwnerProtect> <BusOwnerDashboard /> </BusOwnerProtect>} >
           <Route path="busowner-dashboard2" element={<BDashboard />} />
           <Route path="owner-profile" element={<OwnerProfile />} />
-
         </Route>
       </Routes>
 

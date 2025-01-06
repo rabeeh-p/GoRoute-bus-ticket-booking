@@ -53,8 +53,8 @@ const UserLogin = () => {
                 });
 
             setError('');
-            setUsername('');
-            setPassword('');
+            // setUsername('');
+            // setPassword('');
         }
 
 
@@ -190,7 +190,8 @@ const UserLogin = () => {
                                     onError={() => console.log('Google login failed')}
                                     useOneTap
                                     clientId="95471622345-6mrooku1asdkjvraoqdr18k4jfo5gakf.apps.googleusercontent.com"
-                                    redirectUri="http://localhost:3000/callback"
+                                    // redirectUri="http://localhost:3000/callback"
+                                    // redirectUri="http://localhost:5173/"
                                 />
 
                                 {/* Register Button */}

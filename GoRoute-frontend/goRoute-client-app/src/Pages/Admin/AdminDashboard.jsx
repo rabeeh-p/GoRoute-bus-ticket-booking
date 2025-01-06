@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";  
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { clearUserData } from "../../slice/userSlicer";  
 import { useNavigate } from "react-router-dom";  
 import UsersList from "./UsersList";  
@@ -13,6 +13,12 @@ import BusOwnerDetails from "./BusOwnerDetails";
 const AdminDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
+
+  // const userType = useSelector((state) => state.user.user_type);
+  // console.log(userType,'userrrr');
+  
+  
 
   const handleLogout = () => {
     dispatch(clearUserData());

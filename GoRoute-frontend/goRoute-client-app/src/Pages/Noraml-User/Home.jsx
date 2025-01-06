@@ -2,14 +2,19 @@ import React from 'react'
 import Navbar from '../../Components/Normal/Navbar'
 import Features from '../../Components/Normal/Features'
 import SearchForm from '../../Components/Normal/SearchForm'
+import { useSelector } from 'react-redux'
 
 const Home = () => {
     console.log('hello');
 
+    // let user = localStorage.getItem('userType');
+    // const userType = useSelector((state) => state.user.userType);
+    // console.log(userType,'usert type protect');
     
   return (
     <div className="min-h-screen bg-gray-100">
     <Navbar />
+    
     
     {/* Hero Section */}
     <div 
@@ -24,8 +29,9 @@ const Home = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center text-white mb-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Book Bus Tickets Online
+            Book Bus Tickets Online 
           </h1>
+          {/* <h1>{userType}user hello</h1> */}
           <p className="text-xl">
             Travel safely and comfortably across the country
           </p>

@@ -21,12 +21,15 @@ const AdminLogin = () => {
 
 
       const { access, refresh, user_type } = response.data;
+      
+      
 
       dispatch(setToken({ token: access })); 
       dispatch(setUserType(user_type));  
 
       localStorage.setItem("accessToken", access);
       localStorage.setItem("refreshToken", refresh);
+      localStorage.setItem("userType", user_type);
 
       if (user_type === "super_admin") {
         window.location.href = "admin-home/dashboard";  

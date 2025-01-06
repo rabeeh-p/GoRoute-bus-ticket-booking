@@ -46,9 +46,13 @@ const UsersList = () => {
   if (loading) return <div className="text-center py-4">Loading...</div>;
   if (error) return <div className="text-center py-4">{error}</div>;
 
+
+  
+
   return (
     <div className="container mx-auto py-8">
       <h2 className="text-2xl font-semibold text-center mb-6">User Profiles</h2>
+      
 
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border-collapse">
