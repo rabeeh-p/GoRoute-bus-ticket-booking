@@ -107,8 +107,19 @@ class LoginView(APIView):
         elif user_role == 'super_admin':
             user_type = 'super_admin'
 
-        else:
+        elif user_role == 'normal_user':
+            # Check if the user's status is False
+            try:
+                profile = user.profile  # Access NormalUserProfile
+                if not profile.status:  # Check if status is False (inactive)
+                    return Response({"error": "Your account is deactivated. Please contact support."}, status=status.HTTP_403_FORBIDDEN)
+            except NormalUserProfile.DoesNotExist:
+                return Response({"error": "Normal user profile data not found."}, status=status.HTTP_400_BAD_REQUEST)
+
             user_type = 'normal_user'
+
+        else:
+            return Response({"error": "Invalid user role."}, status=status.HTTP_400_BAD_REQUEST)
 
         refresh = RefreshToken.for_user(user)
         return Response({

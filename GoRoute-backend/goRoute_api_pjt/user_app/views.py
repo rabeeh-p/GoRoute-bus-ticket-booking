@@ -24,6 +24,9 @@ class UserProfileView(APIView):
     def get(self, request):
         try:
             user_profile = NormalUserProfile.objects.get(user=request.user)
+            if not user_profile.status:
+                return Response({"detail": "Your account is deactivated. Please contact support.", "deactivated": True}, status=403)
+            
             serializer = UserProfileSerializer(user_profile)
             return Response(serializer.data)
         except NormalUserProfile.DoesNotExist:
