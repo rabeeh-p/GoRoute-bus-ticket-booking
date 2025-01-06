@@ -13,53 +13,53 @@ const UserLogin = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log(username, 'user');
-        console.log(password, 'pass');
+    // const handleSubmit = (e) => {
+    //     e.preventDefault();
+    //     console.log(username, 'user');
+    //     console.log(password, 'pass');
 
 
-        if (!username || !password) {
-            setError('Please fill in all fields');
-        } else {
-            axios
-                .post('http://127.0.0.1:8000/login/', { username, password })
-                .then((response) => {
-                    const { access, userType } = response.data;
+    //     if (!username || !password) {
+    //         setError('Please fill in all fields');
+    //     } else {
+    //         axios
+    //             .post('http://127.0.0.1:8000/login/', { username, password })
+    //             .then((response) => {
+    //                 const { access, userType } = response.data;
 
-                    if (access) {
-                        dispatch(setToken({ access }));
-                        dispatch(setUserType(userType));
+    //                 if (access) {
+    //                     dispatch(setToken({ access }));
+    //                     dispatch(setUserType(userType));
 
-                        localStorage.setItem('accessToken', access);
-                        localStorage.setItem('userType', userType);
+    //                     localStorage.setItem('accessToken', access);
+    //                     localStorage.setItem('userType', userType);
 
-                        if (userType === 'bus_owner') {
-                            navigate('/busowner-dashboard/busowner-dashboard2');
-                        } else if (userType === 'normal_user') {
-                            navigate('/');
-                        }
-                    } else {
-                        setError('Login failed');
-                    }
-                })
-                .catch((error) => {
-                    if (error.response && error.response.data.error) {
-                        setError(error.response.data.error);
-                    } else {
-                        setError('Something went wrong. Please try again later.');
-                    }
-                    console.error(error);
-                });
+    //                     if (userType === 'bus_owner') {
+    //                         navigate('/busowner-dashboard/busowner-dashboard2');
+    //                     } else if (userType === 'normal_user') {
+    //                         navigate('/');
+    //                     }
+    //                 } else {
+    //                     setError('Login failed');
+    //                 }
+    //             })
+    //             .catch((error) => {
+    //                 if (error.response && error.response.data.error) {
+    //                     setError(error.response.data.error);
+    //                 } else {
+    //                     setError('Something went wrong. Please try again later.');
+    //                 }
+    //                 console.error(error);
+    //             });
 
-            setError('');
-            // setUsername('');
-            // setPassword('');
-        }
+    //         setError('');
+    //         // setUsername('');
+    //         // setPassword('');
+    //     }
 
 
 
-    }
+    // }
 
    
     
@@ -81,6 +81,55 @@ const UserLogin = () => {
     //     }
     // };
     
+
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log(username, 'user');
+        console.log(password, 'pass');
+    
+        if (!username || !password) {
+            setError('Please fill in all fields');
+        } else {
+            axios
+                .post('http://127.0.0.1:8000/login/', { username, password })
+                .then((response) => {
+                    const { access, userType } = response.data;
+    
+                    if (access) {
+                        dispatch(setToken({ access }));
+                        dispatch(setUserType(userType));
+    
+                        localStorage.setItem('accessToken', access);
+                        localStorage.setItem('userType', userType);
+    
+                        if (userType === 'bus_owner') {
+                            navigate('/busowner-dashboard/busowner-dashboard2');
+                        } else if (userType === 'normal_user') {
+                            navigate('/');
+                        }
+                    } else {
+                        setError('Login failed');
+                    }
+                })
+                .catch((error) => {
+                    if (error.response && error.response.data.error) {
+                        setError(error.response.data.error);  
+                    } else {
+                        setError('Something went wrong. Please try again later.');
+                    }
+                    console.error(error);
+                });
+    
+            setError('');
+        }
+    }
+    
+
+
+
+
+
     const handleGoogleLogin = async (response) => {
         const idToken = response.credential;
         console.log(idToken); // Log the token to verify it's valid

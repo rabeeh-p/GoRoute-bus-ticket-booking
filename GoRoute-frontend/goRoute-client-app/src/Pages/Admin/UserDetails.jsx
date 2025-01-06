@@ -115,7 +115,7 @@ const UserDetails = () => {
                 </div>
                 <div className="md:w-1/3 p-4 flex justify-center">
                     <img
-                        src={user.profile_picture ? `http://127.0.0.1:8000${user.profile_picture}` : '/default-profile.jpg'}
+                        src={`https://cdn-icons-png.flaticon.com/512/2815/2815428.png` }
                         alt="Profile"
                         className="w-32 h-32 rounded-full border-4 border-red-600 object-cover"
                     />

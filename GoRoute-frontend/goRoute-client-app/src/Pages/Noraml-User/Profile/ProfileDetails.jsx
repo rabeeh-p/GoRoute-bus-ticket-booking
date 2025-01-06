@@ -12,31 +12,90 @@ const ProfileDetails = () => {
   
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      const accessToken = localStorage.getItem('accessToken');  
+    // const fetchUserProfile = async () => {
+    //   const accessToken = localStorage.getItem('accessToken');  
   
+    //   if (!accessToken) {
+    //     navigate('/admin-login'); 
+    //     return;
+    //   }
+  
+    //   try {
+    //     const response = await axiosInstance.get('api/profile/', {
+    //       headers: {
+    //         Authorization: `Bearer ${accessToken}`,  
+    //       },
+    //     });
+  
+    //     console.log('User profile data:', response.data);  
+    //     setUserDetails(response.data);  
+    //   } catch (err) {
+    //     if (err.response && err.response.status === 401) {
+    //       localStorage.removeItem('accessToken');  
+    //       localStorage.removeItem('refreshToken');  
+    //       localStorage.removeItem('userType');  
+  
+    //       navigate('/login');  
+    //       setError('Session expired. Please log in again.');
+    //     } else {
+    //       console.error('Error fetching user profile:', err.message || err);
+    //       setError('Failed to fetch user profile');
+    //     }
+    //   } finally {
+    //     setLoading(false);  
+    //   }
+    // };
+  
+
+    const fetchUserProfile = async () => {
+      const accessToken = localStorage.getItem('accessToken');
+    
       if (!accessToken) {
-        navigate('/admin-login'); 
+        navigate('/login');  
         return;
       }
-  
+    
       try {
         const response = await axiosInstance.get('api/profile/', {
           headers: {
-            Authorization: `Bearer ${accessToken}`,  
+            Authorization: `Bearer ${accessToken}`,
           },
         });
-  
-        console.log('User profile data:', response.data);  
-        setUserDetails(response.data);  
+    
+        console.log('User profile data:', response.data);
+    
+        if (response.data.deactivated) {
+
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('userType');
+    
+          navigate('/login');   
+          setError('Your account is deactivated. Please contact support.');
+          return;
+        }
+    
+        setUserDetails(response.data);
       } catch (err) {
-        if (err.response && err.response.status === 401) {
-          localStorage.removeItem('accessToken');  
-          localStorage.removeItem('refreshToken');  
-          localStorage.removeItem('userType');  
-  
-          navigate('/login');  
-          setError('Session expired. Please log in again.');
+        if (err.response) {
+          if (err.response.status === 401) {
+
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('userType');
+            
+            navigate('/login');
+            setError('Session expired. Please log in again.');
+          } else if (err.response.status === 403) {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('userType');
+            
+            navigate('/login');   
+            setError('Your account is deactivated. Please contact support.');
+          } else {
+            setError('Failed to fetch user profile');
+          }
         } else {
           console.error('Error fetching user profile:', err.message || err);
           setError('Failed to fetch user profile');
@@ -45,7 +104,13 @@ const ProfileDetails = () => {
         setLoading(false);  
       }
     };
-  
+    
+    
+    
+
+
+
+
     fetchUserProfile();
   }, [navigate]);
   
