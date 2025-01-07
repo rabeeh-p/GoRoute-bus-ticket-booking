@@ -29,15 +29,41 @@ const BusOwnerSignup = () => {
     }));
   };
 
+  // const handleFileChange = (e) => {
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     logoImage: e.target.files[0],
+  //   }));
+  // };
+
   const handleFileChange = (e) => {
+    const file = e.target.files[0];
+  
+    if (file) {
+      const validImageTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+      
+      if (!validImageTypes.includes(file.type)) {
+        alert("Only image files (JPEG, PNG, JPG, WEBP) are allowed.");
+        setFormData((prevData) => ({
+          ...prevData,
+          logoImage: null,  
+        }));
+        return;  
+      }
+    }
+  
     setFormData((prevData) => ({
       ...prevData,
-      logoImage: e.target.files[0],
+      logoImage: file,
     }));
   };
+  
+
+
 
   const validateForm = () => {
     const newErrors = {};
+    
 
     // Username
     if (!formData.username.trim()) {
@@ -201,6 +227,11 @@ const BusOwnerSignup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.logoImage) {
+      alert("Please upload a valid image before submitting.");
+      return;
+    }
   
     if (!validateForm()) {
       return;
