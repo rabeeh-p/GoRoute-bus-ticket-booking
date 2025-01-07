@@ -17,8 +17,8 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
       <GoogleOAuthProvider clientId={CLIENT_ID}>
-
         <App />
+        
       </GoogleOAuthProvider>
     </Provider>
 
