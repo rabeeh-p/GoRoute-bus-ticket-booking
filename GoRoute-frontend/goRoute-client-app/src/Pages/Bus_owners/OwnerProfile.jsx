@@ -32,6 +32,7 @@ const OwnerProfile = () => {
                 if (err.response && err.response.status === 401) {
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('userType');
                     navigate('/login');
                     setError('Session expired. Please log in again.');
                 } else {

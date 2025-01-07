@@ -6,9 +6,9 @@ import { clearUserData } from '../../../slice/userSlicer';
 
 const menuItems = [
   { icon: FaUser, text: 'Profile', path: '/profile-dashboard/profile' },
-  { icon: FaTicketAlt, text: 'My Tickets', path: '/tickets' },
-  { icon: FaWallet, text: 'Wallet', path: '/wallet' },
-  { icon: FaHistory, text: 'Travel History', path: '/history' },
+  { icon: FaTicketAlt, text: 'My Tickets' },
+  { icon: FaWallet, text: 'Wallet' },
+  { icon: FaHistory, text: 'Travel History' },
   { icon: FaSignOutAlt, text: 'Logout', path: '#', action: 'logout' },
 ];
 

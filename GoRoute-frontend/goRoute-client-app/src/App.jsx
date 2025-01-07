@@ -24,6 +24,7 @@ import AdminProtect from './Protect/AdminProtect';
 import NormalUserProtect from './Protect/NormalUserProtect';
 import HomeProtect from './Protect/HomeProtect';
 import BusOwnerProtect from './Protect/BusOwnerProtect';
+import LoggedInProtect from './Protect/LoggedInProtect';
 function App() {
 
 
@@ -31,10 +32,10 @@ function App() {
     <BrowserRouter>
 
       <Routes>
-        <Route path="/login" element={<UserLogin />} />
-        <Route path="/signUp" element={<SignUp />} />
-        <Route path="/otp" element={<OTPVerification />} />
-        <Route path="/b-signup" element={<BSignUp />} />
+        <Route path="/login" element={<LoggedInProtect> <UserLogin /> </LoggedInProtect>} />
+        <Route path="/signUp" element={<LoggedInProtect> <SignUp />    </LoggedInProtect> } />
+        <Route path="/otp" element={ <LoggedInProtect> <OTPVerification />     </LoggedInProtect>} />
+        <Route path="/b-signup" element={<LoggedInProtect>  <BSignUp />   </LoggedInProtect>  } />
 
         {/* USER PROFILE SECTION */}
         <Route path="/" element={<HomeProtect><Home /></HomeProtect>} />
