@@ -104,14 +104,14 @@ class LoginView(APIView):
             
             user_type = 'bus_owner'
         
+        
         elif user_role == 'super_admin':
-            user_type = 'super_admin'
+            return Response({"error": "Super admin access is not allowed in this area."}, status=status.HTTP_403_FORBIDDEN)
 
         elif user_role == 'normal_user':
-            # Check if the user's status is False
             try:
-                profile = user.profile  # Access NormalUserProfile
-                if not profile.status:  # Check if status is False (inactive)
+                profile = user.profile   
+                if not profile.status:   
                     return Response({"error": "Your account is deactivated. Please contact support."}, status=status.HTTP_403_FORBIDDEN)
             except NormalUserProfile.DoesNotExist:
                 return Response({"error": "Normal user profile data not found."}, status=status.HTTP_400_BAD_REQUEST)
