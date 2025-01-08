@@ -87,7 +87,7 @@ class RouteStopModel(models.Model):
     stop_order = models.PositiveIntegerField()
     arrival_time = models.TimeField(blank=True, null=True)
     departure_time = models.TimeField(blank=True, null=True)
-    duration = models.DurationField(blank=True, null=True)   
+    distance_in_km = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
 
     class Meta:
         ordering = ['stop_order']

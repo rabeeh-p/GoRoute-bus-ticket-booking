@@ -17,3 +17,10 @@ class RouteModelSerializer(serializers.ModelSerializer):
         return value
 
 
+
+
+
+class RouteStopSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RouteStopModel
+        fields = ['id', 'route', 'stop_name', 'stop_order', 'arrival_time', 'departure_time', 'distance_in_km']

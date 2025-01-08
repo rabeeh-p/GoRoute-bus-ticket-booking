@@ -96,3 +96,35 @@ class RouteByOwnerView(APIView):
         serializer = RouteModelSerializer(routes, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+
+class RouteStopView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, route_id):
+        route = RouteModel.objects.get(id=route_id)
+        print('rout',route)
+        
+        stops = RouteStopModel.objects.filter(route=route).order_by('stop_order')
+        
+        serializer = RouteStopSerializer(stops, many=True)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, route_id):
+        try:
+            route = RouteModel.objects.get(id=route_id)
+        except RouteModel.DoesNotExist:
+            return Response({"detail": "Route not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        stop_order = RouteStopModel.objects.filter(route=route).count() + 1
+        
+        serializer = RouteStopSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(route=route, stop_order=stop_order)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
