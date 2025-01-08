@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from '../../axios/axios';   
+import { useParams } from "react-router-dom";
 
-const RouteStopsManager = ({ routeId }) => {
+const RouteStopsManager = () => {
   const [routeStops, setRouteStops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stopName, setStopName] = useState("");
   const [arrivalTime, setArrivalTime] = useState("");
   const [departureTime, setDepartureTime] = useState("");
-  const [duration, setDuration] = useState("");
+  const [distance_in_km, setDistance_in_km] = useState("");
   const [stopOrder, setStopOrder] = useState(1);
 
-  console.log('is working');
+  const { routeId }= useParams('id')
+
+  console.log(routeId,'iddd');
+  
+
+
   
 
   useEffect(() => {
     const fetchRouteStops = async () => {
       try {
-        const response = await axiosInstance.get(`/api/routes/${routeId}/stops/`);
+        const response = await axiosInstance.get(`routes/${routeId}/stops/`);
         if (response.status === 200) {
           setRouteStops(response.data);
         }
@@ -39,17 +45,17 @@ const RouteStopsManager = ({ routeId }) => {
       stop_order: routeStops.length + 1,  
       arrival_time: arrivalTime,
       departure_time: departureTime,
-      duration: duration,
+      distance_in_km: distance_in_km,
     };
 
     try {
-      const response = await axiosInstance.post(`/api/routes/${routeId}/stops/`, newStop);
+      const response = await axiosInstance.post(`routes/${routeId}/stops/`, newStop);
       if (response.status === 201) {
         setRouteStops([...routeStops, response.data]); 
         setStopName("");
         setArrivalTime("");
         setDepartureTime("");
-        setDuration("");
+        setDistance_in_km("");
       }
     } catch (error) {
       console.error("Error adding stop:", error);
@@ -115,8 +121,8 @@ const RouteStopsManager = ({ routeId }) => {
               <input
                 type="text"
                 id="duration"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
+                value={distance_in_km}
+                onChange={(e) => setDistance_in_km(e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded-md"
               />
             </div>
@@ -149,7 +155,7 @@ const RouteStopsManager = ({ routeId }) => {
                     <td className="px-4 py-2">{stop.stop_name}</td>
                     <td className="px-4 py-2">{stop.arrival_time}</td>
                     <td className="px-4 py-2">{stop.departure_time}</td>
-                    <td className="px-4 py-2">{stop.duration}</td>
+                    <td className="px-4 py-2">{stop.distance_in_km}</td>
                   </tr>
                 ))
               ) : (

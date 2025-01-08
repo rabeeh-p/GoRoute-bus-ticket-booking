@@ -76,7 +76,7 @@ function App() {
           <Route path="owner-profile" element={<OwnerProfile />} />
           <Route path="bus-owner/route-table" element={<RouteTable />} />
           <Route path="bus-owner/add-route/" element={<AddRouteForm />} />
-          <Route path="bus-owner/add-stop/:id" element={<RouteStopsManager />} />
+          <Route path="bus-owner/add-stop/:routeId" element={<RouteStopsManager />} />
         </Route>
       </Routes>
 
