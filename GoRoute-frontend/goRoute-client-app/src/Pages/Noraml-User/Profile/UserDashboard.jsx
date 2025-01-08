@@ -33,7 +33,7 @@ const UserDashboard = () => {
           </div>
     
           {/* Recent Bookings */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          {/* <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-bold text-red-600 mb-4">Recent Bookings</h2>
             <div className="overflow-x-auto">
               <table className="w-full table-auto">
@@ -65,7 +65,7 @@ const UserDashboard = () => {
                 </tbody>
               </table>
             </div>
-          </div>
+          </div> */}
         </div>
     );
 }

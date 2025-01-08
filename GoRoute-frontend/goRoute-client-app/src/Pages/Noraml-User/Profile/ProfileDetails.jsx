@@ -123,10 +123,10 @@ const ProfileDetails = () => {
     <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-gray-800">User Profile</h2>
-        <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center space-x-2">
+        {/* <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center space-x-2">
           <FaUserEdit />
           <span>Edit</span>
-        </button>
+        </button> */}
       </div>
       <div className="flex flex-col sm:flex-row gap-8 items-center">
         {/* Profile Picture */}

@@ -132,14 +132,13 @@ const UserLogin = () => {
 
     const handleGoogleLogin = async (response) => {
         const idToken = response.credential;
-        console.log(idToken); // Log the token to verify it's valid
+        console.log(idToken);  
     
         try {
             const res = await axios.post("http://127.0.0.1:8000/google-login/", { token: idToken });
             if (res.status === 200) {
                 console.log("Google login successful:", res.data);
     
-                // Dispatch actions to update Redux state
                 dispatch(setToken({ token: res.data.tokens.access }));
                 dispatch(setUserType({ userType: 'normal_user' }));
 
@@ -147,20 +146,16 @@ const UserLogin = () => {
                 console.log('type',res.data.user.user_type);
                 
     
-                // Save the token and user info in localStorage (optional)
                 localStorage.setItem("accessToken", res.data.tokens.access);
                 localStorage.setItem("refresh_token", res.data.tokens.refresh);
                 localStorage.setItem("userType",'normal_user' );
-                // localStorage.setItem("user_info", JSON.stringify(res.data.user));
     
-                // Redirect to the dashboard or home page
-                navigate('/') // Or your desired route
+                navigate('/')  
             } else {
                 console.error("Google login failed:", res.data.error);
             }
         } catch (error) {
             console.error("Error during Google login:", error.response ? error.response.data : error);
-            // Show an error message to the user
         }
     };
    
@@ -233,7 +228,6 @@ const UserLogin = () => {
 
                             <div className="mt-6 space-y-3">
                                 {/* Google Button */}
-                                {/* Google Login Button */}
                                 <GoogleLogin
                                     onSuccess={handleGoogleLogin}
                                     onError={() => console.log('Google login failed')}

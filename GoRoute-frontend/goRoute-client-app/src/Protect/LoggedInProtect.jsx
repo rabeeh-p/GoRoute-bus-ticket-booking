@@ -19,7 +19,7 @@ const LoggedInProtect = ({ children }) => {
       return <Navigate to="/busowner-dashboard" />;
     }
     if (userType === "super_admin") {
-      return <Navigate to="/admin-home" />;
+      return <Navigate to="/admin-home/dashboard" />;
     }
   }
 

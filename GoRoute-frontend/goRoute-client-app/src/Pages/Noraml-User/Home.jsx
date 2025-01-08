@@ -2,7 +2,6 @@ import React from 'react'
 import Navbar from '../../Components/Normal/Navbar'
 import Features from '../../Components/Normal/Features'
 import SearchForm from '../../Components/Normal/SearchForm'
-import { useSelector } from 'react-redux'
 
 const Home = () => {
     console.log('hello');

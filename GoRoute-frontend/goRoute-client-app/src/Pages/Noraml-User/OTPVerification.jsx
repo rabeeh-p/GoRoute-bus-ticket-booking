@@ -79,7 +79,6 @@ const OTPVerification = () => {
           {!isVerified ? (
             <form className="mt-8 space-y-6" onSubmit={handleOtpSubmit}>
               <div className="rounded-md shadow-sm space-y-4">
-                {/* OTP Input */}
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
@@ -96,7 +95,6 @@ const OTPVerification = () => {
                   />
                 </div>
 
-                {/* Error Message */}
                 {error && <p className="text-sm text-red-500">{error}</p>}
               </div>
               <button

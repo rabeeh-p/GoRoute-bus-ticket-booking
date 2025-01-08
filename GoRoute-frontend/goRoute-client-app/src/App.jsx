@@ -37,8 +37,10 @@ function App() {
         <Route path="/otp" element={ <LoggedInProtect> <OTPVerification />     </LoggedInProtect>} />
         <Route path="/b-signup" element={<LoggedInProtect>  <BSignUp />   </LoggedInProtect>  } />
 
-        {/* USER PROFILE SECTION */}
+        
         <Route path="/" element={<HomeProtect> <Home /></HomeProtect>} />
+
+        {/* USER PROFILE SECTION */}
         <Route path="/profile-dashboard/" element={<NormalUserProtect ><ProfileDashboard /></NormalUserProtect>}>
           <Route index element={<Navigate to="user-dashboard" />} />
           <Route path="user-dashboard" element={<UserDashboard />} />

@@ -73,6 +73,14 @@ const RequestBusOwner = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
+  if (busOwners.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+        <h2 className="text-3xl font-semibold text-center mb-6">Bus Owners List</h2>
+        <div className="text-center text-gray-500 text-lg">No bus owners found.</div>
+      </div>
+    );
+  }
 
   if (error) {
     return <div>{error}</div>;

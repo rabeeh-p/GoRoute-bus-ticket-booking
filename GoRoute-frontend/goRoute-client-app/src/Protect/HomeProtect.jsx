@@ -5,7 +5,7 @@ const HomeProtect = ({ children }) => {
   const userType = localStorage.getItem('userType');  
 
   if (userType === 'super_admin') {
-    return <Navigate to="/admin-home" />;
+    return <Navigate to="/admin-home/dashboard" />;
   }
 
   if (userType === 'bus_owner') {

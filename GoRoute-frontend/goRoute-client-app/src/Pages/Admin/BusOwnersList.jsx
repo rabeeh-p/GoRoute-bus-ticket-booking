@@ -46,6 +46,8 @@ const BusOwnersList = () => {
     return <div>{error}</div>;
   }
 
+  
+
   const handleViewClick = (ownerId) => {
     navigate(`/admin-home/busowner-details/${ownerId}`);   
   };
