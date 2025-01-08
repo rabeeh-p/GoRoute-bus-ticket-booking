@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axiosInstance from '../../axios/axios';   
+import Swal from "sweetalert2"; // Import SweetAlert
+import axiosInstance from "../../axios/axios";
 import { useParams } from "react-router-dom";
 
 const RouteStopsManager = () => {
@@ -9,15 +10,8 @@ const RouteStopsManager = () => {
   const [arrivalTime, setArrivalTime] = useState("");
   const [departureTime, setDepartureTime] = useState("");
   const [distance_in_km, setDistance_in_km] = useState("");
-  const [stopOrder, setStopOrder] = useState(1);
 
-  const { routeId }= useParams('id')
-
-  console.log(routeId,'iddd');
-  
-
-
-  
+  const { routeId } = useParams("id");
 
   useEffect(() => {
     const fetchRouteStops = async () => {
@@ -27,6 +21,11 @@ const RouteStopsManager = () => {
           setRouteStops(response.data);
         }
       } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to fetch route stops. Please try again later.",
+        });
         console.error("Error fetching stops:", error);
       } finally {
         setLoading(false);
@@ -42,7 +41,7 @@ const RouteStopsManager = () => {
     const newStop = {
       route: routeId,
       stop_name: stopName,
-      stop_order: routeStops.length + 1,  
+      stop_order: routeStops.length + 1,
       arrival_time: arrivalTime,
       departure_time: departureTime,
       distance_in_km: distance_in_km,
@@ -51,13 +50,28 @@ const RouteStopsManager = () => {
     try {
       const response = await axiosInstance.post(`routes/${routeId}/stops/`, newStop);
       if (response.status === 201) {
-        setRouteStops([...routeStops, response.data]); 
+        setRouteStops([...routeStops, response.data]);
         setStopName("");
         setArrivalTime("");
         setDepartureTime("");
         setDistance_in_km("");
+
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Stop added successfully!",
+        });
       }
     } catch (error) {
+        console.log(error.response.data,'data kmmmm');
+        
+      const errorMessage =
+        error.response?.data?.detail || "Failed to add the stop. Please try again.";
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
       console.error("Error adding stop:", error);
     }
   };
@@ -116,7 +130,7 @@ const RouteStopsManager = () => {
             </div>
             <div className="mb-4">
               <label htmlFor="duration" className="block text-sm font-medium text-gray-700">
-                Duration
+                Distance (in km)
               </label>
               <input
                 type="text"
@@ -144,18 +158,21 @@ const RouteStopsManager = () => {
                 <th className="px-4 py-2">Stop Name</th>
                 <th className="px-4 py-2">Arrival Time</th>
                 <th className="px-4 py-2">Departure Time</th>
-                <th className="px-4 py-2">Duration</th>
+                <th className="px-4 py-2">Distance (km)</th>
               </tr>
             </thead>
             <tbody>
               {routeStops.length > 0 ? (
                 routeStops.map((stop, index) => (
-                  <tr key={stop.id} className={`border-b ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
+                  <tr
+                    key={stop.id}
+                    className={`border-b ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
+                  >
                     <td className="px-4 py-2">{stop.stop_order}</td>
                     <td className="px-4 py-2">{stop.stop_name}</td>
                     <td className="px-4 py-2">{stop.arrival_time}</td>
                     <td className="px-4 py-2">{stop.departure_time}</td>
-                    <td className="px-4 py-2">{stop.distance_in_km}</td>
+                    <td className="px-4 py-2">{stop.distance_in_km} km</td>
                   </tr>
                 ))
               ) : (
