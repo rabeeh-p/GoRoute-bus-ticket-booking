@@ -6,6 +6,7 @@ from admin_app.models import *
 from admin_app.serializers import *
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
+from decimal import Decimal
 
 from .Serializers import *
 
@@ -114,6 +115,7 @@ class RouteStopView(APIView):
         
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
     def post(self, request, route_id):
         try:
             route = RouteModel.objects.get(id=route_id)
@@ -122,9 +124,44 @@ class RouteStopView(APIView):
 
         stop_order = RouteStopModel.objects.filter(route=route).count() + 1
         
-        serializer = RouteStopSerializer(data=request.data)
+        data = request.data
+
+        if RouteStopModel.objects.filter(route=route, stop_name=data.get("stop_name")).exists():
+            return Response({"detail": "Stop name already exists for this route."}, status=status.HTTP_400_BAD_REQUEST)
+
+        arrival_time = data.get("arrival_time")
+        departure_time = data.get("departure_time")
+        if arrival_time and departure_time:
+            if arrival_time >= departure_time:
+                return Response({"detail": "Departure time must be after arrival time."}, status=status.HTTP_400_BAD_REQUEST)
+
+        distance_in_km = data.get("distance_in_km")
+        if distance_in_km is not None:
+            try:
+                distance_in_km = float(distance_in_km)
+            except ValueError:
+                return Response({"detail": "Distance in kilometers must be a valid number."}, status=status.HTTP_400_BAD_REQUEST)
+
+            if distance_in_km <= 0:
+                return Response({"detail": "Distance in kilometers must be positive."}, status=status.HTTP_400_BAD_REQUEST)
+
+            total_stop_distance = (
+                RouteStopModel.objects.filter(route=route).aggregate(total_distance=models.Sum('distance_in_km'))['total_distance'] or Decimal(0)
+            )
+
+            distance_in_km = Decimal(str(distance_in_km))
+
+            if total_stop_distance + distance_in_km > route.distance_in_km:
+                return Response(
+                    {"detail": "The total distance of stops cannot exceed the main route distance."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+
+        serializer = RouteStopSerializer(data=data)
         if serializer.is_valid():
             serializer.save(route=route, stop_order=stop_order)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
