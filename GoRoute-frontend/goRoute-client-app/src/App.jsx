@@ -25,6 +25,8 @@ import NormalUserProtect from './Protect/NormalUserProtect';
 import HomeProtect from './Protect/HomeProtect';
 import BusOwnerProtect from './Protect/BusOwnerProtect';
 import LoggedInProtect from './Protect/LoggedInProtect';
+import RouteTable from './Pages/Bus_owners/RouteTable';
+import AddRouteForm from './Pages/Bus_owners/AddRouteForm';
 function App() {
 
 
@@ -71,6 +73,8 @@ function App() {
         <Route path="/busowner-dashboard" element={<BusOwnerProtect> <BusOwnerDashboard /> </BusOwnerProtect>} >
           <Route path="busowner-dashboard2" element={<BDashboard />} />
           <Route path="owner-profile" element={<OwnerProfile />} />
+          <Route path="bus-owner/route-table" element={<RouteTable />} />
+          <Route path="bus-owner/add-route/" element={<AddRouteForm />} />
         </Route>
       </Routes>
 

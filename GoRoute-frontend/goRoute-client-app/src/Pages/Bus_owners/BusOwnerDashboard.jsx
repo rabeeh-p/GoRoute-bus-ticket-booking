@@ -4,6 +4,8 @@ import Header from '../../Components/BusOwner/Header'
 import { Route, Routes } from 'react-router-dom'
 import BDashboard from './BDashboard'
 import OwnerProfile from './OwnerProfile'
+import RouteTable from './RouteTable'
+import AddRouteForm from './AddRouteForm'
 
 const BusOwnerDashboard = () => {
     return (
@@ -15,6 +17,8 @@ const BusOwnerDashboard = () => {
                     <Routes>
                         <Route path="busowner-dashboard2" element={<BDashboard />} />
                         <Route path="owner-profile" element={<OwnerProfile />} />
+                        <Route path="bus-owner/route-table" element={<RouteTable />} />
+                        <Route path="bus-owner/add-route" element={<AddRouteForm />} />
                         
                     </Routes>
                 </main>

@@ -48,10 +48,10 @@ export default function Sidebar() {
                             <span className="mx-3">Dashboard</span>
                         </a>
                     </li>
-                    <li>
+                    <li onClick={() => navigate('bus-owner/route-table/')}>
                         <a href="#" className="flex items-center px-6 py-3 hover:bg-red-800">
                             <Calendar className="h-5 w-5" />
-                            <span className="mx-3">Schedule</span>
+                            <span className="mx-3">Route</span>
                         </a>
                     </li>
                     <li>
