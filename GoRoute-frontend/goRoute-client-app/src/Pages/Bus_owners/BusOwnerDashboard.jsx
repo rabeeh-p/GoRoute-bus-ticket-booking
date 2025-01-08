@@ -6,6 +6,7 @@ import BDashboard from './BDashboard'
 import OwnerProfile from './OwnerProfile'
 import RouteTable from './RouteTable'
 import AddRouteForm from './AddRouteForm'
+import RouteStopsManager from './RouteStopManager'
 
 const BusOwnerDashboard = () => {
     return (
@@ -19,6 +20,7 @@ const BusOwnerDashboard = () => {
                         <Route path="owner-profile" element={<OwnerProfile />} />
                         <Route path="bus-owner/route-table" element={<RouteTable />} />
                         <Route path="bus-owner/add-route" element={<AddRouteForm />} />
+                        <Route path="bus-owner/add-stop/:id" element={<RouteStopsManager />} />
                         
                     </Routes>
                 </main>

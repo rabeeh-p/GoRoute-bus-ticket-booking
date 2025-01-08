@@ -27,6 +27,7 @@ import BusOwnerProtect from './Protect/BusOwnerProtect';
 import LoggedInProtect from './Protect/LoggedInProtect';
 import RouteTable from './Pages/Bus_owners/RouteTable';
 import AddRouteForm from './Pages/Bus_owners/AddRouteForm';
+import RouteStopsManager from './Pages/Bus_owners/RouteStopManager';
 function App() {
 
 
@@ -75,6 +76,7 @@ function App() {
           <Route path="owner-profile" element={<OwnerProfile />} />
           <Route path="bus-owner/route-table" element={<RouteTable />} />
           <Route path="bus-owner/add-route/" element={<AddRouteForm />} />
+          <Route path="bus-owner/add-stop/:id" element={<RouteStopsManager />} />
         </Route>
       </Routes>
 

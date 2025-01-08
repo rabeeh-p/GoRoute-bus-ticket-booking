@@ -1,37 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from '../../axios/axios';   
 
 const RouteTable = () => {
-  const [routes, setRoutes] = useState([]);  
-  const [loading, setLoading] = useState(true);   
-  const navigate =useNavigate()
+  const [routes, setRoutes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  console.log('routes',routes);
+  
 
   useEffect(() => {
-    setTimeout(() => {
-      const fetchedRoutes = [
-        {
-          id: 1,
-          routeName: "City Express",
-          startLocation: "New York",
-          endLocation: "Boston",
-          distanceInKm: 300,
-        },
-        {
-          id: 2,
-          routeName: "Mountain Journey",
-          startLocation: "Denver",
-          endLocation: "Aspen",
-          distanceInKm: 200,
-        },
-      ];
-      setRoutes(fetchedRoutes);
-      setLoading(false);   
-    }, 2000);   
-  }, []);   
+    const fetchRoutes = async () => {
+      try {
+        const response = await axiosInstance.get('routes/my_routes/');
 
-  const handleViewRoute = (route) => {
-    alert(`Viewing route: ${route.routeName}`);
-  };
+        if (response.status === 200) {
+          setRoutes(response.data);   
+        } else {
+          console.error("Failed to fetch routes:", response.status);
+        }
+      } catch (error) {
+        console.error("Error fetching routes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoutes();
+  }, []);   
 
   
 
@@ -50,7 +47,7 @@ const RouteTable = () => {
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-semibold text-red-600">Manage Routes</h1>
           <button
-            onClick={()=> navigate('/busowner-dashboard/bus-owner/add-route')}
+            onClick={() => navigate('/busowner-dashboard/bus-owner/add-route')}
             className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition"
           >
             Add Route
@@ -78,13 +75,13 @@ const RouteTable = () => {
                     className={`border-b ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
                   >
                     <td className="px-4 py-2">{index + 1}</td>
-                    <td className="px-4 py-2">{route.routeName}</td>
-                    <td className="px-4 py-2">{route.startLocation}</td>
-                    <td className="px-4 py-2">{route.endLocation}</td>
-                    <td className="px-4 py-2">{route.distanceInKm}</td>
+                    <td className="px-4 py-2">{route.route_name}</td>
+                    <td className="px-4 py-2">{route.start_location}</td>
+                    <td className="px-4 py-2">{route.end_location}</td>
+                    <td className="px-4 py-2">{route.distance_in_km}</td>
                     <td className="px-4 py-2">
                       <button
-                        onClick={() => handleViewRoute(route)}
+                      onClick={()=>navigate(`/busowner-dashboard/bus-owner/add-stop/${route.id}`)}
                         className="bg-blue-500 text-white py-1 px-3 rounded-md hover:bg-blue-600 transition"
                       >
                         View
