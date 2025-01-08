@@ -28,6 +28,9 @@ import LoggedInProtect from './Protect/LoggedInProtect';
 import RouteTable from './Pages/Bus_owners/RouteTable';
 import AddRouteForm from './Pages/Bus_owners/AddRouteForm';
 import RouteStopsManager from './Pages/Bus_owners/RouteStopManager';
+import AddBusType from './Pages/Bus_owners/AddBusType';
+import BusList from './Pages/Bus_owners/BusList';
+import AddBus from './Pages/Bus_owners/AddBus';
 function App() {
 
 
@@ -77,6 +80,9 @@ function App() {
           <Route path="bus-owner/route-table" element={<RouteTable />} />
           <Route path="bus-owner/add-route/" element={<AddRouteForm />} />
           <Route path="bus-owner/add-stop/:routeId" element={<RouteStopsManager />} />
+          <Route path="bus-owner/add-bus-type/" element={<AddBusType />} />
+          <Route path="bus-owner/bus-list/" element={<BusList />} />
+          <Route path="bus-owner/bus-add" element={<AddBus />} />
         </Route>
       </Routes>
 
