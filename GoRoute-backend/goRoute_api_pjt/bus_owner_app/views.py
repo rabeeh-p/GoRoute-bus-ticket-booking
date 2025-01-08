@@ -72,3 +72,27 @@ class RouteCreateView(APIView):
             print("Validation Errors:", serializer.errors)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+
+class RouteByOwnerView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        user = request.user
+        try:
+            bus_owner = BusOwnerModel.objects.get(user=user)
+        except BusOwnerModel.DoesNotExist:
+            return Response(
+                {"error": "Bus owner does not exist for the authenticated user."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        routes = RouteModel.objects.filter(bus_owner=bus_owner)
+
+        serializer = RouteModelSerializer(routes, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
