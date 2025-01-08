@@ -54,3 +54,44 @@ class OTP(models.Model):
     otp_code = models.CharField(max_length=6)   
     created_at = models.DateTimeField(auto_now_add=True)   
     verified = models.BooleanField(default=False) 
+
+
+
+
+
+
+
+
+#------------------------------------------- BUS OWNER SIDE ----------------------------------------------
+
+
+
+class RouteModel(models.Model):
+    bus_owner = models.ForeignKey(BusOwnerModel, on_delete=models.CASCADE, related_name='routes')
+    route_name = models.CharField(max_length=100)
+    start_location = models.CharField(max_length=100)
+    end_location = models.CharField(max_length=100)
+    distance_in_km = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.route_name} ({self.start_location} to {self.end_location})"
+
+
+
+
+class RouteStopModel(models.Model):
+    route = models.ForeignKey(RouteModel, on_delete=models.CASCADE, related_name='stops')
+    stop_name = models.CharField(max_length=100)
+    stop_order = models.PositiveIntegerField()
+    arrival_time = models.TimeField(blank=True, null=True)
+    departure_time = models.TimeField(blank=True, null=True)
+    duration = models.DurationField(blank=True, null=True)   
+
+    class Meta:
+        ordering = ['stop_order']
+        unique_together = ('route', 'stop_order')  
+
+    def __str__(self):
+        return f"{self.stop_name} (Order: {self.stop_order})"

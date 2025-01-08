@@ -5,6 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from admin_app.models import *
 from admin_app.serializers import *
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework import status
+
+from .Serializers import *
 
 
 # Create your views here.
@@ -23,3 +26,49 @@ class BusOwnerProfileView(APIView):
             return Response(serializer.data)
         except BusOwnerModel.DoesNotExist:
             return Response({"error": "Bus owner profile not found."}, status=404)
+        
+
+
+
+
+class RouteCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+        user = request.user
+        print('user',user)
+
+        try:
+            bus_owner = BusOwnerModel.objects.get(user=user)
+            print('busowner',bus_owner)
+        except BusOwnerModel.DoesNotExist:
+            return Response(
+                {"error": "Bus owner does not exist for the authenticated user."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # data = request.data.copy()
+        data = request.data
+        data['bus_owner'] = bus_owner.id
+        print("Incoming Data:", data)
+
+        mapped_data = {
+            'route_name': data.get('routeName'),
+            'start_location': data.get('startLocation'),
+            'end_location': data.get('endLocation'),
+            'distance_in_km': data.get('distanceInKm'),
+            'bus_owner': data.get('bus_owner'),
+            
+        }
+
+        serializer = RouteModelSerializer(data=mapped_data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print('is not validated')
+            print("Validation Errors:", serializer.errors)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
