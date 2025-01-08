@@ -9,4 +9,9 @@ admin.site.register(NormalUserProfile)
 admin.site.register(OTP)
 admin.site.register(RouteModel)
 admin.site.register(RouteStopModel)
+admin.site.register(BusType)
+admin.site.register(BusModel)
+
+
+
 

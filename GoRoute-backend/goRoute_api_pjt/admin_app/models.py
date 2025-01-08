@@ -95,3 +95,54 @@ class RouteStopModel(models.Model):
 
     def __str__(self):
         return f"{self.stop_name} (Order: {self.stop_order})"
+
+
+
+
+
+
+class BusType(models.Model):
+    
+    BUS_TYPE_CHOICES = [
+        ('ac', 'AC Bus'),
+        ('sleeper_ac', 'Sleeper AC Bus'),
+        ('non_ac_sleeper', 'Non-AC Sleeper'),
+        ('semi_sleeper', 'Semi Sleeper'),
+    ]
+
+    SEAT_TYPE_CHOICES = [
+        ('standard', 'Standard'),
+        ('recliner', 'Recliner'),
+        ('luxury', 'Luxury'),
+        ('semi_sleeper', 'Semi Sleeper'),
+        ('full_sleeper', 'Full Sleeper'),
+    ]
+
+    SEAT_COUNT_CHOICES = [
+        (20, '20 Seats'),
+        (30, '30 Seats'),
+        (40, '40 Seats'),
+        (50, '50 Seats'),
+        (60, '60 Seats'),
+    ]
+
+    name = models.CharField(max_length=100, choices=BUS_TYPE_CHOICES)
+    seat_type = models.CharField(max_length=50, choices=SEAT_TYPE_CHOICES, default='standard')
+    seat_count = models.IntegerField(choices=SEAT_COUNT_CHOICES)   
+    description = models.TextField(blank=True, null=True)   
+
+    def __str__(self):
+        return f"{self.get_name_display()} - {self.get_seat_type_display()} ({self.seat_count} Seats)"
+
+
+
+class BusModel(models.Model):
+    bus_owner = models.ForeignKey(BusOwnerModel, on_delete=models.CASCADE, related_name='buses')
+    bus_type = models.ForeignKey(BusType, on_delete=models.SET_NULL, null=True, related_name='buses')
+    bus_number = models.CharField(max_length=20, unique=True)
+    is_active = models.BooleanField(default=False)
+    description = models.TextField(null=True, blank=True)
+    name = models.CharField(max_length=100, null=True, blank=True)
+
+
+

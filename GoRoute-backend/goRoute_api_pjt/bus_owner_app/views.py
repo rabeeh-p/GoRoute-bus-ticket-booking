@@ -165,3 +165,90 @@ class RouteStopView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+
+
+class BusTypeCreateView(APIView):
+
+    def post(self, request):
+        serializer = BusTypeSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Bus type added successfully!', 'data': serializer.data}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+    def get(self, request):
+        print('getin woring')
+        bus_types = BusType.objects.all()
+        serializer = BusTypeSerializer(bus_types, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+
+
+
+class AddBusView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    
+    def post(self, request):
+        serializer = BusModelSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save(bus_owner=request.user)   
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    
+
+
+class BusListView(APIView):
+    permission_classes = [IsAuthenticated]   
+
+    def get(self, request):
+        buses = BusModel.objects.all()
+
+        serializer = BusModelSerializer(buses, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class AddBusView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    
+
+    def post(self, request):
+        user = request.user
+
+        if not CustomUser.objects.filter(id=user.id).exists():
+            return Response({'error': 'Invalid user, user does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = request.data.copy()
+        print(data)
+        data['bus_owner'] = user.id   
+
+        if isinstance(data.get('bus_type'), str):
+            try:
+                bus_type_name = data['bus_type']
+                bus_type = BusType.objects.get(name=bus_type_name)  
+                data['bus_type'] = bus_type.id  
+            except BusType.DoesNotExist:
+                return Response({'error': 'Invalid bus type'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = BusModelSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()   
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print('error', serializer.errors)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
