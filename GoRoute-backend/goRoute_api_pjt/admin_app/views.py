@@ -19,6 +19,7 @@ from datetime import timedelta
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import NotFound
+from django.shortcuts import get_object_or_404
 
 
 # Create your views here.
@@ -412,3 +413,62 @@ class LogoutView(APIView):
 
 
 
+# ------------------------------------ bus requests --------------------------
+
+
+
+class PendingBusesView(APIView):
+    authentication_classes = [JWTAuthentication]  
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        pending_buses = BusModel.objects.filter(is_active=False)
+        serializer = BusSerializerPending(pending_buses, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+
+class BusDetailsView(APIView):
+    def get(self, request, pk, format=None):
+        try:
+            bus = BusModel.objects.get(pk=pk)
+
+            serializer = BusSerializerPending(bus)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except BusModel.DoesNotExist:
+            return Response({"detail": "Bus not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+
+class ApproveBusRequestView(APIView):
+    
+    authentication_classes = [JWTAuthentication]  
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, bus_id):
+        print('user',request.user)
+        print(bus_id)
+        bus_request = get_object_or_404(BusModel, id=bus_id)
+        print(bus_request,'bus')
+        
+        if bus_request.is_active:
+            return Response({"message": "This bus request has already been approved."}, status=status.HTTP_400_BAD_REQUEST)
+
+        bus_request.is_active = True
+        bus_request.save()
+        return Response({"message": "Bus request approved successfully."}, status=status.HTTP_200_OK)
+
+
+class RejectBusRequestView(APIView):
+    authentication_classes = [JWTAuthentication]  
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, bus_id):
+        bus_request = get_object_or_404(BusModel, id=bus_id)
+        
+        bus_request.delete()
+        
+        return Response({"message": "Bus request rejected and deleted successfully."}, status=status.HTTP_200_OK)

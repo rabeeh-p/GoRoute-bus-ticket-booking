@@ -14,6 +14,7 @@ urlpatterns = [
     
 
     path('admin-login/', AdminLoginView.as_view(), name='admin-login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 
     # USERS
     path('user-profiles/', UserProfileListView.as_view(), name='user-profile-list'),
@@ -27,7 +28,12 @@ urlpatterns = [
     path('bus-owner-details/<int:id>/', BusOwnerDetailView.as_view(), name='bus-owner-details'),
     path('accept-bus-owner/<int:id>/', AcceptBusOwnerView.as_view(), name='accept-bus-owner'),
 
-    path('logout/', LogoutView.as_view(), name='logout'),
+    # REQUESTS
+    path('buses/pending/', PendingBusesView.as_view(), name='pending-buses'),
+    path('buses/<int:pk>/', BusDetailsView.as_view(), name='bus-details'),
+    path('bus-requests/<int:bus_id>/approve/', ApproveBusRequestView.as_view(), name='approve_bus_request'),
+    path('bus-requests/<int:bus_id>/reject/', RejectBusRequestView.as_view(), name='reject_bus_request'),
+
 
 
 

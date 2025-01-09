@@ -143,6 +143,8 @@ class BusModel(models.Model):
     is_active = models.BooleanField(default=False)
     description = models.TextField(null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
+    bus_document = models.FileField(upload_to='bus_documents/', null=True, blank=True)
+    
 
 
 

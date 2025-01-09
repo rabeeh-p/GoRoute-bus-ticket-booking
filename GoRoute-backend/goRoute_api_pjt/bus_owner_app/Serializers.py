@@ -49,7 +49,7 @@ class BusModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BusModel
-        fields = ['bus_type', 'name', 'bus_owner', 'bus_number', 'description', 'is_active']
+        fields = ['bus_type', 'name', 'bus_owner', 'bus_number', 'description', 'is_active','bus_document']
 
     
     def validate_name(self, value):
@@ -84,3 +84,9 @@ class BusModelSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return BusModel.objects.create(**validated_data)
+
+
+
+
+
+

@@ -103,3 +103,32 @@ class BusOwnerSerializer2(serializers.ModelSerializer):
     class Meta:
         model = BusOwnerModel
         fields = ['user','travel_name', 'address', 'contact_number', 'logo_image', 'created_date']
+
+
+
+
+
+class BusSerializerPending(serializers.ModelSerializer):
+    bus_owner_name = serializers.SerializerMethodField()
+    bus_type_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BusModel
+        fields = [
+            'id',
+            'bus_owner',
+            'bus_owner_name',   
+            'bus_type',
+            'bus_type_name',   
+            'bus_number',
+            'is_active',
+            'description',
+            'name',
+            'bus_document',
+        ]
+
+    def get_bus_owner_name(self, obj):
+        return obj.bus_owner.travel_name if obj.bus_owner else None
+
+    def get_bus_type_name(self, obj):
+        return obj.bus_type.name if obj.bus_type else None
