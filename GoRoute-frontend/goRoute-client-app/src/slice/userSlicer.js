@@ -9,9 +9,13 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    // setToken: (state, action) => {
+    //   const { token, expiry } = action.payload;
+    //   state.token = token;
+    // },
     setToken: (state, action) => {
-      const { token, expiry } = action.payload;
-      state.token = token;
+      const { access } = action.payload;  // Directly use 'access'
+      state.token = access;
     },
     setUserType: (state, action) => {
       state.userType = action.payload;

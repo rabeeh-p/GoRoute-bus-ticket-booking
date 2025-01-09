@@ -3,6 +3,8 @@ import { useDispatch } from "react-redux";
 import { clearUserData } from "../../slice/userSlicer";
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import axios from 'axios';
+import axiosInstance from '../../axios/axios';
 
 export default function Sidebar() {
     const dispatch = useDispatch();
@@ -10,6 +12,24 @@ export default function Sidebar() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);  // Initially set the sidebar to be hidden on mobile
 
     const handleLogout = () => {
+
+        // axiosInstance.post('logout/')
+        // .then(response => {
+        //     console.log(response.data.message); 
+        //     dispatch(clearUserData());
+        //     localStorage.removeItem("accessToken");
+        //     localStorage.removeItem("refreshToken");
+        //     localStorage.removeItem("userType");
+        //     navigate("/");  
+        // })
+        // .catch(error => {
+        //     console.error("Logout error", error);
+        // });
+
+
+
+
+
         dispatch(clearUserData());
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
@@ -48,26 +68,26 @@ export default function Sidebar() {
                             <span className="mx-3">Dashboard</span>
                         </a>
                     </li>
-                    <li onClick={() => navigate('bus-owner/route-table/')}>
-                        <a href="#" className="flex items-center px-6 py-3 hover:bg-red-800">
+                    <li onClick={() => navigate('bus-owner/route-table')}>
+                        <a  className="flex items-center px-6 py-3 hover:bg-red-800">
                             <Calendar className="h-5 w-5" />
                             <span className="mx-3">Route</span>
                         </a>
                     </li>
                     <li onClick={() => navigate('bus-owner/add-bus-type/')}>
-                        <a href="#" className="flex items-center px-6 py-3 hover:bg-red-800">
+                        <a  className="flex items-center px-6 py-3 hover:bg-red-800">
                             <Settings className="h-5 w-5" />
                             <span className="mx-3">Add bus</span>
                         </a>
                     </li>
                     <li onClick={() => navigate('bus-owner/bus-list/')}>
-                        <a href="#" className="flex items-center px-6 py-3 hover:bg-red-800">
+                        <a  className="flex items-center px-6 py-3 hover:bg-red-800">
                             <HelpCircle className="h-5 w-5" />
                             <span className="mx-3">Bus List</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" className="flex items-center px-6 py-3 hover:bg-red-800">
+                        <a  className="flex items-center px-6 py-3 hover:bg-red-800">
                             <HelpCircle className="h-5 w-5" />
                             <span className="mx-3">Sample</span>
                         </a>

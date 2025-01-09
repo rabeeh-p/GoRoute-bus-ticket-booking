@@ -12,6 +12,8 @@ const RouteStopsManager = () => {
   const [distance_in_km, setDistance_in_km] = useState("");
 
   const { routeId } = useParams("id");
+  console.log('route',routeId);
+  
 
   useEffect(() => {
     const fetchRouteStops = async () => {

@@ -11,9 +11,16 @@ const RouteTable = () => {
   
 
   useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+
+    
     const fetchRoutes = async () => {
       try {
-        const response = await axiosInstance.get('routes/my_routes/');
+        const response = await axiosInstance.get('routes/my_routes/',{
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
 
         if (response.status === 200) {
           setRoutes(response.data);   

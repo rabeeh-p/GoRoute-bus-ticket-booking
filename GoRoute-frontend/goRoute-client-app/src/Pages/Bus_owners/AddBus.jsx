@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../axios/axios';  
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';  
 
 const AddBus = () => {
     const [busNumber, setBusNumber] = useState('');
@@ -49,11 +50,51 @@ const AddBus = () => {
                     }
                 }
             );
-            alert('Bus added successfully!');
-            navigate('/bus-owner/bus-list/');  
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Bus added successfully!',
+                confirmButtonText: 'OK'
+            });
+            navigate('/busowner-dashboard/bus-owner/bus-list/');  
         } catch (error) {
             console.error('There was an error adding the bus!', error);
-            alert('Failed to add bus.');
+
+            if (error.response && error.response.data) {
+                if (error.response.data.name && error.response.data.name.length > 0) {
+                    setError(error.response.data.name[0]);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: error.response.data.name[0],
+                        confirmButtonText: 'OK'
+                    });
+                }else if(error.response.data.bus_number){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: error.response.data.bus_number[0],  
+                    });
+
+                }
+                 else {
+                    setError('Failed to add bus.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to add bus.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } else {
+                setError('An unknown error occurred.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An unknown error occurred.',
+                    confirmButtonText: 'OK'
+                });
+            }
         } finally {
             setLoading(false);
         }
@@ -65,7 +106,7 @@ const AddBus = () => {
                 <h2 className="text-2xl font-semibold text-gray-800">Add Bus</h2>
             </div>
             <form onSubmit={handleAddBus} className="bg-white shadow-md rounded-lg p-6">
-                {error && <p className="text-red-500">{error}</p>} {/* Display error message */}
+                {error && <p className="text-red-500">{error}</p>}  
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -90,7 +131,7 @@ const AddBus = () => {
                             {busTypes.length > 0 ? (
                                 busTypes.map((type) => (
                                     <option key={type.id} value={type.id}>
-                                        {type.name}
+                                        {type.name} - {type.seat_type}- {type.seat_count}-{type.id}
                                     </option>
                                 ))
                             ) : (

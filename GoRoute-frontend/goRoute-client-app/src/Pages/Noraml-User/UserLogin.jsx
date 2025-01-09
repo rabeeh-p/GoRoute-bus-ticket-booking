@@ -95,6 +95,9 @@ const UserLogin = () => {
                 .post('http://127.0.0.1:8000/login/', { username, password })
                 .then((response) => {
                     const { access, userType } = response.data;
+
+                    console.log(response.data,'dataaaaaaaaa');
+                    
     
                     if (access) {
                         dispatch(setToken({ access }));

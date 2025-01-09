@@ -8,35 +8,42 @@ const BusList = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  console.log('buss',buses);
 
-  const busTypeMapping = {
-    1: 'AC Bus',
-    2: 'Sleeper AC Bus',
-    3: 'Non-AC Sleeper',
-    4: 'Semi Sleeper',
-  };
+  
   
 
   useEffect(() => {
+    
     const accessToken = localStorage.getItem('accessToken');
-
+    setBuses([]);
+   
     if (!accessToken) {
-      navigate('/admin-login');   
+      navigate('/login');   
       return;
     }
+    
+    
 
     axiosInstance.get('/bus-list/', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
       
     })
     .then(response => {
       setBuses(response.data);
       setLoading(false);
+      console.log('is working loading');
+      
     })
     .catch(err => {
       setError('Failed to fetch bus data');
       setLoading(false);
     });
+
+    return () => {
+      setBuses([]);
+    };
   }, [navigate]);
 
   const handleViewBus = (busId) => {
@@ -76,7 +83,6 @@ const BusList = () => {
                 <td className="px-4 py-2 text-sm">{bus.bus_type.seat_count}</td>
                 <td className="px-4 py-2 text-sm">
                   <button
-                    onClick={() => handleViewBus(bus.id)}
                     className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600"
                   >
                     View
