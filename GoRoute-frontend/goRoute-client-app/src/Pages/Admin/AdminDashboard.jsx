@@ -9,6 +9,8 @@ import UserDetails from "./UserDetails";
 import BusOwnersList from "./BusOwnersList";
 import RequestBusOwner from "./RequestBusOwner";
 import BusOwnerDetails from "./BusOwnerDetails";
+import AdminBusRequests from "./AdminBusRequests";
+import BusDetails from "./BusDetails";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -87,6 +89,14 @@ const AdminDashboard = () => {
                   Requests 
                 </a>
               </li>
+              <li>
+                <a
+                  onClick={() => navigate('/admin-home/bus-requests/')} 
+                  className="block py-2 px-4 hover:bg-red-700 rounded-lg transition duration-300"
+                >
+                  Bus Requests 
+                </a>
+              </li>
              
             </ul>
           </nav>
@@ -104,6 +114,8 @@ const AdminDashboard = () => {
               <Route path="busowners-list" element={<BusOwnersList />} />
               <Route path="request-busowner" element={<RequestBusOwner />} />
               <Route path="busowner-details/:id" element={<BusOwnerDetails />} />
+              <Route path="bus-requests/" element={<AdminBusRequests />} />
+              <Route path="bus-details/:busId" element={<BusDetails />} />
             </Routes>
           </div>
         </main>

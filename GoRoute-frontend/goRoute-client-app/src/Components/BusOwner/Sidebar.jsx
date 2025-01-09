@@ -1,4 +1,4 @@
-import { Home, Calendar, Settings, HelpCircle, LogOut, Bus } from 'lucide-react';
+import { Home, Calendar, Settings, HelpCircle, LogOut, Bus, PlusCircle, MapPin } from 'lucide-react';
 import { useDispatch } from "react-redux";
 import { clearUserData } from "../../slice/userSlicer";
 import { useNavigate } from 'react-router-dom';
@@ -68,26 +68,46 @@ export default function Sidebar() {
                             <span className="mx-3">Dashboard</span>
                         </a>
                     </li>
-                    <li onClick={() => navigate('bus-owner/route-table')}>
+                    {/* <li onClick={() => navigate('bus-owner/route-table')}>
                         <a  className="flex items-center px-6 py-3 hover:bg-red-800">
                             <Calendar className="h-5 w-5" />
                             <span className="mx-3">Route</span>
                         </a>
+                    </li> */}
+
+                    <li onClick={() => navigate('bus-owner/route-table')}>
+                        <a className="flex items-center px-6 py-3 hover:bg-red-800">
+                            <MapPin className="h-5 w-5" /> {/* Updated to MapPin for 'Route' */}
+                            <span className="mx-3">Route</span>
+                        </a>
                     </li>
-                    <li onClick={() => navigate('bus-owner/add-bus-type/')}>
-                        <a  className="flex items-center px-6 py-3 hover:bg-red-800">
+                    {/* <li onClick={() => navigate('bus-owner/add-bus-type/')}>
+                        <a className="flex items-center px-6 py-3 hover:bg-red-800">
                             <Settings className="h-5 w-5" />
                             <span className="mx-3">Add bus</span>
                         </a>
+                    </li> */}
+                    <li onClick={() => navigate('bus-owner/add-bus-type/')}>
+                        <a className="flex items-center px-6 py-3 hover:bg-red-800">
+                            <PlusCircle className="h-5 w-5" /> {/* Replaced Bus icon with PlusCircle */}
+                            <span className="mx-3">Add Bus Type</span>
+                        </a>
                     </li>
-                    <li onClick={() => navigate('bus-owner/bus-list/')}>
-                        <a  className="flex items-center px-6 py-3 hover:bg-red-800">
+
+                    {/* <li onClick={() => navigate('bus-owner/bus-list/')}>
+                        <a className="flex items-center px-6 py-3 hover:bg-red-800">
                             <HelpCircle className="h-5 w-5" />
+                            <span className="mx-3">Bus List</span>
+                        </a>
+                    </li> */}
+                    <li onClick={() => navigate('bus-owner/bus-list/')}>
+                        <a className="flex items-center px-6 py-3 hover:bg-red-800">
+                            <Bus className="h-5 w-5" /> {/* Replaced HelpCircle with Bus icon */}
                             <span className="mx-3">Bus List</span>
                         </a>
                     </li>
                     <li>
-                        <a  className="flex items-center px-6 py-3 hover:bg-red-800">
+                        <a className="flex items-center px-6 py-3 hover:bg-red-800">
                             <HelpCircle className="h-5 w-5" />
                             <span className="mx-3">Sample</span>
                         </a>

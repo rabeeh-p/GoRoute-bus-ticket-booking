@@ -8,6 +8,7 @@ const AddBus = () => {
     const [busType, setBusType] = useState('');
     const [description, setDescription] = useState('');
     const [name, setName] = useState('');
+    const [busDocument, setBusDocument] = useState(null);  
     const [loading, setLoading] = useState(false);
     const [busTypes, setBusTypes] = useState([]);
     const [error, setError] = useState('');
@@ -27,12 +28,28 @@ const AddBus = () => {
     const handleAddBus = async (e) => {
         e.preventDefault();
         setLoading(true);
-        const busData = {
-            bus_number: busNumber,
-            bus_type: busType,   
-            description: description,
-            name: name,   
-        };
+
+
+        if (!busDocument) {
+            setError('Please upload the bus document.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error!',
+                text: 'Please upload the bus document.',
+                confirmButtonText: 'OK',
+            });
+            setLoading(false);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('bus_number', busNumber);
+        formData.append('bus_type', busType);
+        formData.append('description', description);
+        formData.append('name', name);
+        if (busDocument) {
+            formData.append('bus_document', busDocument);  
+        }
 
         try {
             const accessToken = localStorage.getItem('accessToken');
@@ -43,10 +60,11 @@ const AddBus = () => {
 
             const response = await axiosInstance.post(
                 'add-bus/', 
-                busData, 
+                formData, 
                 { 
                     headers: { 
-                        Authorization: `Bearer ${accessToken}` 
+                        Authorization: `Bearer ${accessToken}`,
+                        'Content-Type': 'multipart/form-data' 
                     }
                 }
             );
@@ -69,15 +87,13 @@ const AddBus = () => {
                         text: error.response.data.name[0],
                         confirmButtonText: 'OK'
                     });
-                }else if(error.response.data.bus_number){
+                } else if (error.response.data.bus_number) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
                         text: error.response.data.bus_number[0],  
                     });
-
-                }
-                 else {
+                } else {
                     setError('Failed to add bus.');
                     Swal.fire({
                         icon: 'error',
@@ -131,7 +147,7 @@ const AddBus = () => {
                             {busTypes.length > 0 ? (
                                 busTypes.map((type) => (
                                     <option key={type.id} value={type.id}>
-                                        {type.name} - {type.seat_type}- {type.seat_count}-{type.id}
+                                        {type.name} - {type.seat_type}- {type.seat_count}
                                     </option>
                                 ))
                             ) : (
@@ -154,6 +170,14 @@ const AddBus = () => {
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
+                            className="w-full p-2 border rounded-lg"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Bus Document</label>
+                        <input
+                            type="file"
+                            onChange={(e) => setBusDocument(e.target.files[0])}
                             className="w-full p-2 border rounded-lg"
                         />
                     </div>

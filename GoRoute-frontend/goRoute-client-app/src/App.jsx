@@ -31,6 +31,8 @@ import RouteStopsManager from './Pages/Bus_owners/RouteStopManager';
 import AddBusType from './Pages/Bus_owners/AddBusType';
 import BusList from './Pages/Bus_owners/BusList';
 import AddBus from './Pages/Bus_owners/AddBus';
+import AdminBusRequests from './Pages/Admin/AdminBusRequests';
+import BusDetails from './Pages/Admin/BusDetails';
 function App() {
 
 
@@ -66,6 +68,8 @@ function App() {
           <Route path="busowners-list" element={<BusOwnersList />} />
           <Route path="request-busowner" element={<RequestBusOwner />} />
           <Route path="busowner-details/:id" element={<BusOwnerDetails />} />
+          <Route path="bus-requests/" element={<AdminBusRequests />} />
+          <Route path="bus-details/:busId" element={<BusDetails />} />
 
 
         </Route>
