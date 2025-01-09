@@ -384,6 +384,29 @@ class AcceptBusOwnerView(APIView):
 
 
 
+class LogoutView(APIView):
+    """
+    Handle logout: Invalidate the refresh token, delete cookies and session data.
+    """
+    def post(self, request, *args, **kwargs):
+
+        print("logout is working")
+        refresh_token = request.COOKIES.get('refresh_token')
+        
+        if refresh_token:
+            try:
+                token = RefreshToken(refresh_token)
+                token.blacklist()   
+            except Exception as e:
+                return JsonResponse({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        response = JsonResponse({"message": "Logged out successfully"})
+        
+        response.delete_cookie('access_token')   
+        response.delete_cookie('refresh_token')   
+        
+        return response
+
 
 
 

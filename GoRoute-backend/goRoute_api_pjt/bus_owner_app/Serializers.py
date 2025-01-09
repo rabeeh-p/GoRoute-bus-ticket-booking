@@ -30,20 +30,19 @@ class RouteStopSerializer(serializers.ModelSerializer):
 class BusTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusType
-        fields = ['name', 'seat_type', 'seat_count', 'description']
+        fields = ['id','name', 'seat_type', 'seat_count', 'description']
 
 
 
-# class BusModelSerializer(serializers.ModelSerializer):
-#     # bus_type = serializers.PrimaryKeyRelatedField(queryset=BusType.objects.all())
-#     bus_type = BusTypeSerializer() 
+class BusModelSerializer2(serializers.ModelSerializer):
+    bus_type = BusTypeSerializer() 
 
-#     class Meta:
-#         model = BusModel
-#         fields = ['bus_type', 'name','bus_owner', 'bus_number', 'description', 'is_active']
+    class Meta:
+        model = BusModel
+        fields = ['id','bus_type', 'name','bus_owner', 'bus_number', 'description', 'is_active']
 
-#     def create(self, validated_data):
-#         return BusModel.objects.create(**validated_data)
+    def create(self, validated_data):
+        return BusModel.objects.create(**validated_data)
 
 class BusModelSerializer(serializers.ModelSerializer):
     bus_type = serializers.PrimaryKeyRelatedField(queryset=BusType.objects.all())
@@ -51,6 +50,37 @@ class BusModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusModel
         fields = ['bus_type', 'name', 'bus_owner', 'bus_number', 'description', 'is_active']
+
+    
+    def validate_name(self, value):
+         
+        user = self.context.get('request').user  
+        if user:
+            try:
+                bus_owner = BusOwnerModel.objects.get(user=user)   
+            except BusOwnerModel.DoesNotExist:
+                raise serializers.ValidationError("User is not associated with a bus owner.")
+            
+            if BusModel.objects.filter(bus_owner=bus_owner, name=value).exists():
+                raise serializers.ValidationError("A bus with this name already exists for this bus owner.")
+        
+        return value
+    
+    def validate_bus_number(self, value):
+        """
+        Check if the bus number already exists for the same bus owner.
+        """
+        user = self.context.get('request').user   
+        if user:
+            try:
+                bus_owner = BusOwnerModel.objects.get(user=user)   
+            except BusOwnerModel.DoesNotExist:
+                raise serializers.ValidationError("User is not associated with a bus owner.")
+            
+            if BusModel.objects.filter(bus_owner=bus_owner, bus_number=value).exists():
+                raise serializers.ValidationError("A bus with this number already exists for this bus owner.")
+        
+        return value
 
     def create(self, validated_data):
         return BusModel.objects.create(**validated_data)
