@@ -247,3 +247,119 @@ class AddBusView(APIView):
 
 
 
+# ------------------------------------- scheduling bu--------------------
+
+
+
+
+class ScheduleBusView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, bus_id):
+        try:
+            bus = BusModel.objects.get(id=bus_id)
+
+            route_id = request.data.get('route_id')
+            if not route_id:
+                return Response({"error": "route_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+            route = RouteModel.objects.get(id=route_id)
+
+            stops = RouteStopModel.objects.filter(route_id=route_id).order_by('stop_order')
+            if not stops.exists():
+                return Response({"error": "No stops found for the provided route"}, status=status.HTTP_404_NOT_FOUND)
+
+            scheduled_date = request.data.get('scheduled_date')
+            if not scheduled_date:
+                return Response({"error": "scheduled_date is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+            scheduled_bus = ScheduledBus.objects.create(
+                bus_number=bus.bus_number,
+                bus_owner_name=bus.bus_owner.travel_name,  
+                bus_type=bus.bus_type.name,   
+                seat_type=bus.bus_type.seat_type,  
+                seat_count=bus.bus_type.seat_count,   
+                route=route.route_name,   
+                scheduled_date=scheduled_date,
+                description=bus.description,
+                started=False,
+            )
+
+            for stop in stops:
+                ScheduledStop.objects.create(
+                    scheduled_bus=scheduled_bus,
+                    stop_name=stop.stop_name,
+                    stop_order=stop.stop_order,
+                    arrival_time=stop.arrival_time,
+                    departure_time=stop.departure_time,
+                )
+
+            bus.Scheduled = True
+            bus.save()
+
+            return Response({
+                "message": "Bus scheduled successfully",
+                "scheduled_bus_id": scheduled_bus.id,
+            }, status=status.HTTP_201_CREATED)
+
+        except BusModel.DoesNotExist:
+            return Response({"error": "Bus not found"}, status=status.HTTP_404_NOT_FOUND)
+        except RouteModel.DoesNotExist:
+            return Response({"error": "Route not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+class ScheduledBusListView(APIView):
+    """
+    List all scheduled buses for the current bus owner's travel_name.
+    """
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        try:
+            bus_owner = BusOwnerModel.objects.get(user=request.user)
+        except BusOwnerModel.DoesNotExist:
+            return Response({"detail": "Bus Owner profile not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        travel_name = bus_owner.travel_name   
+        print(travel_name, 'Travel Name')
+
+        buses = ScheduledBus.objects.filter(bus_owner_name=travel_name, status='active')
+        print(buses,'buses')
+
+        if not buses.exists():
+            return Response({"detail": "No active buses found for this bus owner."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ScheduledBusSerializer(buses, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+class ScheduledBusDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+
+    def get(self, request, busId):
+        try:
+            print(busId,'bus idddd11')
+            scheduled_bus = ScheduledBus.objects.get(id=busId)
+            print(scheduled_bus,'scheduled bus')
+
+            serializer = ScheduledBusSerializer(scheduled_bus)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ScheduledBus.DoesNotExist:
+            return Response(
+                {"detail": "Scheduled Bus not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )

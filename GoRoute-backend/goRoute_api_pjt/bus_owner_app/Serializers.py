@@ -45,7 +45,7 @@ class BusModelSerializer2(serializers.ModelSerializer):
 
     class Meta:
         model = BusModel
-        fields = ['id','bus_type', 'name','bus_owner', 'bus_number', 'description', 'is_active']
+        fields = ['id','bus_type', 'name','bus_owner', 'bus_number', 'description', 'is_active','Scheduled']
 
     def create(self, validated_data):
         return BusModel.objects.create(**validated_data)
@@ -96,3 +96,15 @@ class BusModelSerializer(serializers.ModelSerializer):
 
 
 
+
+class ScheduledStopSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduledStop
+        fields = ['id', 'stop_name', 'stop_order', 'arrival_time', 'departure_time', 'description']
+
+class ScheduledBusSerializer(serializers.ModelSerializer):
+    stops = ScheduledStopSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ScheduledBus
+        fields = ['id', 'bus_number', 'bus_owner_name', 'bus_type', 'seat_type', 'seat_count', 'route', 'scheduled_date', 'status', 'description', 'started', 'stops']

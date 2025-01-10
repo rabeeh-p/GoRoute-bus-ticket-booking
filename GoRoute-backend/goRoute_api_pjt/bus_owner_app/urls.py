@@ -12,4 +12,11 @@ urlpatterns = [
     # path('add-bus/', AddBusView.as_view(), name='add-bus'),
     path('bus-list/', BusListView.as_view(), name='bus-list'),
     path('add-bus/', AddBusView.as_view(), name='add_bus'),
+
+
+    # SCHEDULING
+    path('schedule-bus/<int:bus_id>/', ScheduleBusView.as_view(), name='schedule-bus'),
+
+    path('busowner-dashboard/scheduled-buses/', ScheduledBusListView.as_view(), name='scheduled-buses-list'),
+    path('scheduled-buses/<int:busId>/', ScheduledBusDetailView.as_view(), name='scheduled-bus-detail'),
 ]

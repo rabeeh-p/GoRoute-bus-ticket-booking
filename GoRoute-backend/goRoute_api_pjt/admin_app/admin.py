@@ -11,6 +11,9 @@ admin.site.register(RouteModel)
 admin.site.register(RouteStopModel)
 admin.site.register(BusType)
 admin.site.register(BusModel)
+admin.site.register(ScheduledBus)
+admin.site.register(ScheduledStop)
+
 
 
 

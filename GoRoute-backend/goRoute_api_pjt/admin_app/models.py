@@ -103,7 +103,6 @@ class RouteStopModel(models.Model):
 
 
 
-
 class BusType(models.Model):
     
     BUS_TYPE_CHOICES = [
@@ -152,3 +151,32 @@ class BusModel(models.Model):
 
 
 
+class ScheduledBus(models.Model):
+    bus_number = models.CharField(max_length=20)  # Store the bus number directly
+    bus_owner_name = models.CharField(max_length=100)  # Store bus owner's name
+    bus_type = models.CharField(max_length=100)  # Store bus type directly (e.g., AC, Non-AC)
+    seat_type = models.CharField(max_length=50)  # Store seat type (e.g., Recliner, Standard, etc.)
+    seat_count = models.IntegerField()  # Store the number of seats
+    route = models.CharField(max_length=255)  # Store route description (can be a string)
+    scheduled_date = models.DateTimeField()  # DateTime of bus scheduling
+    status = models.CharField(max_length=50, choices=[('active', 'Active'), ('completed', 'Completed'), ('cancelled', 'Cancelled')], default='active')
+    description = models.TextField(blank=True, null=True)  # Additional description for the schedule
+    started= models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Scheduled Bus {self.bus_number} on {self.scheduled_date}"
+    
+
+
+
+
+class ScheduledStop(models.Model):
+    scheduled_bus = models.ForeignKey(ScheduledBus, on_delete=models.CASCADE, related_name='stops')  # ForeignKey relation to ScheduledBus
+    stop_name = models.CharField(max_length=255)  # Stop name (e.g., city or specific location)
+    stop_order = models.IntegerField()  # Order in which the stop occurs (e.g., first stop, second stop, etc.)
+    arrival_time = models.TimeField()  # Arrival time at the stop
+    departure_time = models.TimeField()  # Departure time from the stop
+    description = models.TextField(blank=True, null=True)  # Additional details about the stop
+
+    def __str__(self):
+        return f"Stop: {self.stop_name}, Arrival: {self.arrival_time}, Departure: {self.departure_time}"
