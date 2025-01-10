@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from admin_app.models import *
+from django.utils.timezone import now
 
 class RouteModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = RouteModel
-        fields = ['id', 'bus_owner', 'route_name', 'start_location', 'end_location', 'distance_in_km', 'is_active']
+        fields = ['id', 'bus_owner', 'route_name', 'start_location', 'end_location', 'distance_in_km', 'is_active','start_datetime']
 
     def validate_distance_in_km(self, value):
         if value <= 0:
@@ -14,6 +15,11 @@ class RouteModelSerializer(serializers.ModelSerializer):
     def validate_route_name(self, value):
         if len(value) < 3:
             raise serializers.ValidationError("Route name must be at least 3 characters.")
+        return value
+    
+    def validate_start_datetime(self, value):
+        if value < now():   
+            raise serializers.ValidationError("Start date and time must not be in the past.")
         return value
 
 

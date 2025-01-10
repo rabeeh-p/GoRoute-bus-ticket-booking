@@ -74,6 +74,9 @@ class RouteModel(models.Model):
     distance_in_km = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    start_datetime = models.DateTimeField(null=True, blank=True)
+    
+    
 
     def __str__(self):
         return f"{self.route_name} ({self.start_location} to {self.end_location})"
@@ -144,6 +147,7 @@ class BusModel(models.Model):
     description = models.TextField(null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
     bus_document = models.FileField(upload_to='bus_documents/', null=True, blank=True)
+    Scheduled= models.BooleanField(default=False)
     
 
 

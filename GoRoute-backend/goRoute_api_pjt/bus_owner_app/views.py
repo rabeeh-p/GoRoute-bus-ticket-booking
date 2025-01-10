@@ -60,6 +60,7 @@ class RouteCreateView(APIView):
             'end_location': data.get('endLocation'),
             'distance_in_km': data.get('distanceInKm'),
             'bus_owner': data.get('bus_owner'),
+            'start_datetime': data.get('startDatetime'),
             
         }
 

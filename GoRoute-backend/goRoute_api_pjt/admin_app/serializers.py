@@ -112,6 +112,9 @@ class BusSerializerPending(serializers.ModelSerializer):
     bus_owner_name = serializers.SerializerMethodField()
     bus_type_name = serializers.SerializerMethodField()
 
+    seat_type_name = serializers.SerializerMethodField()
+    seat_count_name = serializers.SerializerMethodField()
+
     class Meta:
         model = BusModel
         fields = [
@@ -125,6 +128,8 @@ class BusSerializerPending(serializers.ModelSerializer):
             'description',
             'name',
             'bus_document',
+            'seat_type_name',
+            'seat_count_name',
         ]
 
     def get_bus_owner_name(self, obj):
@@ -132,3 +137,9 @@ class BusSerializerPending(serializers.ModelSerializer):
 
     def get_bus_type_name(self, obj):
         return obj.bus_type.name if obj.bus_type else None
+    
+    def get_seat_type_name(self, obj):
+        return obj.bus_type.get_seat_type_display() if obj.bus_type else None
+
+    def get_seat_count_name(self, obj):
+        return obj.bus_type.get_seat_count_display() if obj.bus_type else None
