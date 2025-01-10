@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../axios/axios';   
 import { useNavigate } from 'react-router-dom';
+import BusDetail from './BusDetail';
 
 const BusList = () => {
   const [approvedBuses, setApprovedBuses] = useState([]);
@@ -8,6 +9,7 @@ const BusList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [selectedBusId, setSelectedBusId] = useState(null);
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -52,6 +54,14 @@ const BusList = () => {
     </tr>
   );
 
+  const handleViewClick = (busId) => {
+    setSelectedBusId(busId);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedBusId(null);
+  };
+
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
@@ -90,6 +100,7 @@ const BusList = () => {
                   <td className="px-4 py-2 text-sm">{bus.bus_type.seat_count}</td>
                   <td className="px-4 py-2 text-sm">
                     <button
+                    onClick={() => handleViewClick(bus.id)}
                       className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition duration-300"
                     >
                       View
@@ -101,6 +112,15 @@ const BusList = () => {
           </tbody>
         </table>
       </div>
+      
+      {selectedBusId && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full">
+            <BusDetail busId={selectedBusId} onClose={handleCloseDetail} />
+          </div>
+        </div>
+      )}
+    
 
       {/* Approved Buses Table */}
       <div className="overflow-x-auto">

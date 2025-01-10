@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../axios/axios';  
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';  
+import useLogout from '../../Hook/useLogout';
 
 const AddBus = () => {
     const [busNumber, setBusNumber] = useState('');
@@ -13,6 +14,8 @@ const AddBus = () => {
     const [busTypes, setBusTypes] = useState([]);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+
+    const { handleLogout } = useLogout();
 
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken');
@@ -30,8 +33,14 @@ const AddBus = () => {
                 setBusTypes(response.data);
             })
             .catch((error) => {
-                setError('Failed to fetch bus types');
-                console.error('Error fetching bus types:', error);
+                if (error.response && error.response.status === 401) {
+                    // If the error is unauthorized, call the logout function
+                    handleLogout();
+                  } else {
+                    setError('Failed to fetch bus types');
+                    setError('Failed to fetch bus types');
+                    console.error('Error fetching bus types:', error);
+                  }
             });
     }, []);
 

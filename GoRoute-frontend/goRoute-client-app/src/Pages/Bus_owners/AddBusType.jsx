@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../axios/axios';
+import useLogout from '../../Hook/useLogout';
 
 const AddBusType = () => {
   const [busType, setBusType] = useState({
@@ -12,6 +13,7 @@ const AddBusType = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { handleLogout } = useLogout();
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');  
@@ -52,10 +54,7 @@ const AddBusType = () => {
       })
       .catch(err => {
         if (err.response && err.response.status === 401) {
-          localStorage.removeItem('accessToken');  
-          localStorage.removeItem('refreshToken');  
-
-          navigate('/admin-login');   
+          handleLogout();  
 
           setError('Session expired. Please log in again.');
         } else {
