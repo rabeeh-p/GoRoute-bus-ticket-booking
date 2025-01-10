@@ -11,6 +11,8 @@ import AddBusType from './AddBusType'
 import BusList from './BusList'
 import AddBus from './AddBus'
 import BusSchedule from './BusSchedule'
+import ScheduledBusList from './ScheduledBusList'
+import ScheduledBusDetails from './ScheduledBusDetails'
 
 const BusOwnerDashboard = () => {
     return (
@@ -29,6 +31,8 @@ const BusOwnerDashboard = () => {
                         <Route path="bus-owner/bus-list/" element={<BusList />} />
                         <Route path="bus-owner/bus-add" element={<AddBus />} />
                         <Route path="bus-schedule/:busId" element={<BusSchedule />} />
+                        <Route path="scheduled-bus-list" element={<ScheduledBusList />} />
+                        <Route path="scheduled-bus-details/:busId" element={<ScheduledBusDetails />} />
                         
                     </Routes>
                 </main>

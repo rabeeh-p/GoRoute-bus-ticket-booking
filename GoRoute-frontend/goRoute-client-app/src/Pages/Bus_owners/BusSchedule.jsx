@@ -5,16 +5,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 const BusSchedule = () => {
   const { busId } = useParams();  
   const navigate = useNavigate();
-  
+
   const [busDetails, setBusDetails] = useState(null);
   const [routes, setRoutes] = useState([]);
   const [selectedRoute, setSelectedRoute] = useState(null);
   const [selectedStops, setSelectedStops] = useState([]);
+  const [scheduledDate, setScheduledDate] = useState('');
+  const [status, setStatus] = useState('active');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  console.log(busDetails,'bus details');
-  
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -38,6 +37,7 @@ const BusSchedule = () => {
       setLoading(false);
     });
 
+    // Fetch routes
     axiosInstance.get('/routes/my_routes/', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -59,7 +59,32 @@ const BusSchedule = () => {
   };
 
   const handleSubmit = () => {
-    console.log('Submitted');
+    if (!selectedRoute || !scheduledDate) {
+      setError('Please fill all fields before submitting.');
+      return;
+    }
+
+    const accessToken = localStorage.getItem('accessToken');
+    const payload = {
+      route_id: selectedRoute.id,
+      scheduled_date: scheduledDate,
+      status: status,
+    };
+
+    axiosInstance.post(`/schedule-bus/${busId}/`, payload, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+    .then(response => {
+      alert('Bus scheduled successfully!');
+      navigate('/bus-management'); // Navigate to a success page or refresh
+    })
+    .catch(err => {
+        console.log('error',err);
+        
+      setError('Failed to schedule bus. Please try again.');
+    });
   };
 
   return (
@@ -98,43 +123,46 @@ const BusSchedule = () => {
         )}
       </div>
 
-      {/* Route Selection */}
+      {/* Route and Scheduling Fields */}
       <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Select Route</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Select Route and Schedule</h2>
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">Choose Route</label>
-          <div className="relative">
-            <select
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 appearance-none"
-              onChange={handleRouteChange}
-              value={selectedRoute ? selectedRoute.id : ''}
-            >
-              <option value="">-- Select Route --</option>
-              {routes.map(route => (
-                <option key={route.id} value={route.id}>{route.route_name}</option>
-              ))}
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
+          <select
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+            onChange={handleRouteChange}
+            value={selectedRoute ? selectedRoute.id : ''}
+          >
+            <option value="">-- Select Route --</option>
+            {routes.map(route => (
+              <option key={route.id} value={route.id}>{route.route_name}</option>
+            ))}
+          </select>
         </div>
 
-        {/* {selectedRoute && (
-          <>
-            <h3 className="text-lg font-medium text-gray-700 mb-2">Stops for {selectedRoute.route_name}</h3>
-            <div className="space-y-2">
-              {selectedStops.map(stop => (
-                <div key={stop.id} className="flex justify-between items-center">
-                  <p className="text-gray-600">{stop.stop_name}</p>
-                  <p className="text-gray-600">{stop.arrival_time} - {stop.departure_time}</p>
-                </div>
-              ))}
-            </div>
-          </>
-        )} */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Scheduled Date</label>
+          <input
+            type="datetime-local"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+            value={scheduledDate}
+            onChange={(e) => setScheduledDate(e.target.value)}
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+          <select
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
       </div>
 
       {/* Submit Button */}

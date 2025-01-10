@@ -23,7 +23,9 @@ const BusList = () => {
     })
     .then(response => {
       const buses = response.data;
-      setApprovedBuses(buses.filter(bus => bus.is_active)); 
+      console.log('buses',buses);
+      
+      setApprovedBuses(buses.filter(bus => bus.is_active && bus.Scheduled === false )); 
       setPendingBuses(buses.filter(bus => !bus.is_active)); 
       setLoading(false);
     })
@@ -41,6 +43,14 @@ const BusList = () => {
   const handleViewBus = (busId) => {
     navigate(`/busowner-dashboard/bus-schedule/${busId}`);  
   };
+
+  const EmptyMessage = ({ type }) => (
+    <tr>
+      <td colSpan="4" className="px-4 py-6 text-center text-lg text-gray-500">
+        {type === 'pending' ? 'No pending buses available.' : 'No approved buses available.'}
+      </td>
+    </tr>
+  );
 
   return (
     <div className="container mx-auto p-6">
@@ -70,21 +80,24 @@ const BusList = () => {
             </tr>
           </thead>
           <tbody>
-            {pendingBuses.map(bus => (
-              <tr key={bus.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 text-sm">{bus.name}</td>
-                <td className="px-4 py-2 text-sm">{bus.bus_type.name}</td>
-                <td className="px-4 py-2 text-sm">{bus.bus_type.seat_count}</td>
-                <td className="px-4 py-2 text-sm">
-                  <button
-                    // onClick={() => handleViewBus(bus.id)}
-                    className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition duration-300"
-                  >
-                    View
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {pendingBuses.length === 0 ? (
+              <EmptyMessage type="pending" />
+            ) : (
+              pendingBuses.map(bus => (
+                <tr key={bus.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 text-sm">{bus.name}</td>
+                  <td className="px-4 py-2 text-sm">{bus.bus_type.name}</td>
+                  <td className="px-4 py-2 text-sm">{bus.bus_type.seat_count}</td>
+                  <td className="px-4 py-2 text-sm">
+                    <button
+                      className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition duration-300"
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -102,21 +115,25 @@ const BusList = () => {
             </tr>
           </thead>
           <tbody>
-            {approvedBuses.map(bus => (
-              <tr key={bus.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 text-sm">{bus.name}</td>
-                <td className="px-4 py-2 text-sm">{bus.bus_type.name}</td>
-                <td className="px-4 py-2 text-sm">{bus.bus_type.seat_count}</td>
-                <td className="px-4 py-2 text-sm">
-                  <button
-                    onClick={() => handleViewBus(bus.id)}
-                    className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition duration-300"
-                  >
-                    Schedule
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {approvedBuses.length === 0 ? (
+              <EmptyMessage type="approved" />
+            ) : (
+              approvedBuses.map(bus => (
+                <tr key={bus.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 text-sm">{bus.name}</td>
+                  <td className="px-4 py-2 text-sm">{bus.bus_type.name}</td>
+                  <td className="px-4 py-2 text-sm">{bus.bus_type.seat_count}</td>
+                  <td className="px-4 py-2 text-sm">
+                    <button
+                      onClick={() => handleViewBus(bus.id)}
+                      className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition duration-300"
+                    >
+                      Schedule
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

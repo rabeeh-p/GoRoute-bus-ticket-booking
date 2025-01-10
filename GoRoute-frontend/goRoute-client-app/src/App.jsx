@@ -34,6 +34,8 @@ import AddBus from './Pages/Bus_owners/AddBus';
 import AdminBusRequests from './Pages/Admin/AdminBusRequests';
 import BusDetails from './Pages/Admin/BusDetails';
 import BusSchedule from './Pages/Bus_owners/BusSchedule';
+import ScheduledBusList from './Pages/Bus_owners/ScheduledBusList';
+import ScheduledBusDetails from './Pages/Bus_owners/ScheduledBusDetails';
 function App() {
 
 
@@ -89,6 +91,8 @@ function App() {
           <Route path="bus-owner/bus-list/" element={<BusList />} />
           <Route path="bus-owner/bus-add" element={<AddBus />} />
           <Route path="bus-schedule/:busId" element={<BusSchedule />} />
+          <Route path="scheduled-bus-list" element={<ScheduledBusList />} />
+          <Route path="scheduled-bus-details/:busId" element={<ScheduledBusDetails />} />
         </Route>
       </Routes>
 
