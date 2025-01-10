@@ -276,6 +276,7 @@ class ScheduleBusView(APIView):
 
             scheduled_bus = ScheduledBus.objects.create(
                 bus_number=bus.bus_number,
+                name=bus.name,
                 bus_owner_name=bus.bus_owner.travel_name,  
                 bus_type=bus.bus_type.name,   
                 seat_type=bus.bus_type.seat_type,  
@@ -363,3 +364,25 @@ class ScheduledBusDetailView(APIView):
                 {"detail": "Scheduled Bus not found."},
                 status=status.HTTP_404_NOT_FOUND
             )
+        
+
+
+
+class BusDetailView(APIView):
+    def get(self, request, bus_id, format=None):
+        try:
+            print('is woring')
+            bus = BusModel.objects.get(id=bus_id)
+            serializer = BusModelSerializer2(bus)
+            return Response(serializer.data)
+        except BusModel.DoesNotExist:
+            return Response({"error": "Bus not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+    
+    def delete(self, request, bus_id, format=None):
+        try:
+            bus = BusModel.objects.get(id=bus_id)
+            bus.delete()   
+            return Response({"message": "Bus deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except BusModel.DoesNotExist:
+            return Response({"error": "Bus not found"}, status=status.HTTP_404_NOT_FOUND)

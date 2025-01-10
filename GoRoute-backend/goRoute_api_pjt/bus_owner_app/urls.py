@@ -9,9 +9,10 @@ urlpatterns = [
 
 
     path('add_bus_type/', BusTypeCreateView.as_view(), name='add_bus_type'),
-    # path('add-bus/', AddBusView.as_view(), name='add-bus'),
     path('bus-list/', BusListView.as_view(), name='bus-list'),
     path('add-bus/', AddBusView.as_view(), name='add_bus'),
+    path('api/bus/<int:bus_id>/', BusDetailView.as_view(), name='bus-detail'),
+    # path('bus', BusDetailView.as_view(), name='bus-detail'),
 
 
     # SCHEDULING

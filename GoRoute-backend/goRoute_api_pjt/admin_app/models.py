@@ -162,6 +162,7 @@ class ScheduledBus(models.Model):
     status = models.CharField(max_length=50, choices=[('active', 'Active'), ('completed', 'Completed'), ('cancelled', 'Cancelled')], default='active')
     description = models.TextField(blank=True, null=True)  # Additional description for the schedule
     started= models.BooleanField(default=False)
+    name = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return f"Scheduled Bus {self.bus_number} on {self.scheduled_date}"
