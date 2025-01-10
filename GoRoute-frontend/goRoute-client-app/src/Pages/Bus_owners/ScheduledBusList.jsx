@@ -76,7 +76,7 @@ const ScheduledBusList = () => {
             ) : (
               scheduledBuses.map(bus => (
                 <tr key={bus.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm">{bus.bus_owner_name}</td>
+                  <td className="px-4 py-2 text-sm">{bus.name}</td>
                   <td className="px-4 py-2 text-sm">{bus.bus_type}</td>
                   <td className="px-4 py-2 text-sm">{bus.seat_count}</td>
                   <td className="px-4 py-2 text-sm">{new Date(bus.scheduled_date).toLocaleString()}</td>
