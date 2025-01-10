@@ -15,7 +15,17 @@ const AddBus = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axiosInstance.get('add_bus_type/')
+        const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                setError('No access token found');
+                return;
+            }
+        axiosInstance.get('add_bus_type/',{ 
+            headers: { 
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'multipart/form-data' 
+            }
+        })
             .then((response) => {
                 setBusTypes(response.data);
             })

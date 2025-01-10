@@ -33,6 +33,7 @@ import BusList from './Pages/Bus_owners/BusList';
 import AddBus from './Pages/Bus_owners/AddBus';
 import AdminBusRequests from './Pages/Admin/AdminBusRequests';
 import BusDetails from './Pages/Admin/BusDetails';
+import BusSchedule from './Pages/Bus_owners/BusSchedule';
 function App() {
 
 
@@ -87,6 +88,7 @@ function App() {
           <Route path="bus-owner/add-bus-type/" element={<AddBusType />} />
           <Route path="bus-owner/bus-list/" element={<BusList />} />
           <Route path="bus-owner/bus-add" element={<AddBus />} />
+          <Route path="bus-schedule/:busId" element={<BusSchedule />} />
         </Route>
       </Routes>
 

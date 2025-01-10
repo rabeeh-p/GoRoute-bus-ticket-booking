@@ -16,9 +16,21 @@ const RouteStopsManager = () => {
   
 
   useEffect(() => {
+    
     const fetchRouteStops = async () => {
+      const accessToken = localStorage.getItem('accessToken');  
+  
+      if (!accessToken) {
+        navigate('/admin-login');  
+        return;
+      }
+      
       try {
-        const response = await axiosInstance.get(`routes/${routeId}/stops/`);
+        const response = await axiosInstance.get(`routes/${routeId}/stops/`,{
+          headers: {
+            Authorization: `Bearer ${accessToken}`,   
+          },
+        });
         if (response.status === 200) {
           setRouteStops(response.data);
         }

@@ -11,6 +11,7 @@ import RequestBusOwner from "./RequestBusOwner";
 import BusOwnerDetails from "./BusOwnerDetails";
 import AdminBusRequests from "./AdminBusRequests";
 import BusDetails from "./BusDetails";
+import BusSchedule from "../Bus_owners/BusSchedule";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();

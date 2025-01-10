@@ -39,7 +39,7 @@ const BusList = () => {
   }, [navigate]);
 
   const handleViewBus = (busId) => {
-    navigate(`/bus-details/${busId}`);  
+    navigate(`/busowner-dashboard/bus-schedule/${busId}`);  
   };
 
   return (
@@ -77,7 +77,7 @@ const BusList = () => {
                 <td className="px-4 py-2 text-sm">{bus.bus_type.seat_count}</td>
                 <td className="px-4 py-2 text-sm">
                   <button
-                    onClick={() => handleViewBus(bus.id)}
+                    // onClick={() => handleViewBus(bus.id)}
                     className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition duration-300"
                   >
                     View
@@ -112,7 +112,7 @@ const BusList = () => {
                     onClick={() => handleViewBus(bus.id)}
                     className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition duration-300"
                   >
-                    View
+                    Schedule
                   </button>
                 </td>
               </tr>

@@ -10,6 +10,7 @@ import RouteStopsManager from './RouteStopManager'
 import AddBusType from './AddBusType'
 import BusList from './BusList'
 import AddBus from './AddBus'
+import BusSchedule from './BusSchedule'
 
 const BusOwnerDashboard = () => {
     return (
@@ -27,6 +28,7 @@ const BusOwnerDashboard = () => {
                         <Route path="bus-owner/add-bus-type/" element={<AddBusType />} />
                         <Route path="bus-owner/bus-list/" element={<BusList />} />
                         <Route path="bus-owner/bus-add" element={<AddBus />} />
+                        <Route path="bus-schedule/:busId" element={<BusSchedule />} />
                         
                     </Routes>
                 </main>

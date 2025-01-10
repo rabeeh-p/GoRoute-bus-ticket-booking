@@ -60,6 +60,14 @@ const BusDetails = () => {
                         <p className="text-lg text-gray-600">{busDetails.bus_type_name}</p>
                     </div>
                     <div>
+                        <h3 className="text-xl font-medium text-gray-700">Seat Type:</h3>
+                        <p className="text-lg text-gray-600">{busDetails.seat_type_name}</p>
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-medium text-gray-700">Seat Count:</h3>
+                        <p className="text-lg text-gray-600">{busDetails.seat_count_name}</p>
+                    </div>
+                    <div>
                         <h3 className="text-xl font-medium text-gray-700">Status:</h3>
                         <p
                             className={`text-lg ${

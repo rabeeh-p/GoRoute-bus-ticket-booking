@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const AddRouteForm = () => {
   const [routeName, setRouteName] = useState("");
   const [startLocation, setStartLocation] = useState("");
   const [endLocation, setEndLocation] = useState("");
   const [distanceInKm, setDistanceInKm] = useState("");
-  const [error, setError] = useState(null);
+  const [startDatetime, setStartDatetime] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -18,20 +19,24 @@ const AddRouteForm = () => {
       startLocation,
       endLocation,
       distanceInKm,
+      startDatetime,
     };
 
     const accessToken = localStorage.getItem('accessToken');
-    console.log(accessToken,'access');
-    
 
     if (!accessToken) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Session Expired',
+        text: 'Please log in again.',
+      });
       navigate('/login');
       return;
     }
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/bus-owner/routes/",  
+        "http://localhost:8000/bus-owner/routes/",
         newRoute,
         {
           headers: {
@@ -39,57 +44,56 @@ const AddRouteForm = () => {
           },
         }
       );
-      console.log("Route Created:", response.data);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Route Created',
+        text: 'The route has been successfully added!',
+      });
+
+      // Clear form fields
       setRouteName("");
       setStartLocation("");
       setEndLocation("");
       setDistanceInKm("");
+      setStartDatetime("");
+
     } catch (err) {
+      console.error('Error:', err);
+
       if (err.response && err.response.status === 401) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('userType');
         navigate('/login');
-        setError('Session expired. Please log in again.');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Session Expired',
+          text: 'Your session has expired. Please log in again.',
+        });
+      } else if (err.response && err.response.data) {
+        const errorMessage = Object.values(err.response.data)
+          .flat()
+          .join(' ');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorMessage || 'Failed to create route. Please try again later.',
+        });
       } else {
-        setError('Failed to create route. Please try again later.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to create route. Please try again later.',
+        });
       }
     }
   };
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-
-    if (!accessToken) {
-      navigate('/login');
-      return;
-    }
-
-    axios.get("http://localhost:8000/verify-token/", {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
-    .then(response => {
-      console.log('Token is valid', response.data);
-    })
-    .catch(err => {
-      if (err.response && err.response.status === 401) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('userType');
-        navigate('/login');
-        setError('Session expired. Please log in again.');
-      }
-    });
-  }, [navigate]);
 
   return (
     <div className="bg-gray-100 min-h-screen p-6">
       <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-3xl font-semibold text-red-600 mb-6">Add New Route</h2>
-
-        {error && <div className="text-red-600 mb-4">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -145,6 +149,20 @@ const AddRouteForm = () => {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600"
               value={distanceInKm}
               onChange={(e) => setDistanceInKm(e.target.value)}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="startDatetime" className="block text-lg font-medium text-gray-700 mb-2">
+              Start Date & Time
+            </label>
+            <input
+              id="startDatetime"
+              type="datetime-local"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600"
+              value={startDatetime}
+              onChange={(e) => setStartDatetime(e.target.value)}
+              required
             />
           </div>
 
