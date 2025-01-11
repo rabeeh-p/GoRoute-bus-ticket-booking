@@ -42,74 +42,150 @@ const ScheduledBusDetails = () => {
     return <div className="text-center text-lg text-red-500">{error}</div>;
   }
 
+ 
+
+
+
   const renderSeatLayout = () => {
-    const { seat_count } = busDetails;
+    const { seat_count, seat_type } = busDetails;
   
     if (!seat_count || typeof seat_count !== "number" || seat_count <= 0) {
       return <p className="text-gray-600">No seat data available.</p>;
     }
   
-    const totalRows = Math.ceil(seat_count / 3);  
+    const getSeatStyle = (type) => {
+      switch (type) {
+        case "standard":
+          return "w-8 h-8 bg-gray-400 text-white rounded-md shadow-md";
+        case "recliner":
+          return "w-12 h-12 bg-blue-400 text-white rounded-lg shadow-lg";
+        case "luxury":
+          return "w-16 h-16 bg-yellow-500 text-black rounded-full shadow-lg";
+        case "semi_sleeper":
+          return "w-12 h-24 bg-purple-400 text-white rounded-md shadow-md";
+        case "full_sleeper":
+          return "w-12 h-24 bg-green-500 text-white rounded-md shadow-md";
+        default:
+          return "w-8 h-8 bg-gray-400 text-white rounded-md shadow-md";
+      }
+    };
   
-    const leftSideSeats = Array.from({ length: totalRows }, (_, index) => ({
-      id: index + 1,
-      number: index * 3 + 1,  
-    }));
+    const renderSingleDeck = () => {
+      const totalRows = Math.ceil(seat_count / 5); // Two on the left, three on the right
+      const seats = Array.from({ length: seat_count }, (_, index) => index + 1);
   
-    const rightSideSeats = Array.from({ length: totalRows }, (_, index) => ({
-      id: index + 1,
-      seat1: index * 3 + 2,  
-      seat2: index * 3 + 3,  
-    }));
+      const leftSeats = seats.filter((_, index) => index % 5 < 2);
+      const rightSeats = seats.filter((_, index) => index % 5 >= 2);
   
-    const halfSeatCount = Math.floor(seat_count / 2);
-    
-    const upperDeckLeftSeats = leftSideSeats.slice(0, Math.ceil(halfSeatCount / 3));
-    const upperDeckRightSeats = rightSideSeats.slice(0, Math.ceil(halfSeatCount / 3));
+      const leftSeatRows = Array.from({ length: totalRows }, (_, row) =>
+        leftSeats.slice(row * 2, row * 2 + 2)
+      );
+      const rightSeatRows = Array.from({ length: totalRows }, (_, row) =>
+        rightSeats.slice(row * 3, row * 3 + 3)
+      );
   
-    const lowerDeckLeftSeats = leftSideSeats.slice(Math.ceil(halfSeatCount / 3), Math.ceil(halfSeatCount / 3) + Math.floor(halfSeatCount / 3));
-    const lowerDeckRightSeats = rightSideSeats.slice(Math.ceil(halfSeatCount / 3), Math.ceil(halfSeatCount / 3) + Math.floor(halfSeatCount / 3));
-  
-    const renderDeck = (leftSeats, rightSeats, label) => (
-      <div className="w-full space-y-4">
-        <h3 className="text-gray-700 font-medium text-center">{label}</h3>
-        <div className="flex flex-col space-y-4 justify-center">
-
-          {leftSeats.map((seat, index) => (
-            <div key={seat.id} className="flex space-x-8 justify-center mb-2">
-              <div
-                className={`w-12 h-24 bg-green-500 text-white flex items-center justify-center rounded-md shadow-md`}
-              >
-                {seat.number}
+      return (
+        <div className="flex flex-col space-y-4">
+          {leftSeatRows.map((row, rowIndex) => (
+            <div key={rowIndex} className="flex space-x-8 justify-center mb-2">
+              {/* Left Side Seats */}
+              <div className="flex space-x-4">
+                {row.map((seat) => (
+                  <div
+                    key={seat}
+                    className={`${getSeatStyle(seat_type)} flex items-center justify-center`}
+                  >
+                    {seat}
+                  </div>
+                ))}
               </div>
   
+              {/* Right Side Seats */}
               <div className="flex space-x-4">
-                <div
-                  className={`w-12 h-24 bg-green-500 text-white flex items-center justify-center rounded-md shadow-md`}
-                >
-                  {rightSeats[index].seat1}
-                </div>
-                <div
-                  className={`w-12 h-24 bg-green-500 text-white flex items-center justify-center rounded-md shadow-md`}
-                >
-                  {rightSeats[index].seat2}
-                </div>
+                {rightSeatRows[rowIndex]?.map((seat) => (
+                  <div
+                    key={seat}
+                    className={`${getSeatStyle(seat_type)} flex items-center justify-center`}
+                  >
+                    {seat}
+                  </div>
+                ))}
               </div>
             </div>
           ))}
         </div>
-      </div>
-    );
+      );
+    };
+  
+    const renderDoubleDeck = () => {
+      const halfSeatCount = Math.floor(seat_count / 2);
+      const seats = Array.from({ length: seat_count }, (_, index) => index + 1);
+  
+      const upperDeckSeats = seats.slice(0, halfSeatCount);
+      const lowerDeckSeats = seats.slice(halfSeatCount);
+  
+      const renderDeck = (deckSeats, label) => {
+        const totalRows = Math.ceil(deckSeats.length / 3);
+        const leftSeats = deckSeats.filter((_, index) => index % 3 === 0);
+        const rightSeats = deckSeats.filter((_, index) => index % 3 !== 0);
+  
+        const leftSeatRows = Array.from({ length: totalRows }, (_, row) =>
+          leftSeats.slice(row * 1, row * 1 + 1)
+        );
+        const rightSeatRows = Array.from({ length: totalRows }, (_, row) =>
+          rightSeats.slice(row * 2, row * 2 + 2)
+        );
+  
+        return (
+          <div className="w-full space-y-4">
+            <h3 className="text-gray-700 font-medium text-center">{label}</h3>
+            <div className="flex flex-col space-y-4 justify-center">
+              {leftSeatRows.map((row, rowIndex) => (
+                <div key={rowIndex} className="flex space-x-8 justify-center mb-2">
+                  {/* Left Side Seats */}
+                  <div className="flex space-x-4">
+                    {row.map((seat) => (
+                      <div
+                        key={seat}
+                        className={`${getSeatStyle(seat_type)} flex items-center justify-center`}
+                      >
+                        {seat}
+                      </div>
+                    ))}
+                  </div>
+  
+                  {/* Right Side Seats */}
+                  <div className="flex space-x-4">
+                    {rightSeatRows[rowIndex]?.map((seat) => (
+                      <div
+                        key={seat}
+                        className={`${getSeatStyle(seat_type)} flex items-center justify-center`}
+                      >
+                        {seat}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      };
+  
+      return (
+        <div className="flex space-x-12">
+          <div className="w-1/2">{renderDeck(upperDeckSeats, "Upper Deck")}</div>
+          <div className="w-1/2">{renderDeck(lowerDeckSeats, "Lower Deck")}</div>
+        </div>
+      );
+    };
   
     return (
-      <div className="flex space-x-12">
-        <div className="w-1/2">{renderDeck(upperDeckLeftSeats, upperDeckRightSeats, "Upper Deck")}</div>
-  
-        <div className="w-1/2">{renderDeck(lowerDeckLeftSeats, lowerDeckRightSeats, "Lower Deck")}</div>
+      <div className="w-full">
+        {seat_type === "full_sleeper" ? renderDoubleDeck() : renderSingleDeck()}
       </div>
     );
   };
-  
   
   
 

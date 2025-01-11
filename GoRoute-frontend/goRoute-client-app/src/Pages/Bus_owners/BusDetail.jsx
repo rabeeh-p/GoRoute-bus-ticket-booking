@@ -47,7 +47,12 @@ const BusDetail = ({ busId }) => {
 
     if (result.isConfirmed) {
       try {
-        await axiosInstance.delete(`/api/bus/${busId}/`);
+        await axiosInstance.delete(`/api/bus/${busId}/`,{ 
+          headers: { 
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'multipart/form-data' 
+          }
+      });
         Swal.fire(
           'Deleted!',
           'Your bus has been deleted.',

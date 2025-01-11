@@ -45,9 +45,12 @@ const AddBusType = () => {
 
     setLoading(true);   
 
-    axiosInstance.post('add_bus_type/', busType, {
-     
-    })
+    axiosInstance.post('add_bus_type/', busType, { 
+      headers: { 
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data' 
+      }
+  })
       .then(response => {
         setMessage('Bus Type added successfully!');
         setLoading(false);
