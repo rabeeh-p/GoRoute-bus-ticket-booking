@@ -150,10 +150,26 @@ const TripBooking = () => {
                                         className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
                                     >
                                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                            {/* <div className="flex-1">
+                                                <h3 className="text-lg font-semibold text-gray-800">{bus.bus_owner_name}</h3>
+                                                <p className="text-sm text-gray-600">{bus.bus_type}</p>
+                                            </div> */}
+
                                             <div className="flex-1">
+                                                
+
+                                                {/* Conditionally render logo */}
+                                                {bus.bus_owner_logo ? (
+                                                    <img
+                                                        src={`http://127.0.0.1:8000/${bus.bus_owner_logo}`}
+                                                        alt={`${bus.bus_owner_name} logo`}
+                                                        className="mt-2 w-12 h-12 rounded-full object-cover"
+                                                    />
+                                                ) : null}
                                                 <h3 className="text-lg font-semibold text-gray-800">{bus.bus_owner_name}</h3>
                                                 <p className="text-sm text-gray-600">{bus.bus_type}</p>
                                             </div>
+
 
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2">
@@ -169,7 +185,7 @@ const TripBooking = () => {
                                                 <p className="text-sm text-gray-600">Seats Available: {bus.seat_count}</p>
                                                 <div className="flex items-center gap-2">
                                                     <Star className="w-5 h-5 text-yellow-400" />
-                                                    <span className="font-medium">{bus.status}</span>
+                                                    {/* <span className="font-medium">{bus.status}</span> */}
                                                 </div>
                                             </div>
 
@@ -187,9 +203,9 @@ const TripBooking = () => {
                                                         {bus.price}
                                                     </span>
                                                 </div>
-                                                <button 
-                                                onClick={()=>navigate(`/user-bus-view/${bus.id}`)}
-                                                 className="mt-2 bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition-colors">
+                                                <button
+                                                    onClick={() => navigate(`/user-bus-view/${bus.id}`)}
+                                                    className="mt-2 bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition-colors">
                                                     View
                                                 </button>
                                             </div>
