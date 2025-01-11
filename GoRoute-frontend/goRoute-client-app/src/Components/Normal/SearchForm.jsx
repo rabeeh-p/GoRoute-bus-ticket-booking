@@ -21,6 +21,8 @@ const SearchForm = () => {
           params: { from: fromCity, to: toCity, date },
         });
 
+        console.log(response.data,'dataa');
+        
         if (response.data && Array.isArray(response.data.buses)) {
           localStorage.setItem('searchParams', JSON.stringify({ from: fromCity, to: toCity, date }));
 

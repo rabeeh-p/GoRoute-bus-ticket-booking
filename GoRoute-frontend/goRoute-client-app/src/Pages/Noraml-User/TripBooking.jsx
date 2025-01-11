@@ -135,7 +135,7 @@ const TripBooking = () => {
                                     Available Buses
                                 </h2>
                                 <div className="text-sm text-gray-600">
-                                    {loading ? 'Loading buses...' : `${buses.length} buses found`}
+                                    {loading ? 'Loading buses...' : `${buses?.buses?.length || 0} buses found`}
                                 </div>
                             </div>
                         </div>
