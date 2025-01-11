@@ -172,9 +172,12 @@ class RouteStopView(APIView):
 
 
 class BusTypeCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def post(self, request):
         serializer = BusTypeSerializer(data=request.data)
+
         
         if serializer.is_valid():
             serializer.save()
@@ -294,6 +297,7 @@ class ScheduleBusView(APIView):
                     stop_order=stop.stop_order,
                     arrival_time=stop.arrival_time,
                     departure_time=stop.departure_time,
+                    distance_km=stop.distance_in_km
                 )
 
             bus.Scheduled = True
@@ -386,3 +390,10 @@ class BusDetailView(APIView):
             return Response({"message": "Bus deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
         except BusModel.DoesNotExist:
             return Response({"error": "Bus not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+
+
+

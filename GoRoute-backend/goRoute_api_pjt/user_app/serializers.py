@@ -14,3 +14,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 
+
+class ScheduledStopSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduledStop
+        fields = ['stop_name', 'arrival_time', 'departure_time']
+
+class ScheduledBusSerializer(serializers.ModelSerializer):
+    stops = ScheduledStopSerializer(many=True)
+
+    class Meta:
+        model = ScheduledBus
+        fields = ['bus_number', 'bus_owner_name', 'bus_type', 'seat_count', 'route', 'scheduled_date', 'status', 'stops']

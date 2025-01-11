@@ -178,6 +178,7 @@ class ScheduledStop(models.Model):
     arrival_time = models.TimeField()  # Arrival time at the stop
     departure_time = models.TimeField()  # Departure time from the stop
     description = models.TextField(blank=True, null=True)  # Additional details about the stop
+    distance_km = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"Stop: {self.stop_name}, Arrival: {self.arrival_time}, Departure: {self.departure_time}"
