@@ -167,3 +167,44 @@ class BusSearchView(APIView):
         return Response({'buses': buses_data}, status=status.HTTP_200_OK)
 
 
+
+
+
+
+class BusSeatDetailsView(APIView):
+    def get(self, request, bus_id):
+        print('bus view is working')
+        print('id', bus_id)
+
+        try:
+            bus = ScheduledBus.objects.get(id=bus_id)
+
+            seat_data = [
+                {
+                    'seat_number': seat_number,
+                    'status': 'available',   
+                    'type': bus.seat_type   
+                }
+                for seat_number in range(1, bus.seat_count + 1)   
+            ]
+
+            return Response(
+                {
+                    'bus': ScheduledBusSerializer(bus).data,
+                    'seats': seat_data
+                },
+                status=status.HTTP_200_OK
+            )
+        except ScheduledBus.DoesNotExist:
+            return Response(
+                {'error': 'Bus not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+
+
+
+
+
+
