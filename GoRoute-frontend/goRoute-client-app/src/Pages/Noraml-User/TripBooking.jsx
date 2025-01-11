@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../../Components/Normal/Navbar';
 import { Calendar, Clock, IndianRupee, MapPin, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const TripBooking = () => {
     const [buses, setBuses] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    const navigate = useNavigate('')
 
     console.log(buses, 'buses');
 
@@ -184,8 +187,10 @@ const TripBooking = () => {
                                                         {bus.price}
                                                     </span>
                                                 </div>
-                                                <button className="mt-2 bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition-colors">
-                                                    Book Now
+                                                <button 
+                                                onClick={()=>navigate(`/user-bus-view/${bus.id}`)}
+                                                 className="mt-2 bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition-colors">
+                                                    View
                                                 </button>
                                             </div>
                                         </div>

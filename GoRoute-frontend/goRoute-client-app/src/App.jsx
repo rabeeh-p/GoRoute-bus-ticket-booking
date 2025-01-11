@@ -36,6 +36,7 @@ import BusDetails from './Pages/Admin/BusDetails';
 import BusSchedule from './Pages/Bus_owners/BusSchedule';
 import ScheduledBusList from './Pages/Bus_owners/ScheduledBusList';
 import ScheduledBusDetails from './Pages/Bus_owners/ScheduledBusDetails';
+import UserBusView from './Pages/Noraml-User/UserBusView';
 function App() {
 
 
@@ -61,6 +62,7 @@ function App() {
 
 
         <Route path="/trip-booking" element={<TripBooking />} />
+        <Route path="/user-bus-view/:busId" element={<UserBusView />} />
 
 
         <Route path="/admin-login" element={<AdminLogin />} />
