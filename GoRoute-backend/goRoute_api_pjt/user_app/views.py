@@ -258,6 +258,13 @@ class BusSearchView(APIView):
             bus_data_serialized = bus_serializer.data
             bus_data_serialized['distance_km'] = bus_data['distance_km']
             bus_data_serialized['price'] = bus_data['price']
+
+            try:
+                bus_owner = BusOwnerModel.objects.get(travel_name=bus.bus_owner_name)
+                bus_data_serialized['bus_owner_logo'] = bus_owner.logo_image.url if bus_owner.logo_image else None
+            except BusOwnerModel.DoesNotExist:
+                bus_data_serialized['bus_owner_logo'] = None
+
             buses_data.append(bus_data_serialized)
 
         return Response({'buses': buses_data}, status=status.HTTP_200_OK)

@@ -12,7 +12,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 
-
+class BusOwnerLogoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusOwnerModel
+        fields = ['logo_image'] 
 
 
 class ScheduledStopSerializer(serializers.ModelSerializer):
