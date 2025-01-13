@@ -16,7 +16,6 @@ const UserTickets = () => {
             return;
         }
 
-        // Fetch order details and tickets
         axiosInstance
             .get(`orders/${orderId}/tickets/`, {
                 headers: {

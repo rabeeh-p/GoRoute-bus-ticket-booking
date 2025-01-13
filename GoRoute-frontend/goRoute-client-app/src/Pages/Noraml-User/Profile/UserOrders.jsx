@@ -14,7 +14,6 @@ const UserOrders = () => {
             return;
         }
 
-        // Fetch user orders from the API
         axiosInstance.get('orders/', {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -22,7 +21,7 @@ const UserOrders = () => {
         })
         .then(response => {
             console.log('Order Data:', response.data);
-            setOrders(response.data.orders);  // Assuming the response contains `orders` array
+            setOrders(response.data.orders);   
             setLoading(false);
         })
         .catch(error => {
@@ -32,7 +31,7 @@ const UserOrders = () => {
     }, [navigate]);
 
     const viewTickets = (orderId) => {
-        navigate(`/profile-dashboard/orders/${orderId}/tickets`); // Navigate to the ticket details page
+        navigate(`/profile-dashboard/orders/${orderId}/tickets`);  
     };
 
     return (
