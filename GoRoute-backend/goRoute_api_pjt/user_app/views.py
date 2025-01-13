@@ -89,7 +89,16 @@ class GoogleLoginAPIView(APIView):
             return Response({"error": "Invalid token"}, status=400)
     
 
+class AllStopsView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            # Fetch all unique stop names from the ScheduledStop model
+            stops = ScheduledStop.objects.values_list('stop_name', flat=True).distinct()
+            stops_list = sorted(stops)  # Sort stop names alphabetically
 
+            return Response({'stops': stops_list}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 

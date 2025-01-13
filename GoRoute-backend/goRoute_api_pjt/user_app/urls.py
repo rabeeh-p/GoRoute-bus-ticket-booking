@@ -6,6 +6,8 @@ urlpatterns = [
 
 
     # BOOKING AND SEARCH
+    path('all-stops/', AllStopsView.as_view(), name='all-stops'),
+
     path('search_buses/', BusSearchView.as_view(), name='search_buses'),
     path('bus-details/<int:bus_id>/', BusSeatDetailsView.as_view(), name='bus-seat-details'),
     path('seat-booking/', SeatBookingView.as_view(), name='seat-booking'),
@@ -13,4 +15,10 @@ urlpatterns = [
 
     path('orders/', OrderListView.as_view(), name='order-list'),
     path('orders/<int:order_id>/tickets/', TicketListView.as_view(), name='ticket-list'),
+
+
+
+
+
+
 ]
