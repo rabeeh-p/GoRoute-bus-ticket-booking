@@ -15,6 +15,16 @@ admin.site.register(ScheduledBus)
 admin.site.register(ScheduledStop)
 
 
+admin.site.register(Seat)
+admin.site.register(Order)
+admin.site.register(Ticket)
+
+
+
+
+
+
+
 
 
 

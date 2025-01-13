@@ -21,6 +21,10 @@ from django.utils.dateparse import parse_datetime
 from datetime import timedelta
 from rest_framework import status
 from datetime import datetime
+from django.http import JsonResponse
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+import json
 # Create your views here.
 
 
@@ -275,6 +279,7 @@ class BusSearchView(APIView):
 
 
 class BusSeatDetailsView(APIView):
+    
     def get(self, request, bus_id):
         print('bus view is working')
         print('id', bus_id)
@@ -282,19 +287,14 @@ class BusSeatDetailsView(APIView):
         try:
             bus = ScheduledBus.objects.get(id=bus_id)
 
-            seat_data = [
-                {
-                    'seat_number': seat_number,
-                    'status': 'available',   
-                    'type': bus.seat_type   
-                }
-                for seat_number in range(1, bus.seat_count + 1)   
-            ]
+            booked_seats = Seat.objects.filter(bus=bus, status='booked')
+
+            booked_seat_numbers = [seat.seat_number for seat in booked_seats]
 
             return Response(
                 {
-                    'bus': ScheduledBusSerializer(bus).data,
-                    'seats': seat_data
+                    'bus': ScheduledBusSerializer(bus).data,   
+                    'booked_seats': booked_seat_numbers   
                 },
                 status=status.HTTP_200_OK
             )
@@ -308,6 +308,162 @@ class BusSeatDetailsView(APIView):
 
 
 
+
+class SeatBookingView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated] 
+
+    # def post(self, request, *args, **kwargs):
+    #     """
+    #     Handle booking multiple seats by creating new seats and associating them with an order and ticket.
+    #     """
+    #     try:
+    #         # Get the bus ID and a list of seat numbers from the request data
+    #         bus_id = request.POST.get('bus_id')
+    #         seat_numbers = request.POST.getlist('seat_numbers')  # This will get a list of seat numbers
+            
+    #         # Validate input
+    #         if not bus_id or not seat_numbers:
+    #             return JsonResponse({'error': 'Bus ID and Seat Numbers are required.'}, status=400)
+            
+    #         # Get the bus object
+    #         bus = get_object_or_404(ScheduledBus, id=bus_id)
+            
+    #         # Start a transaction to ensure atomicity
+    #         with transaction.atomic():
+    #             # Create an order for the user
+    #             order = Order.objects.create(
+    #                 user=request.user.profile,  # Assuming `NormalUserProfile` is related to the user
+    #                 bus=bus,
+    #                 amount=0.00,  # Amount will be calculated dynamically based on seats
+    #                 status='confirmed'
+    #             )
+                
+    #             total_amount = 0
+    #             booked_seats = []
+                
+    #             # Loop through the seat numbers and create seats if they don't already exist
+    #             for seat_number in seat_numbers:
+    #                 # Check if the seat is already booked
+    #                 if Seat.objects.filter(bus=bus, seat_number=seat_number).exists():
+    #                     return JsonResponse({'error': f'Seat {seat_number} is already booked.'}, status=400)
+                    
+    #                 # Create the seat for the bus
+    #                 seat = Seat.objects.create(
+    #                     bus=bus,
+    #                     seat_number=seat_number,
+    #                     status='booked'
+    #                 )
+    #                 booked_seats.append(seat)
+    #                 total_amount += 500.00  # Example amount for each seat
+                    
+    #                 # Create a ticket for the seat
+    #                 Ticket.objects.create(
+    #                     order=order,
+    #                     seat=seat,
+    #                     amount=500.00,  # Amount per seat
+    #                     status='issued'
+    #                 )
+                
+    #             # Update the order amount with the total cost for the booked seats
+    #             order.amount = total_amount
+    #             order.save()
+            
+    #         # Return success response
+    #         return JsonResponse({
+    #             'message': 'Seats booked successfully.',
+    #             'order_id': order.id,
+    #             'seat_numbers': [seat.seat_number for seat in booked_seats],
+    #             'total_amount': total_amount
+    #         })
+
+    #     except Exception as e:
+    #         return JsonResponse({'error': str(e)}, status=500)
+        
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handle booking multiple seats by creating new seats and associating them with an order and ticket.
+        """
+        try:
+            data = request.data if hasattr(request, 'data') else json.loads(request.body)
+            
+
+            bus_id = data.get('bus_id')
+            seat_numbers = data.get('seat_numbers')
+            user_name = data.get('userName')
+            email = data.get('email')
+            phone_number = data.get('phone')
+
+            print(request.data,'data')
+            print(bus_id)
+            print(seat_numbers)
+            print(email)
+            print(phone_number,'phone')
+            
+            # Validate input
+            if not bus_id or not seat_numbers or not email or not phone_number:
+                return JsonResponse({'error': 'Bus ID, Seat Numbers, Email, and Phone Number are required.'}, status=400)
+            
+            # Get the bus object
+            bus = get_object_or_404(ScheduledBus, id=bus_id)
+            print(bus,'buss ')
+            print(request.user,'userrrname')
+
+
+           
+            
+
+            profile_obj = NormalUserProfile.objects.get(user=request.user)
+            print(profile_obj.id,'profil id')
+
+
+            with transaction.atomic():
+                order = Order.objects.create(
+                    user=profile_obj,  
+                    bus=bus,
+                    email=email,   
+                    phone_number=phone_number,   
+                    name=user_name,
+                    amount=0.00,   
+                    status='confirmed'
+                )
+                
+                total_amount = 0
+                booked_seats = []
+                
+                for seat_number in seat_numbers:
+                    if Seat.objects.filter(bus=bus, seat_number=seat_number).exists():
+                        return JsonResponse({'error': f'Seat {seat_number} is already booked.'}, status=400)
+                    
+                    seat = Seat.objects.create(
+                        bus=bus,
+                        seat_number=seat_number,
+                        status='booked'
+                    )
+                    booked_seats.append(seat)
+                    total_amount += 500.00   
+                    
+                    Ticket.objects.create(
+                        order=order,
+                        seat=seat,
+                        amount=500.00,   
+                        status='issued'
+                    )
+                
+                order.amount = total_amount
+                order.save()
+            
+            return JsonResponse({
+                'message': 'Seats booked successfully.',
+                'order_id': order.id,
+                'seat_numbers': [seat.seat_number for seat in booked_seats],
+                'total_amount': total_amount
+            })
+        
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
 
 

@@ -152,15 +152,15 @@ class BusModel(models.Model):
 
 
 class ScheduledBus(models.Model):
-    bus_number = models.CharField(max_length=20)  # Store the bus number directly
-    bus_owner_name = models.CharField(max_length=100)  # Store bus owner's name
-    bus_type = models.CharField(max_length=100)  # Store bus type directly (e.g., AC, Non-AC)
-    seat_type = models.CharField(max_length=50)  # Store seat type (e.g., Recliner, Standard, etc.)
-    seat_count = models.IntegerField()  # Store the number of seats
-    route = models.CharField(max_length=255)  # Store route description (can be a string)
-    scheduled_date = models.DateTimeField()  # DateTime of bus scheduling
+    bus_number = models.CharField(max_length=20)   
+    bus_owner_name = models.CharField(max_length=100)   
+    bus_type = models.CharField(max_length=100)   
+    seat_type = models.CharField(max_length=50)   
+    seat_count = models.IntegerField()   
+    route = models.CharField(max_length=255)   
+    scheduled_date = models.DateTimeField()   
     status = models.CharField(max_length=50, choices=[('active', 'Active'), ('completed', 'Completed'), ('cancelled', 'Cancelled')], default='active')
-    description = models.TextField(blank=True, null=True)  # Additional description for the schedule
+    description = models.TextField(blank=True, null=True)   
     started= models.BooleanField(default=False)
     name = models.CharField(max_length=100, null=True, blank=True)
 
@@ -172,13 +172,66 @@ class ScheduledBus(models.Model):
 
 
 class ScheduledStop(models.Model):
-    scheduled_bus = models.ForeignKey(ScheduledBus, on_delete=models.CASCADE, related_name='stops')  # ForeignKey relation to ScheduledBus
-    stop_name = models.CharField(max_length=255)  # Stop name (e.g., city or specific location)
-    stop_order = models.IntegerField()  # Order in which the stop occurs (e.g., first stop, second stop, etc.)
-    arrival_time = models.TimeField()  # Arrival time at the stop
-    departure_time = models.TimeField()  # Departure time from the stop
-    description = models.TextField(blank=True, null=True)  # Additional details about the stop
+    scheduled_bus = models.ForeignKey(ScheduledBus, on_delete=models.CASCADE, related_name='stops')   
+    stop_name = models.CharField(max_length=255)   
+    stop_order = models.IntegerField()   
+    arrival_time = models.TimeField()   
+    departure_time = models.TimeField()   
+    description = models.TextField(blank=True, null=True)   
     distance_km = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"Stop: {self.stop_name}, Arrival: {self.arrival_time}, Departure: {self.departure_time}"
+    
+
+
+class Seat(models.Model):
+    bus = models.ForeignKey(ScheduledBus, on_delete=models.CASCADE, related_name='seats')
+    seat_number = models.PositiveIntegerField()   
+    status = models.CharField(
+        max_length=20,
+        choices=[('available', 'Available'), ('booked', 'Booked')],
+        default='available'
+    )
+
+    def __str__(self):
+        return f"Seat {self.seat_number} on Bus {self.bus.bus_number}"
+
+    class Meta:
+        unique_together = ('bus', 'seat_number')   
+
+
+
+
+class Order(models.Model):
+    user = models.ForeignKey(NormalUserProfile, on_delete=models.CASCADE, related_name='orders')
+    bus = models.ForeignKey(ScheduledBus, on_delete=models.CASCADE, related_name='bus_ordering_time')
+    status = models.CharField(
+        max_length=20,
+        choices=[('pending', 'Pending'), ('confirmed', 'Confirmed'), ('cancelled', 'Cancelled')],
+        default='pending'
+    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    email = models.EmailField(max_length=255, blank=True, null=True)  
+    phone_number = models.CharField(max_length=15, blank=True, null=True) 
+    name = models.CharField(max_length=255, blank=True, null=True) 
+
+    def __str__(self):
+        return f"Order by {self.user} - Status: {self.status}"
+    
+
+
+class Ticket(models.Model):
+    order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True, related_name='seats')  
+    seat = models.ForeignKey(Seat, on_delete=models.CASCADE, related_name='tickets')
+    status = models.CharField(
+        max_length=20,
+        choices=[('issued', 'Issued'), ('used', 'Used'), ('cancelled', 'Cancelled')],
+        default='issued'
+    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    related_data = models.TextField(blank=True, null=True)   
+
+    def __str__(self):
+        return f"Ticket for Seat {self.seat.seat_number} - Status: {self.status}"
