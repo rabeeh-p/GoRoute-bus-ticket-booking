@@ -17,10 +17,19 @@ const UserBusView = () => {
     const naviagate = useNavigate()
 
     const { busId } = useParams();
+    const searchParams = JSON.parse(localStorage.getItem('searchParams'));
+    const { from, to, date } = searchParams;
 
     useEffect(() => {
         axios
-            .get(`http://127.0.0.1:8000/bus-details/${busId}/`)
+            .get(`http://127.0.0.1:8000/bus-details/${busId}/`,{
+                params: {
+                    from_city: from,
+                    to_city: to,
+                    date: date
+                }
+            }
+            )
             .then((response) => {
                 console.log(response.data.booked_seats,'dataaas');
                 
@@ -64,6 +73,8 @@ const UserBusView = () => {
       naviagate('/login');   
       return;
     }
+    const searchParams = JSON.parse(localStorage.getItem('searchParams'));
+    const { from, to, date } = searchParams;
     
         // Prepare the data to be sent to the server
         const formData = {
@@ -72,6 +83,9 @@ const UserBusView = () => {
             userName: e.target.userName.value,
             email: e.target.email.value,
             phone: e.target.phone.value,
+            to: to,      // Added toCity from localStorage
+            from:from,
+            date: date 
         };
     
         // Make the API call to submit the booking

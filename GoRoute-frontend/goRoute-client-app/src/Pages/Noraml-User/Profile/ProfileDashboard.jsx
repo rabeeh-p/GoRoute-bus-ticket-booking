@@ -3,6 +3,8 @@ import Sidebar from '../../../Components/Normal/UserProfile/Sidebar'
 import UserDashboard from './UserDashboard'
 import { Route, Routes } from 'react-router-dom'
 import ProfileDetails from './ProfileDetails'
+import UserTickets from './UserTickets'
+import UserOrders from './UserOrders'
 
 const ProfileDashboard = () => {
     return (
@@ -14,6 +16,8 @@ const ProfileDashboard = () => {
                 <Routes>
                     <Route path="user-dashboard/" element={<UserDashboard />} />
                     <Route path="profile" element={<ProfileDetails />} />
+                    <Route path="orders/:orderId/tickets" element={<UserTickets />} />
+                    <Route path="orders" element={<UserOrders />} />
                 </Routes>
             </div>
         </div>

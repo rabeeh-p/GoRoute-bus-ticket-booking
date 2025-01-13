@@ -37,6 +37,8 @@ import BusSchedule from './Pages/Bus_owners/BusSchedule';
 import ScheduledBusList from './Pages/Bus_owners/ScheduledBusList';
 import ScheduledBusDetails from './Pages/Bus_owners/ScheduledBusDetails';
 import UserBusView from './Pages/Noraml-User/UserBusView';
+import UserTickets from './Pages/Noraml-User/Profile/UserTickets';
+import UserOrders from './Pages/Noraml-User/Profile/UserOrders';
 function App() {
 
 
@@ -57,6 +59,8 @@ function App() {
           <Route index element={<Navigate to="user-dashboard" />} />
           <Route path="user-dashboard" element={<UserDashboard />} />
           <Route path="profile" element={<ProfileDetails />} />
+          <Route path="orders/:orderId/tickets" element={<UserTickets />} />
+          <Route path="orders" element={<UserOrders />} />
         </Route>
 
 
