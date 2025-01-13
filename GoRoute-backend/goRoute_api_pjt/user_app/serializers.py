@@ -29,3 +29,23 @@ class ScheduledBusSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScheduledBus
         fields = ['id','bus_number', 'bus_owner_name', 'bus_type', 'seat_count', 'route', 'scheduled_date', 'status', 'stops','name','seat_type']
+
+class SeatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Seat
+        fields = ['id', 'seat_number',] 
+
+class TicketSerializer(serializers.ModelSerializer):
+    seat = SeatSerializer()
+    class Meta:
+        model = Ticket
+        fields = ['id', 'order', 'seat', 'status', 'amount', 'related_data']
+
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    tickets = TicketSerializer(many=True, read_only=True)  # Include tickets related to the order
+    bus = ScheduledBusSerializer()
+    class Meta:
+        model = Order
+        fields = ['id','from_city','to_city','date', 'bus', 'status', 'amount', 'created_at', 'email', 'phone_number', 'name', 'tickets']

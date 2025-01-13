@@ -193,6 +193,10 @@ class Seat(models.Model):
         choices=[('available', 'Available'), ('booked', 'Booked')],
         default='available'
     )
+    from_city = models.CharField(max_length=100, blank=True, null=True)  # Optional field
+    to_city = models.CharField(max_length=100, blank=True, null=True)  # Optional field
+    date = models.DateField(blank=True, null=True)  # Optional fiel
+
 
     def __str__(self):
         return f"Seat {self.seat_number} on Bus {self.bus.bus_number}"
@@ -216,6 +220,9 @@ class Order(models.Model):
     email = models.EmailField(max_length=255, blank=True, null=True)  
     phone_number = models.CharField(max_length=15, blank=True, null=True) 
     name = models.CharField(max_length=255, blank=True, null=True) 
+    from_city = models.CharField(max_length=255, blank=True, null=True)
+    to_city = models.CharField(max_length=255, blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return f"Order by {self.user} - Status: {self.status}"
@@ -223,11 +230,11 @@ class Order(models.Model):
 
 
 class Ticket(models.Model):
-    order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True, related_name='seats')  
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True, related_name='seats')  
     seat = models.ForeignKey(Seat, on_delete=models.CASCADE, related_name='tickets')
     status = models.CharField(
         max_length=20,
-        choices=[('issued', 'Issued'), ('used', 'Used'), ('cancelled', 'Cancelled')],
+        choices=[ ('confirmed', 'Confirmed'), ('cancelled', 'Cancelled')],
         default='issued'
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2)

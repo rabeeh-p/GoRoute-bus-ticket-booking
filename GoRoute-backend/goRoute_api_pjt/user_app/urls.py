@@ -5,7 +5,12 @@ urlpatterns = [
     path('google-login/', GoogleLoginAPIView.as_view(), name='google-login'),
 
 
+    # BOOKING AND SEARCH
     path('search_buses/', BusSearchView.as_view(), name='search_buses'),
     path('bus-details/<int:bus_id>/', BusSeatDetailsView.as_view(), name='bus-seat-details'),
     path('seat-booking/', SeatBookingView.as_view(), name='seat-booking'),
+
+
+    path('orders/', OrderListView.as_view(), name='order-list'),
+    path('orders/<int:order_id>/tickets/', TicketListView.as_view(), name='ticket-list'),
 ]
