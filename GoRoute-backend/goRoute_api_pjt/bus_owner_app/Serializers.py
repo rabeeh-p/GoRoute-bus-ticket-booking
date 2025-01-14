@@ -17,10 +17,10 @@ class RouteModelSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Route name must be at least 3 characters.")
         return value
     
-    def validate_start_datetime(self, value):
-        if value < now():   
-            raise serializers.ValidationError("Start date and time must not be in the past.")
-        return value
+    # def validate_start_datetime(self, value):
+    #     if value < now():   
+    #         raise serializers.ValidationError("Start date and time must not be in the past.")
+    #     return value
 
 
 

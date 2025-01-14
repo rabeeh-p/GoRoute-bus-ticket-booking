@@ -107,14 +107,15 @@ class BusType(models.Model):
     
     BUS_TYPE_CHOICES = [
         ('ac', 'AC Bus'),
-        ('sleeper_ac', 'Sleeper AC Bus'),
-        ('non_ac_sleeper', 'Non-AC Sleeper'),
-        ('semi_sleeper', 'Semi Sleeper'),
+        ('non_ac', 'Non-AC Bus'),
+        # ('sleeper_ac', 'Sleeper AC Bus'),
+        # ('non_ac_sleeper', 'Non-AC Sleeper'),
+        # ('semi_sleeper', 'Semi Sleeper'),
     ]
 
     SEAT_TYPE_CHOICES = [
         ('standard', 'Standard'),
-        ('recliner', 'Recliner'),
+        # ('recliner', 'Recliner'),
         ('luxury', 'Luxury'),
         ('semi_sleeper', 'Semi Sleeper'),
         ('full_sleeper', 'Full Sleeper'),
@@ -124,8 +125,8 @@ class BusType(models.Model):
         (20, '20 Seats'),
         (30, '30 Seats'),
         (40, '40 Seats'),
-        (50, '50 Seats'),
-        (60, '60 Seats'),
+        # (50, '50 Seats'),
+        # (60, '60 Seats'),
     ]
 
     name = models.CharField(max_length=100, choices=BUS_TYPE_CHOICES)

@@ -33,8 +33,8 @@ class BusOwnerProfileView(APIView):
 
 
 class RouteCreateView(APIView):
-    permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         user = request.user
@@ -60,7 +60,7 @@ class RouteCreateView(APIView):
             'end_location': data.get('endLocation'),
             'distance_in_km': data.get('distanceInKm'),
             'bus_owner': data.get('bus_owner'),
-            'start_datetime': data.get('startDatetime'),
+            # 'start_datetime': data.get('startDatetime'),
             
         }
 
@@ -83,6 +83,23 @@ class RouteByOwnerView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
+    # def get(self, request):
+    #     user = request.user
+    #     try:
+    #         bus_owner = BusOwnerModel.objects.get(user=user)
+    #     except BusOwnerModel.DoesNotExist:
+    #         return Response(
+    #             {"error": "Bus owner does not exist for the authenticated user."},
+    #             status=status.HTTP_404_NOT_FOUND
+    #         )
+
+    #     routes = RouteModel.objects.filter(bus_owner=bus_owner)
+
+    #     serializer = RouteModelSerializer(routes, many=True)
+
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
     def get(self, request):
         user = request.user
         try:
@@ -93,22 +110,73 @@ class RouteByOwnerView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        routes = RouteModel.objects.filter(bus_owner=bus_owner)
+        # Fetch routes for the bus owner that have at least one stop
+        routes = RouteModel.objects.filter(bus_owner=bus_owner).filter(stops__isnull=False).distinct()
 
+        # Serialize the filtered routes
         serializer = RouteModelSerializer(routes, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
     
 
 
-
-class RouteStopView(APIView):
+class SingleRouteView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
+    def get_object(self, route_id, user):
+        try:
+            bus_owner = BusOwnerModel.objects.get(user=user)
+            return RouteModel.objects.get(id=route_id, bus_owner=bus_owner)
+        except BusOwnerModel.DoesNotExist:
+            return None
+        except RouteModel.DoesNotExist:
+            return None
+
+    def get(self, request, route_id):
+        route = self.get_object(route_id, request.user)
+        if not route:
+            return Response(
+                {"error": "Route not found or you do not have permission to access it."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = RouteModelSerializer(route)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    
+    def put(self, request, route_id):
+        route = self.get_object(route_id, request.user)
+        print("PUT is working")
+        if not route:
+            return Response(
+                {"error": "Route not found or you do not have permission to edit it."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        print("Route instance:", route)
+        print("Request data:", request.data)
+        
+        serializer = RouteModelSerializer(route, data=request.data, partial=True)
+        if serializer.is_valid():
+            print("Serializer is valid. Updating route.")
+            serializer.save()
+            print("Route updated:", serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        print("Validation errors:", serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RouteStopView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, route_id):
         route = RouteModel.objects.get(id=route_id)
-        print('rout',route)
+        print('rout11',route)
         
         stops = RouteStopModel.objects.filter(route=route).order_by('stop_order')
         
@@ -321,9 +389,7 @@ class ScheduleBusView(APIView):
 
 
 class ScheduledBusListView(APIView):
-    """
-    List all scheduled buses for the current bus owner's travel_name.
-    """
+    
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
     def get(self, request):
@@ -373,6 +439,8 @@ class ScheduledBusDetailView(APIView):
 
 
 class BusDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     def get(self, request, bus_id, format=None):
         try:
             print('is woring')

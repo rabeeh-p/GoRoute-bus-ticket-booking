@@ -209,6 +209,9 @@ class BusSearchView(APIView):
         from_city = request.query_params.get('from', '').strip().lower()
         to_city = request.query_params.get('to', '').strip().lower()
         date = request.query_params.get('date')
+        print(from_city)
+        print(to_city)
+        print(date,'date')
 
         if date:
             try:
@@ -509,11 +512,19 @@ class BusSeatDetailsView(APIView):
                         booked_seat_numbers.append(seat.seat_number)
 
             print('Booked Seats:', booked_seat_numbers)
+            try:
+                bus_owner = BusOwnerModel.objects.get(travel_name=bus.bus_owner_name)
+                bus_owner_logo_url = bus_owner.logo_image.url if bus_owner.logo_image else None
+            except BusOwnerModel.DoesNotExist:
+                bus_owner_logo_url = None
+
+            print(bus_owner_logo_url,'url')
 
             return Response(
                 {
                     'bus': ScheduledBusSerializer(bus).data,
-                    'booked_seats': booked_seat_numbers
+                    'booked_seats': booked_seat_numbers,
+                    'bus_log':bus_owner_logo_url
                 },
                 status=status.HTTP_200_OK
             )
