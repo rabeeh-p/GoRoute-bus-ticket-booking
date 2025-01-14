@@ -8,6 +8,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
 from decimal import Decimal
 
+from django.shortcuts import get_object_or_404
 from .Serializers import *
 
 
@@ -465,3 +466,26 @@ class BusDetailView(APIView):
 
 
 
+class BusSeatsAPIView(APIView):
+   
+
+    def get(self, request, bus_id):
+        bus = get_object_or_404(ScheduledBus, id=bus_id)
+
+        tickets = Ticket.objects.filter(seat__bus=bus)
+
+        booked_seats = []
+        for ticket in tickets:
+            order = ticket.order
+            user = order.user   
+
+            seat_data = {
+                'seat_number': ticket.seat.seat_number,
+            }
+            user_data = NormalUserProfileSerializer(user).data   
+            booked_seats.append({
+                'seat': seat_data,
+                'user': user_data
+            })
+
+        return Response({"booked_seats": booked_seats}, status=status.HTTP_200_OK)
