@@ -28,6 +28,7 @@ class BusOwnerModel(models.Model):
     contact_number = models.CharField(max_length=15, blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     logo_image = models.ImageField(upload_to='bus_owner_logos/', blank=True, null=True)
+    document = models.FileField(upload_to='bus_owner_documents/', blank=True, null=True)
     is_approved = models.BooleanField(default=False)
 
     def __str__(self):

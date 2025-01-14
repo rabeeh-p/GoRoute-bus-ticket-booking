@@ -2,6 +2,12 @@ from django.urls import path
 from .views import *
 urlpatterns = [
     path('api/profile/', UserProfileView.as_view(), name='user-profile'),
+    path('user-profile/edit/', UserProfileEditView.as_view(), name='user-profile-edit'),
+
+
+
+
+
     path('google-login/', GoogleLoginAPIView.as_view(), name='google-login'),
 
 

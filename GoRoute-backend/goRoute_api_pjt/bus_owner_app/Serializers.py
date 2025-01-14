@@ -73,9 +73,7 @@ class BusModelSerializer(serializers.ModelSerializer):
         return value
     
     def validate_bus_number(self, value):
-        """
-        Check if the bus number already exists for the same bus owner.
-        """
+        
         user = self.context.get('request').user   
         if user:
             try:
@@ -120,9 +118,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    seat_number = serializers.IntegerField(source='seat.seat_number')  # Assuming the seat has a `seat_number` field
-    ticket_status = serializers.CharField(source='status')  # Assuming you have a status field in Ticket model
-    ticket_amount = serializers.DecimalField(source='amount', max_digits=10, decimal_places=2)  # Assuming you have an `amount` field
+    seat_number = serializers.IntegerField(source='seat.seat_number')   
+    ticket_status = serializers.CharField(source='status')   
+    ticket_amount = serializers.DecimalField(source='amount', max_digits=10, decimal_places=2)   
 
     class Meta:
         model = Ticket
@@ -132,15 +130,13 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class BusOwnerSerializerProfileUpdate(serializers.ModelSerializer):
-    logo_image = serializers.ImageField(required=False, allow_null=True)  # Handle image field correctly
+    logo_image = serializers.ImageField(required=False, allow_null=True)  
     
     class Meta:
         model = BusOwnerModel
-        fields = ['id', 'travel_name', 'address', 'contact_number', 'logo_image', 'created_date', 'is_approved']
+        fields = ['id', 'travel_name', 'address', 'contact_number', 'logo_image', 'created_date', 'is_approved','document' ]
     
     def validate_travel_name(self, value):
-        """ Ensure the travel_name is unique and valid, except for the current instance """
-        # Check uniqueness, but exclude the current instance (when updating)
         instance = self.instance
         if instance and instance.travel_name != value and BusOwnerModel.objects.filter(travel_name=value).exists():
             raise serializers.ValidationError("Travel name must be unique.")

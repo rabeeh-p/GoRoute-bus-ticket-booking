@@ -45,6 +45,36 @@ class UserProfileView(APIView):
         
 
 
+class UserProfileEditView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, user):
+        """
+        Fetch the user's profile.
+        """
+        try:
+            return NormalUserProfile.objects.get(user=user)
+        except NormalUserProfile.DoesNotExist:
+            return None
+
+    def patch(self, request, *args, **kwargs):
+        
+        user = request.user   
+        user_profile = self.get_object(user)
+
+        if user_profile is None:
+            return Response({'detail': 'User profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserProfileSerializer(user_profile, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 
@@ -92,9 +122,8 @@ class GoogleLoginAPIView(APIView):
 class AllStopsView(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            # Fetch all unique stop names from the ScheduledStop model
             stops = ScheduledStop.objects.values_list('stop_name', flat=True).distinct()
-            stops_list = sorted(stops)  # Sort stop names alphabetically
+            stops_list = sorted(stops)   
 
             return Response({'stops': stops_list}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -292,162 +321,7 @@ class BusSearchView(APIView):
 
 class BusSeatDetailsView(APIView):
     
-    # def get(self, request, bus_id):
-    #     print('bus view is working')
-    #     print('id', bus_id)
-
-    #     try:
-    #         bus = ScheduledBus.objects.get(id=bus_id)
-    #         from_city = request.query_params.get('from_city')
-    #         to_city = request.query_params.get('to_city')
-    #         date = request.query_params.get('date')
-    #         print(from_city)
-    #         print(to_city,'to city')
-
-    #         print(date,'date')
-
-
-    #         # booked_seats = Seat.objects.filter(bus=bus, status='booked')
-    #         # booked_seat_numbers = [seat.seat_number for seat in booked_seats]
-
-    #         seats = Seat.objects.filter(bus=bus, date=date)
-    #         stops = bus.stops.order_by('stop_order') 
-    #         booked_seat_numbers = []
-    #         for seat in seats:
-    #             if seat.status == 'booked':
-    #                 # Get the from_city and to_city stop objects
-    #                 from_stop = stops.filter(stop_name=seat.from_city).first()
-    #                 to_stop = stops.filter(stop_name=seat.to_city).first()
-
-    #                 # Handle cases where either from_stop or to_stop is not found
-    #                 if not from_stop or not to_stop:
-    #                     continue  # Skip this seat if the city is not in the route
-
-    #                 from_index = from_stop.stop_order
-    #                 to_index = to_stop.stop_order
-
-    #                 # Handle search_from_index and search_to_index with proper null checks
-    #                 search_from_stop = stops.filter(stop_name=from_city).first()
-    #                 search_to_stop = stops.filter(stop_name=to_city).first()
-
-    #                 # Ensure both search stops are found
-    #                 if not search_from_stop or not search_to_stop:
-    #                     continue  # Skip the seat if any of the searched cities is not in the route
-
-    #                 search_from_index = search_from_stop.stop_order
-    #                 search_to_index = search_to_stop.stop_order
-
-    #                 # Case 1: Full route booking (Malappuram to Kasargod)
-    #                 if from_index <= search_from_index and to_index >= search_to_index:
-    #                     booked_seat_numbers.append(seat.seat_number)
-
-    #                 # Case 2: Partial segment booking (Malappuram to Kozhikode)
-    #                 elif from_index <= search_from_index and to_index >= search_from_index:
-    #                     booked_seat_numbers.append(seat.seat_number)
-                    
-       
-
-    #         return Response(
-    #             {
-    #                 'bus': ScheduledBusSerializer(bus).data,   
-    #                 'booked_seats': booked_seat_numbers   
-    #             },
-    #             status=status.HTTP_200_OK
-    #         )
-    #     except ScheduledBus.DoesNotExist:
-    #         return Response(
-    #             {'error': 'Bus not found'},
-    #             status=status.HTTP_404_NOT_FOUND
-    #         )
-
-    #  def get(self, request, bus_id):
-    #     print('Bus view is working')
-    #     print('Bus ID:', bus_id)
-
-    #     try:
-    #         bus = ScheduledBus.objects.get(id=bus_id)
-    #         from_city = request.query_params.get('from_city')
-    #         to_city = request.query_params.get('to_city')
-    #         date = request.query_params.get('date')
-    #         print('From City:', from_city)
-    #         print('To City:', to_city)
-    #         print('Date:', date)
-
-    #         # Validate query parameters
-    #         if not from_city or not to_city or not date:
-    #             return Response(
-    #                 {'error': 'from_city, to_city, and date are required query parameters.'},
-    #                 status=status.HTTP_400_BAD_REQUEST
-    #             )
-
-    #         # Validate date format
-    #         try:
-    #             date = datetime.strptime(date, '%Y-%m-%d').date()
-    #         except ValueError:
-    #             return Response(
-    #                 {'error': 'Invalid date format. Please use YYYY-MM-DD.'},
-    #                 status=status.HTTP_400_BAD_REQUEST
-    #             )
-
-    #         seats = Seat.objects.filter(bus=bus, date=date)
-    #         stops = bus.stops.order_by('stop_order')
-    #         print('Stops:', [stop.stop_name for stop in stops])
-
-    #         # Find stop indices with case-insensitive search
-    #         search_from_stop = stops.filter(stop_name__iexact=from_city).first()
-    #         search_to_stop = stops.filter(stop_name__iexact=to_city).first()
-
-    #         # Handle missing stops
-    #         if not search_from_stop or not search_to_stop:
-    #             return Response(
-    #                 {
-    #                     'error': f'Invalid from_city "{from_city}" or to_city "{to_city}". '
-    #                              'Please check the route and try again.'
-    #                 },
-    #                 status=status.HTTP_400_BAD_REQUEST
-    #             )
-
-    #         search_from_index = search_from_stop.stop_order
-    #         search_to_index = search_to_stop.stop_order
-    #         print('Search From Index:', search_from_index)
-    #         print('Search To Index:', search_to_index)
-
-    #         booked_seat_numbers = []
-    #         for seat in seats:
-    #             if seat.status == 'booked':
-    #                 from_stop = stops.filter(stop_name__iexact=seat.from_city).first()
-    #                 to_stop = stops.filter(stop_name__iexact=seat.to_city).first()
-
-    #                 # Handle missing stops for booked seats
-    #                 if not from_stop or not to_stop:
-    #                     continue
-
-    #                 from_index = from_stop.stop_order
-    #                 to_index = to_stop.stop_order
-
-    #                 # Case 1: Full route booking
-    #                 if from_index <= search_from_index and to_index >= search_to_index:
-    #                     booked_seat_numbers.append(seat.seat_number)
-
-    #                 # Case 2: Partial segment booking
-    #                 elif from_index <= search_from_index and to_index >= search_from_index:
-    #                     booked_seat_numbers.append(seat.seat_number)
-
-    #         print('Booked Seats:', booked_seat_numbers)
-
-    #         return Response(
-    #             {
-    #                 'bus': ScheduledBusSerializer(bus).data,
-    #                 'booked_seats': booked_seat_numbers
-    #             },
-    #             status=status.HTTP_200_OK
-    #         )
-    #     except ScheduledBus.DoesNotExist:
-    #         return Response(
-    #             {'error': 'Bus not found'},
-    #             status=status.HTTP_404_NOT_FOUND
-    #         )
-
+   
     def get(self, request, bus_id):
         print('Bus view is working')
         print('Bus ID:', bus_id)
@@ -609,9 +483,7 @@ class SeatBookingView(APIView):
         
 
     def post(self, request, *args, **kwargs):
-        """
-        Handle booking multiple seats by creating new seats and associating them with an order and ticket.
-        """
+        
         try:
             data = request.data if hasattr(request, 'data') else json.loads(request.body)
             
@@ -621,8 +493,8 @@ class SeatBookingView(APIView):
             user_name = data.get('userName')
             email = data.get('email')
             phone_number = data.get('phone')
-            from_city = data.get('from')  # Get the from city
-            to_city = data.get('to')      # Get the to city
+            from_city = data.get('from')   
+            to_city = data.get('to')       
             date = data.get('date') 
 
             print(request.data,'data')
@@ -631,11 +503,9 @@ class SeatBookingView(APIView):
             print(email)
             print(phone_number,'phone')
             
-            # Validate input
             if not bus_id or not seat_numbers or not email or not phone_number:
                 return JsonResponse({'error': 'Bus ID, Seat Numbers, Email, and Phone Number are required.'}, status=400)
             
-            # Get the bus object
             bus = get_object_or_404(ScheduledBus, id=bus_id)
             print(bus,'buss ')
             print(request.user,'userrrname')
@@ -707,12 +577,10 @@ class SeatBookingView(APIView):
 
 
 class OrderListView(APIView):
-    # permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
     
     def get(self, request):
-        # user = request.user
         profile_obj = NormalUserProfile.objects.get(user=request.user)
         orders = Order.objects.filter(user=profile_obj)
 
@@ -726,7 +594,6 @@ class TicketListView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request, order_id):
-        # user = request.user
         try:
             profile_obj = NormalUserProfile.objects.get(user=request.user)
             order = Order.objects.get(id=order_id, user=profile_obj)
