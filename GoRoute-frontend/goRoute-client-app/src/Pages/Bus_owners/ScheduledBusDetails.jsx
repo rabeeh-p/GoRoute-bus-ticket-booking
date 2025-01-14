@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../../axios/axios";
 import { useNavigate, useParams } from "react-router-dom";
 import BusCard from "../../Components/Bus/BusCard"; // Adjust the path based on your file structure
+import OrdersTable from "../../Components/BusOwner/OrdersTable";
 
 const ScheduledBusDetails = () => {
   const { busId } = useParams();
@@ -10,8 +11,11 @@ const ScheduledBusDetails = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [seatNumbers, setSeatNumbers] = useState([])
+  const [orders, setOrders] = useState([])
+
 
   console.log(seatNumbers,'numbers');
+  console.log(orders,'orders');
   
 
   // useEffect(() => {
@@ -63,10 +67,18 @@ const ScheduledBusDetails = () => {
         });
         console.log(seatNumbersResponse.data,'data respon');
         
-        // setSeatNumbers(seatNumbersResponse.data.seat_numbers);
-        // setSeatNumbers(seatNumbersResponse.data.booked_seats.map(seat => seat.seat_number));
-        const seatNumbers = seatNumbersResponse.data.booked_seats.map(seat => seat.seat.seat_number);
-        setSeatNumbers(seatNumbers);
+        
+        // const seatNumbers = seatNumbersResponse.data.booked_seats.map(seat => seat.seat.seat_number);
+        // setSeatNumbers(seatNumbers);
+        // const orders = seatNumbersResponse.data.booked_seats.map(seat => seat.order);
+        // setOrders(orders);
+
+        const seatNumbers = seatNumbersResponse.data.booked_seats.map(seat => seat.seats.map(s => s.seat_number)).flat();
+      setSeatNumbers(seatNumbers);
+
+      // Extracting order details
+      const orders = seatNumbersResponse.data.booked_seats.map(seat => seat.order);
+      setOrders(orders);
 
         setLoading(false);
       } catch (err) {
@@ -445,6 +457,7 @@ const ScheduledBusDetails = () => {
           {renderSeatLayout()}
         </div>
       </div>
+      <OrdersTable orders={orders}/>
     </div>
   );
 };
