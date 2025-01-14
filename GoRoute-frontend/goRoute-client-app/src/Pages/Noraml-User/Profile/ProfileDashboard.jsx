@@ -5,6 +5,7 @@ import { Route, Routes } from 'react-router-dom'
 import ProfileDetails from './ProfileDetails'
 import UserTickets from './UserTickets'
 import UserOrders from './UserOrders'
+import UserProfileEdit from './UserProfileEdit'
 
 const ProfileDashboard = () => {
     return (
@@ -18,6 +19,7 @@ const ProfileDashboard = () => {
                     <Route path="profile" element={<ProfileDetails />} />
                     <Route path="orders/:orderId/tickets" element={<UserTickets />} />
                     <Route path="orders" element={<UserOrders />} />
+                    <Route path="profile-edit" element={<UserProfileEdit />} />
                 </Routes>
             </div>
         </div>

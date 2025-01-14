@@ -88,6 +88,17 @@ const OwnerProfile = () => {
                     Edit
                 </button>
             </div>
+            {owner?.document && (
+        <div className="mt-4">
+            <a
+                href={`http://127.0.0.1:8000${owner.document}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none">
+                View Document
+            </a>
+        </div>
+    )}
         </div>
     );
 };

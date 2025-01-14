@@ -123,10 +123,12 @@ const ProfileDetails = () => {
     <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-gray-800">User Profile</h2>
-        {/* <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center space-x-2">
+        <button
+        onClick={()=>navigate('/profile-dashboard/profile-edit')}
+        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center space-x-2">
           <FaUserEdit />
           <span>Edit</span>
-        </button> */}
+        </button>
       </div>
       <div className="flex flex-col sm:flex-row gap-8 items-center">
         {/* Profile Picture */}
@@ -138,56 +140,7 @@ const ProfileDetails = () => {
           />
         </div>
 
-        {/* User Info */}
-        {/* <div className="sm:w-2/3 space-y-4">
-          <div className="flex items-center space-x-3">
-            <FaUser className="text-gray-500" />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700">Username:</h3>
-              <p className="text-gray-600">{userDetails.user || "N/A"}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <FaUser className="text-gray-500" />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700">First Name:</h3>
-              <p className="text-gray-600">{userDetails.first_name || "N/A"}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <FaUser className="text-gray-500" />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700">Last Name:</h3>
-              <p className="text-gray-600">{userDetails.last_name || "N/A"}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <FaPhoneAlt className="text-gray-500" />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700">Phone Number:</h3>
-              <p className="text-gray-600">{userDetails.phone_number || "N/A"}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <FaCalendarAlt className="text-gray-500" />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700">Date of Birth:</h3>
-              <p className="text-gray-600">{userDetails.date_of_birth || "N/A"}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <FaTransgender className="text-gray-500" />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700">Gender:</h3>
-              <p className="text-gray-600 capitalize">{userDetails.gender || "N/A"}</p>
-            </div>
-          </div>
-        </div> */}
+        
 
         <div className="sm:w-2/3 space-y-4">
           {userDetails.user && (

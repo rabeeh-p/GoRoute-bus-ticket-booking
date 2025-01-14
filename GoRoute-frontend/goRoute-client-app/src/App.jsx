@@ -43,6 +43,7 @@ import EditRouteForm from './Pages/Bus_owners/Route/EditRouteForm';
 import EditBusOwnerForm from './Pages/Admin/BusOwner/EditBusOwnerForm';
 import UserCreating from './Pages/Admin/User/UserCreating';
 import EditOwnerProfile from './Pages/Bus_owners/EditOwnerProfile';
+import UserProfileEdit from './Pages/Noraml-User/Profile/UserProfileEdit';
 function App() {
 
 
@@ -65,6 +66,7 @@ function App() {
           <Route path="profile" element={<ProfileDetails />} />
           <Route path="orders/:orderId/tickets" element={<UserTickets />} />
           <Route path="orders" element={<UserOrders />} />
+          <Route path="profile-edit" element={<UserProfileEdit />} />
         </Route>
 
 

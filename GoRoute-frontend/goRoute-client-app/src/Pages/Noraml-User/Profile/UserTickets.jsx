@@ -91,7 +91,7 @@ const UserTickets = () => {
                                     <thead>
                                         <tr className="bg-red-100 text-gray-700">
                                             <th className="px-6 py-3 text-left">Seat Number</th>
-                                            <th className="px-6 py-3 text-left">Boarding Time</th>
+                                            {/* <th className="px-6 py-3 text-left">Boarding Time</th> */}
                                             <th className="px-6 py-3 text-left">Amount</th>
                                             <th className="px-6 py-3 text-left">Status</th>
                                         </tr>
@@ -100,7 +100,7 @@ const UserTickets = () => {
                                         {tickets.map((ticket) => (
                                             <tr key={ticket.id} className="hover:bg-red-50">
                                                 <td className="border px-6 py-4">{ticket.seat.seat_number}</td>
-                                                <td className="border px-6 py-4">{ticket.boarding_time}</td>
+                                                {/* <td className="border px-6 py-4">{ticket.boarding_time}</td> */}
                                                 <td className="border px-6 py-4">${ticket.amount}</td>
                                                 <td
                                                     className={`border px-6 py-4 ${

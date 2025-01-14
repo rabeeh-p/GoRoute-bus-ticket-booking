@@ -10,6 +10,7 @@ const BusOwnerEdit = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [logoImageFile, setLogoImageFile] = useState(null);
+    const [documentFile, setDocumentFile] = useState(null);  // New state for document
     const [travelName, setTravelName] = useState('');
     const [address, setAddress] = useState('');
     const [contactNumber, setContactNumber] = useState('');
@@ -51,6 +52,11 @@ const BusOwnerEdit = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         setLogoImageFile(file);
+    };
+
+    const handleDocumentChange = (e) => {
+        const file = e.target.files[0];
+        setDocumentFile(file);  // Handle document file change
     };
 
     const validateForm = () => {
@@ -105,6 +111,9 @@ const BusOwnerEdit = () => {
         formData.append('contact_number', contactNumber);
         if (logoImageFile) {
             formData.append('logo_image', logoImageFile);
+        }
+        if (documentFile) {  // Add document file to FormData
+            formData.append('document', documentFile);
         }
 
         axiosInstance.patch(`bus-owner-details/${id}/edit/`, formData, {
@@ -196,6 +205,16 @@ const BusOwnerEdit = () => {
                         value={contactNumber} 
                         onChange={(e) => setContactNumber(e.target.value)} 
                         className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                    />
+                </div>
+
+                {/* Document Upload Field */}
+                <div className="mb-4">
+                    <label className="block text-gray-700">Upload Document</label>
+                    <input 
+                        type="file" 
+                        onChange={handleDocumentChange} 
+                        className="block w-full text-sm text-gray-500 border border-gray-300 rounded-md"
                     />
                 </div>
 
