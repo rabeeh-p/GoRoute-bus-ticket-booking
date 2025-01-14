@@ -8,6 +8,8 @@ urlpatterns = [
     path('routes/<int:route_id>/stops/', RouteStopView.as_view(), name='route-stop-view'),
     path('routes/<int:route_id>/', SingleRouteView.as_view(), name='single-route'),
 
+    path('bus-owner-details/<int:id>/edit/', BusOwnerUpdateView.as_view(), name='edit-bus-owner-profile'),
+
     path('api/bus/<int:bus_id>/seat-numbers/', BusSeatsAPIView.as_view(), name='bus_seat_numbers_api'),
     path('api/orders/<int:order_id>/details/', OrderDetailsView.as_view(), name='order-details'),
 

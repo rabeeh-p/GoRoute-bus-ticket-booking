@@ -32,6 +32,38 @@ class BusOwnerProfileView(APIView):
             return Response({"error": "Bus owner profile not found."}, status=404)
         
 
+class BusOwnerUpdateView(APIView):
+
+    def get_object(self, id):
+        try:
+            return BusOwnerModel.objects.get(user=id)
+        except BusOwnerModel.DoesNotExist:
+            return None
+
+    
+
+    def patch(self, request, id, *args, **kwargs):
+        """ Handle the PATCH request for updating bus owner details """
+        owner = self.get_object(id)
+        if not owner:
+            return Response({"detail": "Bus owner not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        data = request.data.copy()
+
+        if 'logo_image' in request.FILES:
+            data['logo_image'] = request.FILES['logo_image']
+
+        serializer = BusOwnerSerializerProfileUpdate(owner, data=data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            print('err', serializer.errors)  
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 
 
@@ -52,7 +84,6 @@ class RouteCreateView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # data = request.data.copy()
         data = request.data
         data['bus_owner'] = bus_owner.id
         print("Incoming Data:", data)
@@ -113,10 +144,8 @@ class RouteByOwnerView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Fetch routes for the bus owner that have at least one stop
         routes = RouteModel.objects.filter(bus_owner=bus_owner).filter(stops__isnull=False).distinct()
 
-        # Serialize the filtered routes
         serializer = RouteModelSerializer(routes, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)

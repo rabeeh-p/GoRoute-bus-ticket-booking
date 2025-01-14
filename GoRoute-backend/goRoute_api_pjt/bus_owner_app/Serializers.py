@@ -127,3 +127,21 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ['seat_number', 'ticket_status', 'ticket_amount']
+
+
+
+
+class BusOwnerSerializerProfileUpdate(serializers.ModelSerializer):
+    logo_image = serializers.ImageField(required=False, allow_null=True)  # Handle image field correctly
+    
+    class Meta:
+        model = BusOwnerModel
+        fields = ['id', 'travel_name', 'address', 'contact_number', 'logo_image', 'created_date', 'is_approved']
+    
+    def validate_travel_name(self, value):
+        """ Ensure the travel_name is unique and valid, except for the current instance """
+        # Check uniqueness, but exclude the current instance (when updating)
+        instance = self.instance
+        if instance and instance.travel_name != value and BusOwnerModel.objects.filter(travel_name=value).exists():
+            raise serializers.ValidationError("Travel name must be unique.")
+        return value
