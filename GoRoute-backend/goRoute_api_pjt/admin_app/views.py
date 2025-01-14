@@ -20,6 +20,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import NotFound
 from django.shortcuts import get_object_or_404
+from rest_framework.parsers import MultiPartParser, FormParser
+import json
 
 
 # Create your views here.
@@ -327,6 +329,7 @@ class BusOwnerDetailView(APIView):
    
     def get(self, request, id, *args, **kwargs):
         try:
+            print('get is working')
             user = CustomUser.objects.get(id=id)
             bus_owner = BusOwnerModel.objects.get(user=user)
             serializer = BusOwnerSerializer2(bus_owner)
@@ -338,6 +341,58 @@ class BusOwnerDetailView(APIView):
         except BusOwnerModel.DoesNotExist:
             return Response({"error": "Bus owner not found for this user"}, status=status.HTTP_404_NOT_FOUND)
         
+
+    
+
+    def put(self, request, id, format=None):
+        try:
+            print(id, 'idd')
+            print('put  is working')
+
+            bus_owner = BusOwnerModel.objects.get(user=id)
+            print(bus_owner, 'owner')
+            print(request.data, 'data')
+        except BusOwnerModel.DoesNotExist:
+            return Response({'detail': 'Bus owner not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        new_travel_name = request.data.get('travel_name', '').strip()
+
+        if BusOwnerModel.objects.filter(travel_name=new_travel_name).exclude(pk=bus_owner.pk).exists():
+            return Response(
+                {'detail': f'A bus owner with the travel name "{new_travel_name}" already exists.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = BusOwnerSerializerWithoutLogo(bus_owner, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            print(serializer.errors, 'err')
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    def patch(self, request, id, *args, **kwargs):
+        
+        print('patch is  working')
+        bus_owner = get_object_or_404(BusOwnerModel, user=id)
+        print(bus_owner,'bus owner')
+        try:
+            body = json.loads(request.body)
+            is_approved = body.get('is_approved')
+
+            if is_approved is not None:
+                bus_owner.is_approved = is_approved
+                bus_owner.save()
+                return JsonResponse({'message': 'Status updated successfully.'}, status=200)
+            else:
+                return JsonResponse({'error': 'Invalid data provided.'}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON provided.'}, status=400)
+        
+
 
 
 class AcceptBusOwnerView(APIView):
@@ -473,3 +528,54 @@ class RejectBusRequestView(APIView):
         bus_request.delete()
         
         return Response({"message": "Bus request rejected and deleted successfully."}, status=status.HTTP_200_OK)
+    
+
+
+
+class CreateUserByAdmin(APIView):
+    # authentication_classes = [JWTAuthentication]  
+    # permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # Get the required fields from the request body
+        username = request.data.get("username")
+        email = request.data.get("email")
+        password = request.data.get("password")
+        first_name = request.data.get("first_name")
+        last_name = request.data.get("last_name")
+        date_of_birth = request.data.get("date_of_birth")
+        phone_number = request.data.get("phone_number")
+        gender = request.data.get("gender")
+
+        # Validate the required fields
+        if not username or not email or not password or not first_name or not last_name or not date_of_birth or not phone_number or not gender:
+            return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the username or email already exists
+        if get_user_model().objects.filter(username=username).exists():
+            return Response({"error": "Username already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if get_user_model().objects.filter(email=email).exists():
+            return Response({"error": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create the user
+        user = get_user_model().objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+        )
+
+        # Create the user's profile
+        profile = NormalUserProfile.objects.create(
+            user=user,
+            first_name=first_name,
+            last_name=last_name,
+            date_of_birth=date_of_birth,
+            phone_number=phone_number,
+            gender=gender
+        )
+
+        return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED)
+
+
+

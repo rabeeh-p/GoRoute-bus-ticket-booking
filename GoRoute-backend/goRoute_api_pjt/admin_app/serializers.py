@@ -102,7 +102,7 @@ class NormalUserProfileSerializer(serializers.ModelSerializer):
 class BusOwnerSerializer2(serializers.ModelSerializer):
     class Meta:
         model = BusOwnerModel
-        fields = ['user','travel_name', 'address', 'contact_number', 'logo_image', 'created_date']
+        fields = ['user','travel_name', 'address', 'contact_number', 'logo_image', 'created_date','is_approved']
 
 
 
@@ -143,3 +143,13 @@ class BusSerializerPending(serializers.ModelSerializer):
 
     def get_seat_count_name(self, obj):
         return obj.bus_type.get_seat_count_display() if obj.bus_type else None
+    
+
+
+
+
+
+class BusOwnerSerializerWithoutLogo(serializers.ModelSerializer):
+    class Meta:
+        model = BusOwnerModel
+        fields = ['user', 'travel_name', 'address', 'contact_number', 'created_date'] 

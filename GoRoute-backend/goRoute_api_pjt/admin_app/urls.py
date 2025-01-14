@@ -7,6 +7,7 @@ urlpatterns = [
     # path('bus-stations/', views.get_bus_stations, name='get_bus_stations'),
     path('bus_owner/register/', UserAndBusOwnerRegisterView.as_view(), name='bus_owner_register'),
     path('login/', LoginView.as_view(), name='login'),
+    path('admin-create-user/', CreateUserByAdmin.as_view(), name='admin-create-user'),
 
 
     path('register/', UserSignupView.as_view(), name='register'),
@@ -27,6 +28,7 @@ urlpatterns = [
     path('bus-owner-requests/', BusOwnerRequestListView.as_view(), name='bus-owner-requests'),
     path('bus-owner-details/<int:id>/', BusOwnerDetailView.as_view(), name='bus-owner-details'),
     path('accept-bus-owner/<int:id>/', AcceptBusOwnerView.as_view(), name='accept-bus-owner'),
+
 
     # REQUESTS
     path('buses/pending/', PendingBusesView.as_view(), name='pending-buses'),
