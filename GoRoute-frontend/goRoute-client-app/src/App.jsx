@@ -40,6 +40,9 @@ import UserBusView from './Pages/Noraml-User/UserBusView';
 import UserTickets from './Pages/Noraml-User/Profile/UserTickets';
 import UserOrders from './Pages/Noraml-User/Profile/UserOrders';
 import EditRouteForm from './Pages/Bus_owners/Route/EditRouteForm';
+import EditBusOwnerForm from './Pages/Admin/BusOwner/EditBusOwnerForm';
+import UserCreating from './Pages/Admin/User/UserCreating';
+import EditOwnerProfile from './Pages/Bus_owners/EditOwnerProfile';
 function App() {
 
 
@@ -80,6 +83,8 @@ function App() {
           <Route path="busowner-details/:id" element={<BusOwnerDetails />} />
           <Route path="bus-requests/" element={<AdminBusRequests />} />
           <Route path="bus-details/:busId" element={<BusDetails />} />
+          <Route path="edit-bus-owner/:id" element={<EditBusOwnerForm />} />
+          <Route path="user-creating" element={<UserCreating />} />
 
 
         </Route>
@@ -101,6 +106,7 @@ function App() {
           <Route path="scheduled-bus-list" element={<ScheduledBusList />} />
           <Route path="scheduled-bus-details/:busId" element={<ScheduledBusDetails />} />
           <Route path="edit-route/:routeId" element={<EditRouteForm />} />
+          <Route path="edit-owner-profile/:id" element={<EditOwnerProfile />} />
         </Route>
       </Routes>
 

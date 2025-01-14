@@ -14,6 +14,7 @@ import BusSchedule from './BusSchedule'
 import ScheduledBusList from './ScheduledBusList'
 import ScheduledBusDetails from './ScheduledBusDetails'
 import EditRouteForm from './Route/EditRouteForm'
+import EditOwnerProfile from './EditOwnerProfile'
 
 const BusOwnerDashboard = () => {
     return (
@@ -35,6 +36,7 @@ const BusOwnerDashboard = () => {
                         <Route path="scheduled-bus-list" element={<ScheduledBusList />} />
                         <Route path="scheduled-bus-details/:busId" element={<ScheduledBusDetails />} />
                         <Route path="edit-route/:routeId" element={<EditRouteForm />} />
+                        <Route path="edit-owner-profile/:id" element={<EditOwnerProfile />} />
                         
                     </Routes>
                 </main>

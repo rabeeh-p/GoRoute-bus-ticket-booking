@@ -52,6 +52,14 @@ const UsersList = () => {
   return (
     <div className="container mx-auto py-8">
       <h2 className="text-2xl font-semibold text-center mb-6">User Profiles</h2>
+      <button
+          onClick={() => navigate('/admin-home/user-creating')}
+          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+        >
+          Add User
+        </button>
+      
+
       
 
       <div className="overflow-x-auto">

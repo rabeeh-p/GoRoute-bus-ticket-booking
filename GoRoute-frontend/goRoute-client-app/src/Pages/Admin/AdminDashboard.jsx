@@ -12,6 +12,8 @@ import BusOwnerDetails from "./BusOwnerDetails";
 import AdminBusRequests from "./AdminBusRequests";
 import BusDetails from "./BusDetails";
 import BusSchedule from "../Bus_owners/BusSchedule";
+import EditBusOwnerForm from "./BusOwner/EditBusOwnerForm";
+import UserCreating from "./User/UserCreating";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -117,6 +119,8 @@ const AdminDashboard = () => {
               <Route path="busowner-details/:id" element={<BusOwnerDetails />} />
               <Route path="bus-requests/" element={<AdminBusRequests />} />
               <Route path="bus-details/:busId" element={<BusDetails />} />
+              <Route path="edit-bus-owner/:id" element={<EditBusOwnerForm />} />
+              <Route path="user-creating" element={<UserCreating />} />
             </Routes>
           </div>
         </main>

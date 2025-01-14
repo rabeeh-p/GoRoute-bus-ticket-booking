@@ -82,7 +82,9 @@ const OwnerProfile = () => {
                 </div>
 
                 {/* Edit Button */}
-                <button className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none">
+                <button
+                onClick={()=>navigate(`/busowner-dashboard/edit-owner-profile/${owner.user}`)}
+                className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none">
                     Edit
                 </button>
             </div>
