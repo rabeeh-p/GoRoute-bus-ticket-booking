@@ -598,7 +598,7 @@ const UserBusView = () => {
                                     type="text"
                                     id="selectedSeats"
                                     name="selectedSeats"
-                                    value={selectedSeats.join(", ")} // Array of selected seats
+                                    value={selectedSeats.join(", ")}  
                                     disabled
                                     className="mt-2 p-2 w-full border rounded-lg"
                                 />
