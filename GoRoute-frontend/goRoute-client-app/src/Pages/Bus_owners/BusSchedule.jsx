@@ -45,6 +45,8 @@ const BusSchedule = () => {
     })
     .then(response => {
       setRoutes(response.data);
+      console.log(response,'data');
+      
     })
     .catch(err => {
       setError('Failed to fetch routes');
@@ -78,7 +80,7 @@ const BusSchedule = () => {
     })
     .then(response => {
       alert('Bus scheduled successfully!');
-      navigate('/bus-management'); // Navigate to a success page or refresh
+      navigate('/busowner-dashboard/scheduled-bus-list'); // Navigate to a success page or refresh
     })
     .catch(err => {
         console.log('error',err);
@@ -151,7 +153,7 @@ const BusSchedule = () => {
           />
         </div>
 
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
           <select
             className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -162,7 +164,7 @@ const BusSchedule = () => {
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
           </select>
-        </div>
+        </div> */}
       </div>
 
       {/* Submit Button */}

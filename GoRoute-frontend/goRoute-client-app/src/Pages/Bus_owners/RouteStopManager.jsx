@@ -13,12 +13,17 @@ const RouteStopsManager = () => {
 
   const { routeId } = useParams("id");
   console.log('route',routeId);
+
+  console.log('stops component');
+  
   
 
   useEffect(() => {
     
     const fetchRouteStops = async () => {
       const accessToken = localStorage.getItem('accessToken');  
+      console.log(accessToken,'access tocken');
+      
   
       if (!accessToken) {
         navigate('/admin-login');  

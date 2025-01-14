@@ -2,17 +2,21 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../Components/Normal/Navbar";
+import { Calendar, Clock, IndianRupee, MapPin, Star } from 'lucide-react';
 
 const UserBusView = () => {
     const [busDetails, setBusDetails] = useState(null);
     const [error, setError] = useState("");
+    const [logo, setLogo] = useState("");
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [bookedSeats, setBookedSeats] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     // const [isBooking, setIsBooking] = useState(false); // B
 
-    console.log(busDetails,'details');
-    
+    console.log(busDetails, 'details');
+    console.log(logo, 'logo');
+
+
 
     const naviagate = useNavigate()
 
@@ -22,7 +26,7 @@ const UserBusView = () => {
 
     useEffect(() => {
         axios
-            .get(`http://127.0.0.1:8000/bus-details/${busId}/`,{
+            .get(`http://127.0.0.1:8000/bus-details/${busId}/`, {
                 params: {
                     from_city: from,
                     to_city: to,
@@ -31,11 +35,12 @@ const UserBusView = () => {
             }
             )
             .then((response) => {
-                console.log(response.data.booked_seats,'dataaas');
-                
+                console.log(response.data, 'dataaas');
+
                 setBusDetails(response.data.bus);
                 // setBookedSeats([3, 7, 12,20]);
                 setBookedSeats(response.data.booked_seats);
+                setLogo(response.data.bus_log)
             })
             .catch((error) => {
                 console.error("Error fetching bus details:", error);
@@ -66,16 +71,16 @@ const UserBusView = () => {
     // };
 
     const handleFormSubmit = (e) => {
-        
+
         e.preventDefault();
         const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-      naviagate('/login');   
-      return;
-    }
-    const searchParams = JSON.parse(localStorage.getItem('searchParams'));
-    const { from, to, date } = searchParams;
-    
+        if (!accessToken) {
+            naviagate('/login');
+            return;
+        }
+        const searchParams = JSON.parse(localStorage.getItem('searchParams'));
+        const { from, to, date } = searchParams;
+
         // Prepare the data to be sent to the server
         const formData = {
             bus_id: busId, // Replace with the correct bus ID if needed
@@ -84,17 +89,17 @@ const UserBusView = () => {
             email: e.target.email.value,
             phone: e.target.phone.value,
             to: to,      // Added toCity from localStorage
-            from:from,
-            date: date 
+            from: from,
+            date: date
         };
-    
+
         // Make the API call to submit the booking
         axios.post('http://127.0.0.1:8000/seat-booking/', formData,
             {
                 headers: {
-                  Authorization: `Bearer ${accessToken}`,
+                    Authorization: `Bearer ${accessToken}`,
                 },
-              }
+            }
         )
             .then((response) => {
                 if (response.data.message) {
@@ -138,6 +143,8 @@ const UserBusView = () => {
 
     const getSeatStyle = (type, seatNumber) => {
         let baseStyle = "";
+        console.log(type, 'typeeeee');
+
 
         switch (type) {
             case "standard":
@@ -149,9 +156,13 @@ const UserBusView = () => {
             case "luxury":
                 baseStyle = "w-16 h-16 text-black rounded-full shadow-lg cursor-pointer transition-all duration-200";
                 break;
+            // case "semi_sleeper":
+            //     baseStyle = "w-12 h-24 text-white rounded-md shadow-md cursor-pointer transition-all duration-200";
+            //     break;
             case "semi_sleeper":
-                baseStyle = "w-12 h-24 text-white rounded-md shadow-md cursor-pointer transition-all duration-200";
+                baseStyle = "w-10 h-12 bg-gray-300 text-white rounded-lg shadow-md cursor-pointer transition-all duration-200 hover:bg-blue-500 hover:scale-105 active:scale-95";
                 break;
+
             case "full_sleeper":
                 baseStyle = "w-12 h-24 text-white rounded-md shadow-md cursor-pointer transition-all duration-200";
                 break;
@@ -340,18 +351,87 @@ const UserBusView = () => {
         <>
             <Navbar />
 
+
             <div className="container mx-auto mt-16 p-6 bg-white rounded-lg shadow-lg">
                 {/* Bus Details Section */}
-                <div className="bg-gray-50 p-6 rounded-lg shadow mb-6">
+                {/* <div className="bg-gray-50 p-6 rounded-lg shadow mb-6">
                     <h2 className="text-3xl font-semibold text-gray-800 mb-4">{busDetails.bus_owner_name}</h2>
                     <p className="text-gray-700 mb-2"><span className="font-medium">Bus Name:</span> {busDetails.name}</p>
                     <p className="text-gray-700 mb-2"><span className="font-medium">Bus Number:</span> {busDetails.bus_number}</p>
                     <p className="text-gray-700 mb-2"><span className="font-medium">Bus Type:</span> {busDetails.bus_type}</p>
                     <p className="text-gray-700 mb-2"><span className="font-medium">Route:</span> {busDetails.route}</p>
+                    <p className="text-gray-700 mb-2"><span className="font-medium">Seat Type:</span> {busDetails.seat_type}</p>
                     <p className="text-gray-700 mb-2">
                         <span className="font-medium">Scheduled Date:</span> {new Date(busDetails.scheduled_date).toLocaleString()}
                     </p>
                     <p className="text-gray-700 mb-2"><span className="font-medium">Seats Available:</span> {busDetails.seat_count}</p>
+                </div> */}
+                <div className="bg-gray-50 p-6 rounded-lg shadow mb-6 flex flex-col lg:flex-row justify-between">
+                    <div className="w-full lg:w-1/2 mb-4 lg:mb-0">
+                        <h2 className="text-3xl font-semibold text-gray-800 mb-4 flex items-center">
+                            {/* Add the logo image here */}
+                            <img
+                                src={`http://127.0.0.1:8000/${logo}`} // Replace with actual path to the logo
+                                alt="Bus Owner Logo"
+                                className="w-12 h-12 rounded-full mr-4" // Circular logo with size
+                            />
+                            {busDetails.bus_owner_name}
+                        </h2>
+                        <p className="text-gray-700 mb-2"><span className="font-medium">Bus Name:</span> {busDetails.name}</p>
+                        <p className="text-gray-700 mb-2"><span className="font-medium">Bus Number:</span> {busDetails.bus_number}</p>
+                        <p className="text-gray-700 mb-2"><span className="font-medium">Bus Type:</span> {busDetails.bus_type}</p>
+                        <p className="text-gray-700 mb-2"><span className="font-medium">Route:</span> {busDetails.route}</p>
+                    </div>
+                    <div className="w-full lg:w-1/2">
+                        <p className="text-gray-700 mb-2"><span className="font-medium">Seat Type:</span> {busDetails.seat_type}</p>
+                        <p className="text-gray-700 mb-2">
+                            <span className="font-medium">Scheduled Date:</span> {new Date(busDetails.scheduled_date).toLocaleString()}
+                        </p>
+                        <p className="text-gray-700 mb-2"><span className="font-medium">Seats Available:</span> {busDetails.seat_count}</p>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+                <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                                <MapPin className="w-5 h-5 text-red-500" />
+                                <div>
+                                    <p className="text-sm text-gray-500">From</p>
+                                    <p className="font-semibold">{from}</p>
+                                </div>
+                            </div>
+                            <div className="h-0.5 w-8 bg-gray-300" />
+                            <div className="flex items-center gap-2">
+                                <MapPin className="w-5 h-5 text-red-500" />
+                                <div>
+                                    <p className="text-sm text-gray-500">To</p>
+                                    <p className="font-semibold">{to}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Calendar className="w-5 h-5 text-red-500" />
+                            <div>
+                                <p className="text-sm text-gray-500">Date</p>
+                                <p className="font-semibold">
+                                    {new Date(date).toLocaleDateString('en-US', {
+                                        weekday: 'short',
+                                        day: 'numeric',
+                                        month: 'short',
+                                        year: 'numeric',
+                                    })}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Seat Layout */}

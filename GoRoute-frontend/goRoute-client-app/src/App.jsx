@@ -39,6 +39,7 @@ import ScheduledBusDetails from './Pages/Bus_owners/ScheduledBusDetails';
 import UserBusView from './Pages/Noraml-User/UserBusView';
 import UserTickets from './Pages/Noraml-User/Profile/UserTickets';
 import UserOrders from './Pages/Noraml-User/Profile/UserOrders';
+import EditRouteForm from './Pages/Bus_owners/Route/EditRouteForm';
 function App() {
 
 
@@ -99,6 +100,7 @@ function App() {
           <Route path="bus-schedule/:busId" element={<BusSchedule />} />
           <Route path="scheduled-bus-list" element={<ScheduledBusList />} />
           <Route path="scheduled-bus-details/:busId" element={<ScheduledBusDetails />} />
+          <Route path="edit-route/:routeId" element={<EditRouteForm />} />
         </Route>
       </Routes>
 

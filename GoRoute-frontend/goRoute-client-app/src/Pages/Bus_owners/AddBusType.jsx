@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../axios/axios';
 import useLogout from '../../Hook/useLogout';
+import Swal from 'sweetalert2';
+
 
 const AddBusType = () => {
   const [busType, setBusType] = useState({
@@ -32,40 +34,62 @@ const AddBusType = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
 
-    const accessToken = localStorage.getItem('accessToken');  
+const handleSubmit = (e) => {
+  e.preventDefault();
 
-    if (!accessToken) {
-      setError('Session expired. Please log in again.');
-      navigate('/admin-login');   
-      return;
+  const accessToken = localStorage.getItem('accessToken');  
+
+  if (!accessToken) {
+    setError('Session expired. Please log in again.');
+    Swal.fire({
+      icon: 'warning',
+      title: 'Session Expired',
+      text: 'Please log in again.',
+    });
+    navigate('/admin-login');   
+    return;
+  }
+
+  setLoading(true);   
+
+  axiosInstance.post('add_bus_type/', busType, { 
+    headers: { 
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'multipart/form-data' 
     }
-
-    setLoading(true);   
-
-    axiosInstance.post('add_bus_type/', busType, { 
-      headers: { 
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'multipart/form-data' 
-      }
   })
-      .then(response => {
-        setMessage('Bus Type added successfully!');
-        setLoading(false);
-      })
-      .catch(err => {
-        if (err.response && err.response.status === 401) {
-          handleLogout();  
+  .then(response => {
+    setMessage('Bus Type added successfully!');
+    Swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: 'Bus type has been added successfully!',
+    });
+    setLoading(false);
+  })
+  .catch(err => {
+    if (err.response && err.response.status === 401) {
+      handleLogout();  
 
-          setError('Session expired. Please log in again.');
-        } else {
-          setError('Failed to add bus type. Please try again.');
-        }
-        setLoading(false);
+      setError('Session expired. Please log in again.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Session Expired',
+        text: 'Session expired. Please log in again.',
       });
-  };
+    } else {
+      setError('Failed to add bus type. Please try again.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to add bus type. Please try again.',
+      });
+    }
+    setLoading(false);
+  });
+};
+
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -84,9 +108,9 @@ const AddBusType = () => {
             >
               <option value="">Select Bus Type</option>
               <option value="ac">AC Bus</option>
-              <option value="sleeper_ac">Sleeper AC Bus</option>
-              <option value="non_ac_sleeper">Non-AC Sleeper</option>
-              <option value="semi_sleeper">Semi Sleeper</option>
+              <option value="non_ac">Non-AC Bus</option>
+              {/* <option value="non_ac_sleeper">Non-AC Sleeper</option>
+              <option value="semi_sleeper">Semi Sleeper</option> */}
             </select>
           </div>
 
@@ -101,7 +125,7 @@ const AddBusType = () => {
             >
               <option value="">Select Seat Type</option>
               <option value="standard">Standard</option>
-              <option value="recliner">Recliner</option>
+              {/* <option value="recliner">Recliner</option> */}
               <option value="luxury">Luxury</option>
               <option value="semi_sleeper">Semi Sleeper</option>
               <option value="full_sleeper">Full Sleeper</option>
@@ -121,8 +145,8 @@ const AddBusType = () => {
               <option value="20">20 Seats</option>
               <option value="30">30 Seats</option>
               <option value="40">40 Seats</option>
-              <option value="50">50 Seats</option>
-              <option value="60">60 Seats</option>
+              {/* <option value="50">50 Seats</option> */}
+              {/* <option value="60">60 Seats</option> */}
             </select>
           </div>
 

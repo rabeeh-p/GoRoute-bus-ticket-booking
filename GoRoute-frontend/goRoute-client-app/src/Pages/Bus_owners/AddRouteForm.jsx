@@ -19,10 +19,12 @@ const AddRouteForm = () => {
       startLocation,
       endLocation,
       distanceInKm,
-      startDatetime,
+      // startDatetime,
     };
 
     const accessToken = localStorage.getItem('accessToken');
+    console.log(accessToken,'tocken');
+    
 
     if (!accessToken) {
       Swal.fire({
@@ -57,6 +59,7 @@ const AddRouteForm = () => {
       setEndLocation("");
       setDistanceInKm("");
       setStartDatetime("");
+      navigate('/busowner-dashboard/bus-owner/route-table')
 
     } catch (err) {
       console.error('Error:', err);
@@ -152,7 +155,7 @@ const AddRouteForm = () => {
             />
           </div>
 
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <label htmlFor="startDatetime" className="block text-lg font-medium text-gray-700 mb-2">
               Start Date & Time
             </label>
@@ -164,7 +167,7 @@ const AddRouteForm = () => {
               onChange={(e) => setStartDatetime(e.target.value)}
               required
             />
-          </div>
+          </div> */}
 
           <div className="flex justify-end">
             <button

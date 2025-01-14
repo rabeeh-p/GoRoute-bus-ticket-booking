@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from '../../axios/axios';   
+import axiosInstance from '../../axios/axios';
 
 const RouteTable = () => {
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  console.log('routes',routes);
-  
+  console.log('routes', routes);
+
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
 
-    
+
     const fetchRoutes = async () => {
       try {
-        const response = await axiosInstance.get('routes/my_routes/',{
+        const response = await axiosInstance.get('routes/my_routes/', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
 
         if (response.status === 200) {
-          setRoutes(response.data);   
+          setRoutes(response.data);
         } else {
           console.error("Failed to fetch routes:", response.status);
         }
@@ -35,9 +35,9 @@ const RouteTable = () => {
     };
 
     fetchRoutes();
-  }, []);   
+  }, []);
 
-  
+
 
   if (loading) {
     return (
@@ -72,6 +72,7 @@ const RouteTable = () => {
                 <th className="px-4 py-2">End Location</th>
                 <th className="px-4 py-2">Distance (km)</th>
                 <th className="px-4 py-2">Actions</th>
+                <th className="px-4 py-2">Edit</th>
               </tr>
             </thead>
             <tbody>
@@ -88,12 +89,22 @@ const RouteTable = () => {
                     <td className="px-4 py-2">{route.distance_in_km}</td>
                     <td className="px-4 py-2">
                       <button
-                      onClick={()=>navigate(`/busowner-dashboard/bus-owner/add-stop/${route.id}`)}
+                        onClick={() => navigate(`/busowner-dashboard/bus-owner/add-stop/${route.id}`)}
                         className="bg-blue-500 text-white py-1 px-3 rounded-md hover:bg-blue-600 transition"
                       >
                         View
                       </button>
                     </td>
+                      
+                    <td className="px-4 py-2">
+                      <button
+                        onClick={()=> navigate(`/busowner-dashboard/edit-route/${route.id}`)}
+                        className="bg-blue-500 text-white py-1 px-3 rounded-md hover:bg-blue-600 transition"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                    
                   </tr>
                 ))
               ) : (
