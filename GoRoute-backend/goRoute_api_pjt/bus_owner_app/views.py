@@ -11,6 +11,8 @@ from decimal import Decimal
 from django.shortcuts import get_object_or_404
 from .Serializers import *
 
+from collections import defaultdict
+
 
 # Create your views here.
 
@@ -469,23 +471,96 @@ class BusDetailView(APIView):
 class BusSeatsAPIView(APIView):
    
 
+    # def get(self, request, bus_id):
+    #     bus = get_object_or_404(ScheduledBus, id=bus_id)
+
+    #     tickets = Ticket.objects.filter(seat__bus=bus)
+
+    #     booked_seats = []
+    #     for ticket in tickets:
+    #         order = ticket.order
+    #         user = order.user   
+
+    #         order_data = OrderSerializer(order).data
+
+    #         seat_data = {
+    #             'seat_number': ticket.seat.seat_number,
+    #         }
+    #         user_data = NormalUserProfileSerializer(user).data   
+    #         booked_seats.append({
+    #             'seat': seat_data,
+    #             # 'user': user_data,
+    #             'order': order_data
+    #         })
+
+    #     return Response({"booked_seats": booked_seats}, status=status.HTTP_200_OK)
+
+    # def get(self, request, bus_id):
+    #     bus = get_object_or_404(ScheduledBus, id=bus_id)
+
+    #     # Get all orders related to the bus through tickets
+    #     orders = Order.objects.filter(bus=bus)
+
+    #     booked_seats = []
+        
+    #     for order in orders:
+    #         seats = []
+    #         tickets = Ticket.objects.filter(order=order)
+
+    #         for ticket in tickets:
+    #             seat_data = {
+    #                 'seat_number': ticket.seat.seat_number,
+    #             }
+    #             seats.append(seat_data)
+
+    #         # Serialize the order data
+    #         order_data = OrderSerializer(order).data
+
+    #         # Add the order with its seats to the response
+    #         booked_seats.append({
+    #             'order': order_data,
+    #             'seats': seats
+    #         })
+
+    #     return Response({"booked_seats": booked_seats}, status=status.HTTP_200_OK)
+
     def get(self, request, bus_id):
         bus = get_object_or_404(ScheduledBus, id=bus_id)
 
-        tickets = Ticket.objects.filter(seat__bus=bus)
+        orders = Order.objects.filter(bus=bus)
 
         booked_seats = []
-        for ticket in tickets:
-            order = ticket.order
-            user = order.user   
+        
+        for order in orders:
+            seats = []
+            tickets = Ticket.objects.filter(order=order)
 
-            seat_data = {
-                'seat_number': ticket.seat.seat_number,
-            }
-            user_data = NormalUserProfileSerializer(user).data   
+            for ticket in tickets:
+                seat_data = {
+                    'seat_number': ticket.seat.seat_number,
+                }
+                seats.append(seat_data)
+
+            order_data = OrderSerializer(order).data
+
             booked_seats.append({
-                'seat': seat_data,
-                'user': user_data
+                'order': order_data,
+                'seats': seats
             })
 
         return Response({"booked_seats": booked_seats}, status=status.HTTP_200_OK)
+
+class OrderDetailsView(APIView):
+    def get(self, request, order_id):
+        print('order id is working')
+        order = get_object_or_404(Order, id=order_id)
+
+        tickets = Ticket.objects.filter(order=order)
+
+        order_data = OrderSerializer(order).data
+        tickets_data = TicketSerializer(tickets, many=True).data
+
+        return Response({
+            "order": order_data,
+            "tickets": tickets_data
+        }, status=status.HTTP_200_OK)

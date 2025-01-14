@@ -9,6 +9,7 @@ urlpatterns = [
     path('routes/<int:route_id>/', SingleRouteView.as_view(), name='single-route'),
 
     path('api/bus/<int:bus_id>/seat-numbers/', BusSeatsAPIView.as_view(), name='bus_seat_numbers_api'),
+    path('api/orders/<int:order_id>/details/', OrderDetailsView.as_view(), name='order-details'),
 
 
     path('add_bus_type/', BusTypeCreateView.as_view(), name='add_bus_type'),

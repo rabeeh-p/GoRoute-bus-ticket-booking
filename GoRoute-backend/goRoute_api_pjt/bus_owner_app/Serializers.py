@@ -108,3 +108,22 @@ class ScheduledBusSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScheduledBus
         fields = ['id', 'bus_number','name', 'bus_owner_name', 'bus_type', 'seat_type', 'seat_count', 'route', 'scheduled_date', 'status', 'description', 'started', 'stops']
+
+
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = '__all__' 
+
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    seat_number = serializers.IntegerField(source='seat.seat_number')  # Assuming the seat has a `seat_number` field
+    ticket_status = serializers.CharField(source='status')  # Assuming you have a status field in Ticket model
+    ticket_amount = serializers.DecimalField(source='amount', max_digits=10, decimal_places=2)  # Assuming you have an `amount` field
+
+    class Meta:
+        model = Ticket
+        fields = ['seat_number', 'ticket_status', 'ticket_amount']
