@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axiosInstance from './../../axios/axios';   
 import { useNavigate } from 'react-router-dom';
  import useLogout from '../../Hook/useLogout';  
+ import Swal from 'sweetalert2';
 
 const OwnerProfile = () => {
     const navigate = useNavigate();
@@ -27,6 +28,25 @@ const OwnerProfile = () => {
             },
         })
             .then(response => {
+                const ownerData = response.data;
+                
+                // if (!ownerData.is_approved) {
+                //     handleLogout();
+                //     setError('Your account is not approved. Please contact support.');
+                //     return;
+                // }
+
+                if (!ownerData.is_approved) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Account Is Blocked Approved',
+                        text: ' Please contact support.',
+                    }).then(() => {
+                        handleLogout();
+                    });
+                    return;
+                }
+
                 setOwner(response.data);
                 setLoading(false);
             })
