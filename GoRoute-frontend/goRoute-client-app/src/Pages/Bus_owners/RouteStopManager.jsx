@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2"; // Import SweetAlert
 import axiosInstance from "../../axios/axios";
 import { useParams } from "react-router-dom";
+import useLogout from '../../Hook/useLogout';
 
 const RouteStopsManager = () => {
   const [routeStops, setRouteStops] = useState([]);
@@ -10,6 +11,7 @@ const RouteStopsManager = () => {
   const [arrivalTime, setArrivalTime] = useState("");
   const [departureTime, setDepartureTime] = useState("");
   const [distance_in_km, setDistance_in_km] = useState("");
+  const { handleLogout } = useLogout();
 
   const { routeId } = useParams("id");
   console.log('route',routeId);
@@ -26,7 +28,7 @@ const RouteStopsManager = () => {
       
   
       if (!accessToken) {
-        navigate('/admin-login');  
+        navigate('/login');  
         return;
       }
       
@@ -40,12 +42,18 @@ const RouteStopsManager = () => {
           setRouteStops(response.data);
         }
       } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Failed to fetch route stops. Please try again later.",
-        });
+        if (error.response && error.response.status === 401) {
+          handleLogout();  
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to fetch route stops. Please try again later.",
+          })
+
+       
         console.error("Error fetching stops:", error);
+        }
       } finally {
         setLoading(false);
       }

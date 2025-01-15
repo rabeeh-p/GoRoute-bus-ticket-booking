@@ -3,6 +3,7 @@ import axiosInstance from "../../axios/axios";
 import { useNavigate, useParams } from "react-router-dom";
 import BusCard from "../../Components/Bus/BusCard"; // Adjust the path based on your file structure
 import OrdersTable from "../../Components/BusOwner/OrdersTable";
+import useLogout from '../../Hook/useLogout';
 
 const ScheduledBusDetails = () => {
   const { busId } = useParams();
@@ -12,6 +13,7 @@ const ScheduledBusDetails = () => {
   const navigate = useNavigate();
   const [seatNumbers, setSeatNumbers] = useState([])
   const [orders, setOrders] = useState([])
+  const { handleLogout } = useLogout();
 
 
   console.log(seatNumbers,'numbers');
@@ -68,10 +70,7 @@ const ScheduledBusDetails = () => {
         console.log(seatNumbersResponse.data,'data respon');
         
         
-        // const seatNumbers = seatNumbersResponse.data.booked_seats.map(seat => seat.seat.seat_number);
-        // setSeatNumbers(seatNumbers);
-        // const orders = seatNumbersResponse.data.booked_seats.map(seat => seat.order);
-        // setOrders(orders);
+        
 
         const seatNumbers = seatNumbersResponse.data.booked_seats.map(seat => seat.seats.map(s => s.seat_number)).flat();
       setSeatNumbers(seatNumbers);
@@ -82,9 +81,14 @@ const ScheduledBusDetails = () => {
 
         setLoading(false);
       } catch (err) {
-        console.log("Error fetching data:", err);
-        setError("Failed to fetch data");
-        setLoading(false);
+        if (err.response && err.response.status === 401) {
+          handleLogout();  
+        } else {
+          console.log("Error fetching data:", err);
+          setError("Failed to fetch data");
+          setLoading(false);
+        }
+         
       }
     };
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../axios/axios';   
 import { useNavigate } from 'react-router-dom';
 import BusDetail from './BusDetail';
+import useLogout from '../../Hook/useLogout';
 
 const BusList = () => {
   const [approvedBuses, setApprovedBuses] = useState([]);
@@ -10,6 +11,7 @@ const BusList = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [selectedBusId, setSelectedBusId] = useState(null);
+  const { handleLogout } = useLogout();
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -32,8 +34,13 @@ const BusList = () => {
       setLoading(false);
     })
     .catch(err => {
-      setError('Failed to fetch bus data');
-      setLoading(false);
+      if (err.response && err.response.status === 401) {
+        handleLogout();  
+      } else {
+        setError('Failed to fetch bus data');
+        setLoading(false);
+      }
+      // setError('Failed to fetch bus data');
     });
 
     return () => {

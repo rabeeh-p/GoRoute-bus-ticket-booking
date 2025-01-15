@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
 import axiosInstance from "../../axios/axios";
+import useLogout from '../../Hook/useLogout';
 
 const BusDetail = ({ busId }) => {
   const [busDetail, setBusDetail] = useState(null);
@@ -10,6 +11,7 @@ const BusDetail = ({ busId }) => {
   const navigate = useNavigate();
 
   console.log(busDetail,'details');
+  const { handleLogout } = useLogout();
   
 
   useEffect(() => {
@@ -24,7 +26,11 @@ const BusDetail = ({ busId }) => {
         const response = await axiosInstance.get(`/api/bus/${busId}/`);
         setBusDetail(response.data);
       } catch (err) {
-        setError(err.message || "Something went wrong");
+        if (err.response && err.response.status === 401) {
+          handleLogout();  
+        } else {
+          setError(err.message || "Something went wrong");
+        }
       } finally {
         setLoading(false);
       }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../axios/axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import useLogout from '../../Hook/useLogout';
+import Swal from 'sweetalert2'
 
 const BusSchedule = () => {
   const { busId } = useParams();  
@@ -14,6 +16,7 @@ const BusSchedule = () => {
   const [status, setStatus] = useState('active');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { handleLogout } = useLogout();
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -38,7 +41,7 @@ const BusSchedule = () => {
     });
 
     // Fetch routes
-    axiosInstance.get('/routes/my_routes/', {
+    axiosInstance.get('/routes/my_routes/schedule-time/', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -49,7 +52,13 @@ const BusSchedule = () => {
       
     })
     .catch(err => {
-      setError('Failed to fetch routes');
+      if (err.response && err.response.status === 401) {
+        handleLogout();  
+      } else {
+        setError('Failed to fetch bus details');
+        setLoading(false);
+      }
+      // setError('Failed to fetch routes');
     });
   }, [busId, navigate]);
 
@@ -60,32 +69,84 @@ const BusSchedule = () => {
     setSelectedStops(selected ? selected.stops : []);
   };
 
+  // const handleSubmit = () => {
+  //   if (!selectedRoute || !scheduledDate) {
+  //     setError('Please fill all fields before submitting.');
+  //     return;
+  //   }
+
+  //   const accessToken = localStorage.getItem('accessToken');
+  //   const payload = {
+  //     route_id: selectedRoute.id,
+  //     scheduled_date: scheduledDate,
+  //     status: status,
+  //   };
+
+  //   axiosInstance.post(`/schedule-bus/${busId}/`, payload, {
+  //     headers: {
+  //       Authorization: `Bearer ${accessToken}`,
+  //     },
+  //   })
+  //   .then(response => {
+  //     alert('Bus scheduled successfully!');
+  //     navigate('/busowner-dashboard/scheduled-bus-list'); // Navigate to a success page or refresh
+  //   })
+  //   .catch(err => {
+  //       console.log('error',err);
+        
+  //     setError('Failed to schedule bus. Please try again.');
+  //   });
+  // };
+
+
   const handleSubmit = () => {
     if (!selectedRoute || !scheduledDate) {
       setError('Please fill all fields before submitting.');
       return;
     }
-
+  
     const accessToken = localStorage.getItem('accessToken');
     const payload = {
       route_id: selectedRoute.id,
       scheduled_date: scheduledDate,
       status: status,
     };
-
+  
     axiosInstance.post(`/schedule-bus/${busId}/`, payload, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     })
     .then(response => {
-      alert('Bus scheduled successfully!');
-      navigate('/busowner-dashboard/scheduled-bus-list'); // Navigate to a success page or refresh
+      Swal.fire({
+        title: 'Success!',
+        text: 'Bus scheduled successfully!',
+        icon: 'success',
+        confirmButtonText: 'OK',
+      });
+      navigate('/busowner-dashboard/scheduled-bus-list'); // Navigate to success page or refresh
     })
     .catch(err => {
-        console.log('error',err);
-        
-      setError('Failed to schedule bus. Please try again.');
+      console.log('Error:', err);
+  
+      // Handle the error message from backend
+      if (err.response && err.response.data && err.response.data.error) {
+        const errorMessage = err.response.data.error;
+  
+        Swal.fire({
+          title: 'Error!',
+          text: errorMessage, // Display backend error message
+          icon: 'error',
+          confirmButtonText: 'Try Again',
+        });
+      } else {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to schedule bus. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'Try Again',
+        });
+      }
     });
   };
 

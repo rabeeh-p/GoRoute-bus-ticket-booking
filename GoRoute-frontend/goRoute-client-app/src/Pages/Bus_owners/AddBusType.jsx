@@ -109,8 +109,7 @@ const handleSubmit = (e) => {
               <option value="">Select Bus Type</option>
               <option value="ac">AC Bus</option>
               <option value="non_ac">Non-AC Bus</option>
-              {/* <option value="non_ac_sleeper">Non-AC Sleeper</option>
-              <option value="semi_sleeper">Semi Sleeper</option> */}
+              
             </select>
           </div>
 
@@ -125,7 +124,6 @@ const handleSubmit = (e) => {
             >
               <option value="">Select Seat Type</option>
               <option value="standard">Standard</option>
-              {/* <option value="recliner">Recliner</option> */}
               <option value="luxury">Luxury</option>
               <option value="semi_sleeper">Semi Sleeper</option>
               <option value="full_sleeper">Full Sleeper</option>
@@ -145,8 +143,7 @@ const handleSubmit = (e) => {
               <option value="20">20 Seats</option>
               <option value="30">30 Seats</option>
               <option value="40">40 Seats</option>
-              {/* <option value="50">50 Seats</option> */}
-              {/* <option value="60">60 Seats</option> */}
+              
             </select>
           </div>
 

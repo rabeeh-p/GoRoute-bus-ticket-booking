@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from './../../axios/axios';   
-import { useNavigate } from 'react-router-dom';   
+import { useNavigate } from 'react-router-dom';
+ import useLogout from '../../Hook/useLogout';  
 
 const OwnerProfile = () => {
     const navigate = useNavigate();
     const [owner, setOwner] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { handleLogout } = useLogout();
 
     console.log(owner, 'owner');
 
@@ -15,7 +17,7 @@ const OwnerProfile = () => {
         const accessToken = localStorage.getItem('accessToken');
 
         if (!accessToken) {
-            navigate('/admin-login');
+            navigate('/login');
             return;
         }
 
@@ -30,10 +32,11 @@ const OwnerProfile = () => {
             })
             .catch(err => {
                 if (err.response && err.response.status === 401) {
-                    localStorage.removeItem('accessToken');
-                    localStorage.removeItem('refreshToken');
-                    localStorage.removeItem('userType');
-                    navigate('/login');
+                    // localStorage.removeItem('accessToken');
+                    // localStorage.removeItem('refreshToken');
+                    // localStorage.removeItem('userType');
+                    // navigate('/login');
+                    handleLogout()
                     setError('Session expired. Please log in again.');
                 } else {
                     setError('Failed to fetch owner data');

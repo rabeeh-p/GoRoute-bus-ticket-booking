@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import useLogout from '../../Hook/useLogout';
 
 const AddRouteForm = () => {
   const [routeName, setRouteName] = useState("");
@@ -10,6 +11,7 @@ const AddRouteForm = () => {
   const [distanceInKm, setDistanceInKm] = useState("");
   const [startDatetime, setStartDatetime] = useState('');
   const navigate = useNavigate();
+  const { handleLogout } = useLogout();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,7 +55,6 @@ const AddRouteForm = () => {
         text: 'The route has been successfully added!',
       });
 
-      // Clear form fields
       setRouteName("");
       setStartLocation("");
       setEndLocation("");
@@ -65,10 +66,8 @@ const AddRouteForm = () => {
       console.error('Error:', err);
 
       if (err.response && err.response.status === 401) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('userType');
-        navigate('/login');
+        handleLogout()
+        
         Swal.fire({
           icon: 'warning',
           title: 'Session Expired',
@@ -155,19 +154,7 @@ const AddRouteForm = () => {
             />
           </div>
 
-          {/* <div className="mb-4">
-            <label htmlFor="startDatetime" className="block text-lg font-medium text-gray-700 mb-2">
-              Start Date & Time
-            </label>
-            <input
-              id="startDatetime"
-              type="datetime-local"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600"
-              value={startDatetime}
-              onChange={(e) => setStartDatetime(e.target.value)}
-              required
-            />
-          </div> */}
+          
 
           <div className="flex justify-end">
             <button

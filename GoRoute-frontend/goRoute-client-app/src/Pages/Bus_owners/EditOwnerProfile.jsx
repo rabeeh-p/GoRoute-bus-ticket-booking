@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from './../../axios/axios';   
 import { useNavigate, useParams } from 'react-router-dom';  
 import Swal from 'sweetalert2';  
+import useLogout from '../../Hook/useLogout';
 
 const BusOwnerEdit = () => {
     const navigate = useNavigate();
@@ -14,6 +15,7 @@ const BusOwnerEdit = () => {
     const [travelName, setTravelName] = useState('');
     const [address, setAddress] = useState('');
     const [contactNumber, setContactNumber] = useState('');
+    const { handleLogout } = useLogout();
 
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken');
@@ -37,10 +39,11 @@ const BusOwnerEdit = () => {
         })
         .catch(err => {
             if (err.response && err.response.status === 401) {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                localStorage.removeItem('userType');
-                navigate('/login');
+                // localStorage.removeItem('accessToken');
+                // localStorage.removeItem('refreshToken');
+                // localStorage.removeItem('userType');
+                // navigate('/login');
+                handleLogout()
                 setError('Session expired. Please log in again.');
             } else {
                 setError('Failed to fetch owner data');
