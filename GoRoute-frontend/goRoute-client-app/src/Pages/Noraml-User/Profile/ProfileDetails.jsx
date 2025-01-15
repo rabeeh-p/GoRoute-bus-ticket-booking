@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaUserEdit, FaPhoneAlt, FaCalendarAlt, FaUser, FaTransgender } from "react-icons/fa";
 import axiosInstance from '../../../axios/axios';
 import { useNavigate } from 'react-router-dom';
+import useLogout from '../../../Hook/useLogout';
 
 const ProfileDetails = () => {
   const [userDetails, setUserDetails] = useState(null);
@@ -9,6 +10,7 @@ const ProfileDetails = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate()
 
+  const { handleLogout } = useLogout();
 
 
   useEffect(() => {
@@ -65,12 +67,9 @@ const ProfileDetails = () => {
         console.log('User profile data:', response.data);
 
         if (response.data.deactivated) {
+          handleLogout()
 
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('userType');
-
-          navigate('/login');
+          
           setError('Your account is deactivated. Please contact support.');
           return;
         }
@@ -79,19 +78,21 @@ const ProfileDetails = () => {
       } catch (err) {
         if (err.response) {
           if (err.response.status === 401) {
+            handleLogout()
 
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('userType');
+            // localStorage.removeItem('accessToken');
+            // localStorage.removeItem('refreshToken');
+            // localStorage.removeItem('userType');
 
-            navigate('/login');
+            // navigate('/login');
             setError('Session expired. Please log in again.');
           } else if (err.response.status === 403) {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('userType');
+            // localStorage.removeItem('accessToken');
+            // localStorage.removeItem('refreshToken');
+            // localStorage.removeItem('userType');
+            handleLogout()
 
-            navigate('/login');
+            // navigate('/login');
             setError('Your account is deactivated. Please contact support.');
           } else {
             setError('Failed to fetch user profile');

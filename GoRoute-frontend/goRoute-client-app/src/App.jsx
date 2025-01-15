@@ -75,7 +75,8 @@ function App() {
         <Route path="/user-bus-view/:busId" element={<UserBusView />} />
 
 
-        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/admin-login" element={<LoggedInProtect><AdminLogin /> </LoggedInProtect>} />
+
         <Route path="/admin-home" element={<AdminProtect><AdminDashboard /></AdminProtect>}>
           <Route path="users-list" element={<UsersList />} />
           <Route path="dashboard" element={<Dashboard />} />

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../axios/axios";
 import { useNavigate, useParams } from "react-router-dom";
-import BusCard from "../../Components/Bus/BusCard"; // Adjust the path based on your file structure
+import BusCard from "../../Components/Bus/BusCard"; 
 import OrdersTable from "../../Components/BusOwner/OrdersTable";
 import useLogout from '../../Hook/useLogout';
 
@@ -20,30 +20,7 @@ const ScheduledBusDetails = () => {
   console.log(orders,'orders');
   
 
-  // useEffect(() => {
-  //   const accessToken = localStorage.getItem("accessToken");
-  //   if (!accessToken) {
-  //     navigate("/login");
-  //     return;
-  //   }
-
-  //   axiosInstance
-  //     .get(`/scheduled-buses/${busId}/`, {
-  //       headers: {
-  //         Authorization: `Bearer ${accessToken}`,
-  //       },
-  //     })
-  //     .then((response) => {
-  //       setBusDetails(response.data);
-  //       setLoading(false);
-  //     })
-  //     .catch((err) => {
-  //       console.log("err", err);
-  //       setError("Failed to fetch bus details");
-  //       setLoading(false);
-  //     });
-  // }, [busId, navigate]);
-
+ 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     if (!accessToken) {
@@ -53,7 +30,6 @@ const ScheduledBusDetails = () => {
 
     const fetchBusDetails = async () => {
       try {
-        // Fetch bus details
         const busResponse = await axiosInstance.get(`/scheduled-buses/${busId}/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -61,7 +37,6 @@ const ScheduledBusDetails = () => {
         });
         setBusDetails(busResponse.data);
 
-        // Fetch seat numbers
         const seatNumbersResponse = await axiosInstance.get(`/api/bus/${busId}/seat-numbers/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -75,7 +50,6 @@ const ScheduledBusDetails = () => {
         const seatNumbers = seatNumbersResponse.data.booked_seats.map(seat => seat.seats.map(s => s.seat_number)).flat();
       setSeatNumbers(seatNumbers);
 
-      // Extracting order details
       const orders = seatNumbersResponse.data.booked_seats.map(seat => seat.order);
       setOrders(orders);
 
@@ -262,8 +236,8 @@ const ScheduledBusDetails = () => {
     const getSeatStyle = (seatNumber, type) => {
       const isBooked = seatNumbers.includes(seatNumber);
       const baseStyle = isBooked
-        ? "w-8 h-8 bg-red-500 text-white rounded-md shadow-md" // red for booked seats
-        : "w-8 h-8 bg-gray-400 text-white rounded-md shadow-md"; // gray for available seats
+        ? "w-8 h-8 bg-red-500 text-white rounded-md shadow-md"  
+        : "w-8 h-8 bg-gray-400 text-white rounded-md shadow-md";  
 
       switch (type) {
         case "standard":
@@ -290,7 +264,7 @@ const ScheduledBusDetails = () => {
     };
 
     const renderSingleDeck = () => {
-      const totalRows = Math.ceil(seat_count / 5); // Two on the left, three on the right
+      const totalRows = Math.ceil(seat_count / 5);  
       const seats = Array.from({ length: seat_count }, (_, index) => index + 1);
 
       const leftSeats = seats.filter((_, index) => index % 5 < 2);
@@ -430,7 +404,6 @@ const ScheduledBusDetails = () => {
           description={busDetails.description}
         />
 
-        {/* Route & Stops Section */}
         <div className="bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">Route & Stops</h2>
           <div className="space-y-4">

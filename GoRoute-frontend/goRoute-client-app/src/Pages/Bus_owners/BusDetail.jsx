@@ -40,7 +40,6 @@ const BusDetail = ({ busId }) => {
   }, [busId, navigate]);
 
   const handleDelete = async () => {
-    // SweetAlert2 confirmation popup
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",

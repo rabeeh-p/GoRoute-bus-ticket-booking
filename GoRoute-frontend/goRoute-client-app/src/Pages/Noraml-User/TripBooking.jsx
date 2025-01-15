@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../../Components/Normal/Navbar';
-import { Calendar, Clock, IndianRupee, MapPin, Star } from 'lucide-react';
+import { Calendar, Clock, IndianRupee, MapPin, Star,Bus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { FaBusAlt, FaTag } from 'react-icons/fa';
 
 const TripBooking = () => {
     const [buses, setBuses] = useState([]);
@@ -142,7 +143,7 @@ const TripBooking = () => {
 
                         {error && <div className="text-red-500">{error}</div>}
 
-                        <div className="space-y-4">
+                        {/* <div className="space-y-4">
                             {Array.isArray(buses.buses) && buses.buses.length > 0 ? (
                                 buses.buses.map((bus) => (
                                     <div
@@ -150,15 +151,9 @@ const TripBooking = () => {
                                         className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
                                     >
                                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                            {/* <div className="flex-1">
-                                                <h3 className="text-lg font-semibold text-gray-800">{bus.bus_owner_name}</h3>
-                                                <p className="text-sm text-gray-600">{bus.bus_type}</p>
-                                            </div> */}
+
 
                                             <div className="flex-1">
-                                                
-
-                                                {/* Conditionally render logo */}
                                                 {bus.bus_owner_logo ? (
                                                     <img
                                                         src={`http://127.0.0.1:8000/${bus.bus_owner_logo}`}
@@ -168,6 +163,17 @@ const TripBooking = () => {
                                                 ) : null}
                                                 <h3 className="text-lg font-semibold text-gray-800">{bus.bus_owner_name}</h3>
                                                 <p className="text-sm text-gray-600">{bus.bus_type}</p>
+                                            </div>
+
+                                             
+                                            <div className="flex-1">
+                                                <p className="text-lg font-medium text-gray-800 flex items-center gap-2">
+                                                     
+                                                    <span className="text-red-500">
+                                                        <FaTag />
+                                                    </span>
+                                                    {bus.name}
+                                                </p>
                                             </div>
 
 
@@ -185,7 +191,7 @@ const TripBooking = () => {
                                                 <p className="text-sm text-gray-600">Seats Available: {bus.seat_count}</p>
                                                 <div className="flex items-center gap-2">
                                                     <Star className="w-5 h-5 text-yellow-400" />
-                                                    {/* <span className="font-medium">{bus.status}</span> */}
+                                                     
                                                 </div>
                                             </div>
 
@@ -215,7 +221,87 @@ const TripBooking = () => {
                             ) : (
                                 <p className="text-gray-500 col-span-3">No buses available.</p>
                             )}
+                        </div> */}
+
+
+                        <div className="space-y-4">
+                            {Array.isArray(buses.buses) && buses.buses.length > 0 ? (
+                                buses.buses.map((bus) => (
+                                    <div
+                                        key={bus.bus_number}
+                                        className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                                    >
+                                        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+
+                                            {/* Bus Owner Section */}
+                                            <div className="flex-1 flex items-center gap-3">
+                                                {bus.bus_owner_logo ? (
+                                                    <img
+                                                        src={`http://127.0.0.1:8000/${bus.bus_owner_logo}`}
+                                                        alt={`${bus.bus_owner_name} logo`}
+                                                        className="w-12 h-12 rounded-full object-cover"
+                                                    />
+                                                ) : null}
+                                                <div>
+                                                    <h3 className="text-lg font-semibold text-gray-800">{bus.bus_owner_name}</h3>
+                                                    <p className="text-sm text-gray-600">{bus.bus_type}</p>
+                                                </div>
+                                            </div>
+
+                                            
+                                            <div className="flex-1 flex items-center gap-2">
+                                                <span className="text-red-500">
+                                                    {/* <Bus className="w-5 h-5" /> */}
+                                                </span>
+                                                <p className="text-lg font-medium text-gray-800">{bus.name}</p>
+                                            </div>
+
+                                            {/* Scheduled Date Section */}
+                                            <div className="flex-1 flex items-center gap-2">
+                                                <Clock className="w-5 h-5 text-gray-500" />
+                                                <div>
+                                                    <p className="font-medium">{new Date(bus.scheduled_date).toLocaleString()}</p>
+                                                    <p className="text-sm text-gray-500">Scheduled Date</p>
+                                                </div>
+                                            </div>
+
+                                            {/* Seats Available Section */}
+                                            <div className="flex-1 flex items-center gap-2">
+                                                <p className="text-sm text-gray-600">Seats: {bus.seat_count}</p>
+                                                <Star className="w-5 h-5 text-yellow-400" />
+                                            </div>
+
+                                            {/* Distance Section */}
+                                            <div className="flex-1 text-center">
+                                                <p className="text-sm text-gray-600">Distance:</p>
+                                                <span className="text-xl font-semibold text-gray-800">{bus.distance_km} km</span>
+                                            </div>
+
+                                            {/* Price and Button Section */}
+                                            <div className="flex-1 text-right">
+                                                <div className="flex items-center justify-end gap-1">
+                                                    <IndianRupee className="w-5 h-5 text-gray-800" />
+                                                    <span className="text-xl font-bold text-gray-800">{bus.price}</span>
+                                                </div>
+                                                <button
+                                                    onClick={() => navigate(`/user-bus-view/${bus.id}`)}
+                                                    className="mt-2 bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition-colors"
+                                                >
+                                                    View
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-gray-500 col-span-3">No buses available.</p>
+                            )}
                         </div>
+
+
+
+
+
 
 
 

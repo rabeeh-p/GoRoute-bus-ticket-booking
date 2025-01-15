@@ -29,13 +29,7 @@ const BusOwnerSignup = () => {
     }));
   };
 
-  // const handleFileChange = (e) => {
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     logoImage: e.target.files[0],
-  //   }));
-  // };
-
+ 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
   
@@ -112,116 +106,7 @@ const BusOwnerSignup = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  
-  //   if (!validateForm()) {
-  //     return;
-  //   }
-  
-  //   const payload = {
-  //     user: {
-  //       username: formData.username,
-  //       password: formData.password,
-  //       role: "bus_owner",
-  //       email: formData.email,
-  //     },
-  //     bus_owner: {
-  //       travel_name: formData.travelName,
-  //       address: formData.address,
-  //       contact_number: formData.contactNumber,
-  //     },
-  //   };
 
-  //   console.log(formData.logoImage,'logo imggggggggggggggggg');
-    
-  
-  //   if (formData.logoImage) {
-  //     const formDataWithLogo = new FormData();
-  //     formDataWithLogo.append("user.username", formData.username);
-  //     formDataWithLogo.append("user.password", formData.password);
-  //     formDataWithLogo.append("user.role", "bus_owner");
-  //     formDataWithLogo.append("user.email", formData.email);
-  //     formDataWithLogo.append("bus_owner.travel_name", formData.travelName);
-  //     formDataWithLogo.append("bus_owner.address", formData.address);
-  //     formDataWithLogo.append("bus_owner.contact_number", formData.contactNumber);
-  //     formDataWithLogo.append("bus_owner.logo_image", formData.logoImage);
-  
-
-      
-  //     try {
-  //       setLoading(true);
-  //       const response = await axios.post(
-  //         "http://127.0.0.1:8000/bus_owner/register/",
-  //         formDataWithLogo,
-  //         {
-  //           headers: {
-  //             "Content-Type": "multipart/form-data",
-  //           },
-  //         }
-  //       );
-  
-  //       if (response.status === 201) {
-  //         setSuccessMessage("Registration successful!");
-  //         setErrors({});
-  //         setFormData({
-  //           username: "",
-  //           email: "",
-  //           password: "",
-  //           confirmPassword: "",
-  //           travelName: "",
-  //           address: "",
-  //           contactNumber: "",
-  //           logoImage: null,
-  //         });
-  //         setTimeout(() => navigate("/login"), 2000);
-  //       }
-  //     } catch (error) {
-  //       setErrors({
-  //         general:
-  //           error.response?.status === 400
-  //             ? "Invalid data provided."
-  //             : "Registration failed. Please try again.",
-  //       });
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   } else {
-  //     try {
-  //       setLoading(true);
-  //       const response = await axios.post(
-  //         "http://127.0.0.1:8000/bus_owner/register/",
-  //         payload
-  //       );
-  
-  //       if (response.status === 201) {
-  //         setSuccessMessage("Registration successful!");
-  //         setErrors({});
-  //         setFormData({
-  //           username: "",
-  //           email: "",
-  //           password: "",
-  //           confirmPassword: "",
-  //           travelName: "",
-  //           address: "",
-  //           contactNumber: "",
-  //           logoImage: null,
-  //         });
-  //         setTimeout(() => navigate("/login"), 2000);
-  //       }
-  //     } catch (error) {
-  //       setErrors({
-  //         general:
-  //           error.response?.status === 400
-  //             ? "Invalid data provided."
-  //             : "Registration failed. Please try again.",
-  //       });
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }
-  // };
-  
 
   
 
@@ -315,7 +200,6 @@ const BusOwnerSignup = () => {
                 <div className="text-green-500 text-sm">{successMessage}</div>
               )}
 
-              {/* Unified Form Fields */}
               <div className="space-y-4">
                 <input
                   type="text"

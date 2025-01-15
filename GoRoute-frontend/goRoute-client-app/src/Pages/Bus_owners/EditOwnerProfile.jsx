@@ -11,7 +11,7 @@ const BusOwnerEdit = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [logoImageFile, setLogoImageFile] = useState(null);
-    const [documentFile, setDocumentFile] = useState(null);  // New state for document
+    const [documentFile, setDocumentFile] = useState(null);   
     const [travelName, setTravelName] = useState('');
     const [address, setAddress] = useState('');
     const [contactNumber, setContactNumber] = useState('');
@@ -39,10 +39,7 @@ const BusOwnerEdit = () => {
         })
         .catch(err => {
             if (err.response && err.response.status === 401) {
-                // localStorage.removeItem('accessToken');
-                // localStorage.removeItem('refreshToken');
-                // localStorage.removeItem('userType');
-                // navigate('/login');
+                 
                 handleLogout()
                 setError('Session expired. Please log in again.');
             } else {
@@ -59,7 +56,7 @@ const BusOwnerEdit = () => {
 
     const handleDocumentChange = (e) => {
         const file = e.target.files[0];
-        setDocumentFile(file);  // Handle document file change
+        setDocumentFile(file);   
     };
 
     const validateForm = () => {
@@ -115,7 +112,7 @@ const BusOwnerEdit = () => {
         if (logoImageFile) {
             formData.append('logo_image', logoImageFile);
         }
-        if (documentFile) {  // Add document file to FormData
+        if (documentFile) {   
             formData.append('document', documentFile);
         }
 
@@ -211,7 +208,6 @@ const BusOwnerEdit = () => {
                     />
                 </div>
 
-                {/* Document Upload Field */}
                 <div className="mb-4">
                     <label className="block text-gray-700">Upload Document</label>
                     <input 

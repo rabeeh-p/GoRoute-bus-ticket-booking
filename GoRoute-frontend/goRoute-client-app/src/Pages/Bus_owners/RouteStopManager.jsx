@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Swal from "sweetalert2"; // Import SweetAlert
+import Swal from "sweetalert2";  
 import axiosInstance from "../../axios/axios";
 import { useParams } from "react-router-dom";
 import useLogout from '../../Hook/useLogout';
@@ -75,7 +75,17 @@ const RouteStopsManager = () => {
     };
 
     try {
-      const response = await axiosInstance.post(`routes/${routeId}/stops/`, newStop);
+      const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                setError('No access token found');
+                return;
+            }
+      const response = await axiosInstance.post(`routes/${routeId}/stops/`, newStop,{ 
+        headers: { 
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data' 
+        }
+    });
       if (response.status === 201) {
         setRouteStops([...routeStops, response.data]);
         setStopName("");
@@ -112,7 +122,6 @@ const RouteStopsManager = () => {
       <div className="max-w-5xl mx-auto">
         <h1 className="text-2xl font-semibold text-red-600 mb-6">Manage Route Stops</h1>
 
-        {/* Form to add a new stop */}
         <div className="bg-white p-4 shadow-md rounded-lg mb-6">
           <h2 className="text-lg font-semibold mb-4">Add New Stop</h2>
           <form onSubmit={handleAddStop}>
@@ -176,7 +185,6 @@ const RouteStopsManager = () => {
           </form>
         </div>
 
-        {/* Route Stops Table */}
         <div className="overflow-x-auto bg-white shadow-md rounded-lg">
           <table className="table-auto w-full text-left border-collapse">
             <thead className="bg-red-600 text-white">

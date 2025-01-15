@@ -56,7 +56,7 @@ export default function Sidebar() {
               className="rounded-full w-20 h-20 border-4 border-red-500"
             />
           </div>
-          <h2 className="text-xl font-bold text-center text-red-500 mb-8">John Doe</h2>
+          {/* <h2 className="text-xl font-bold text-center text-red-500 mb-8">John Doe</h2> */}
           <nav>
             <ul>
               {menuItems.map((item, index) => (

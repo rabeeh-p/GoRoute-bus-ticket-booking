@@ -12,34 +12,7 @@ const RouteTable = () => {
   const { handleLogout } = useLogout();
 
 
-  // useEffect(() => {
-  //   const accessToken = localStorage.getItem('accessToken');
-
-
-  //   const fetchRoutes = async () => {
-  //     try {
-  //       const response = await axiosInstance.get('routes/my_routes/', {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //         },
-  //       });
-
-  //       if (response.status === 200) {
-  //         setRoutes(response.data);
-  //       } else {
-  //         console.error("Failed to fetch routes:", response.status);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching routes:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchRoutes();
-  // }, [])
-  // ;
-
+  
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
   
@@ -84,7 +57,6 @@ const RouteTable = () => {
   return (
     <div className="bg-gray-100 min-h-screen p-6">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-semibold text-red-600">Manage Routes</h1>
           <button
@@ -95,7 +67,6 @@ const RouteTable = () => {
           </button>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto bg-white shadow-md rounded-lg">
           <table className="table-auto w-full text-left border-collapse">
             <thead className="bg-red-600 text-white">

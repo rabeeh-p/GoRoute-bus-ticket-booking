@@ -3,12 +3,14 @@ import { Bus, User, Search, Phone, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { clearUserData } from '../../slice/userSlicer';
+import useLogout from '../../Hook/useLogout';
 
 const Navbar = () => {
   const [userType, setUserType] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);  // State to toggle mobile menu
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { handleLogout } = useLogout();
 
   useEffect(() => {
     const storedUserType = localStorage.getItem('userType');
@@ -17,16 +19,18 @@ const Navbar = () => {
     }
   }, []);
 
-  const handleLogout = () => {
-    // Dispatch action to clear user data in Redux store
-    dispatch(clearUserData());
+  const handleLogout2 = () => {
+    // // Dispatch action to clear user data in Redux store
+    // dispatch(clearUserData());
 
-    // Optionally, remove user data from localStorage
-    localStorage.removeItem('userType');
-    localStorage.removeItem('token');
+    // // Optionally, remove user data from localStorage
+    // localStorage.removeItem('userType');
+    // localStorage.removeItem('token');
 
-    // Redirect to home or login page
-    navigate('/login');
+    // // Redirect to home or login page
+    // navigate('/login');
+    
+    handleLogout()
   };
 
   const toggleMenu = () => {
@@ -68,7 +72,7 @@ const Navbar = () => {
                 <button onClick={() => navigate('/profile-dashboard/user-dashboard')} className="hidden md:block bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
                   Profile
                 </button>
-                <button onClick={handleLogout} className="hidden md:block bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
+                <button onClick={handleLogout2} className="hidden md:block bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
                   Logout
                 </button>
               </>

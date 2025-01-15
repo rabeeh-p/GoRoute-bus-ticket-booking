@@ -25,7 +25,6 @@ const BusSchedule = () => {
       return;
     }
 
-    // Fetch bus details
     axiosInstance.get(`/buses/${busId}/`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -40,7 +39,6 @@ const BusSchedule = () => {
       setLoading(false);
     });
 
-    // Fetch routes
     axiosInstance.get('/routes/my_routes/schedule-time/', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -69,35 +67,7 @@ const BusSchedule = () => {
     setSelectedStops(selected ? selected.stops : []);
   };
 
-  // const handleSubmit = () => {
-  //   if (!selectedRoute || !scheduledDate) {
-  //     setError('Please fill all fields before submitting.');
-  //     return;
-  //   }
-
-  //   const accessToken = localStorage.getItem('accessToken');
-  //   const payload = {
-  //     route_id: selectedRoute.id,
-  //     scheduled_date: scheduledDate,
-  //     status: status,
-  //   };
-
-  //   axiosInstance.post(`/schedule-bus/${busId}/`, payload, {
-  //     headers: {
-  //       Authorization: `Bearer ${accessToken}`,
-  //     },
-  //   })
-  //   .then(response => {
-  //     alert('Bus scheduled successfully!');
-  //     navigate('/busowner-dashboard/scheduled-bus-list'); // Navigate to a success page or refresh
-  //   })
-  //   .catch(err => {
-  //       console.log('error',err);
-        
-  //     setError('Failed to schedule bus. Please try again.');
-  //   });
-  // };
-
+ 
 
   const handleSubmit = () => {
     if (!selectedRoute || !scheduledDate) {
@@ -124,18 +94,17 @@ const BusSchedule = () => {
         icon: 'success',
         confirmButtonText: 'OK',
       });
-      navigate('/busowner-dashboard/scheduled-bus-list'); // Navigate to success page or refresh
+      navigate('/busowner-dashboard/scheduled-bus-list');  
     })
     .catch(err => {
       console.log('Error:', err);
   
-      // Handle the error message from backend
       if (err.response && err.response.data && err.response.data.error) {
         const errorMessage = err.response.data.error;
   
         Swal.fire({
           title: 'Error!',
-          text: errorMessage, // Display backend error message
+          text: errorMessage, 
           icon: 'error',
           confirmButtonText: 'Try Again',
         });
@@ -159,7 +128,6 @@ const BusSchedule = () => {
       {loading && <div className="text-center text-lg text-gray-600">Loading...</div>}
       {error && <div className="text-center text-lg text-red-500">{error}</div>}
 
-      {/* Current Bus Information */}
       <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
         {busDetails && (
           <>
@@ -186,7 +154,6 @@ const BusSchedule = () => {
         )}
       </div>
 
-      {/* Route and Scheduling Fields */}
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Select Route and Schedule</h2>
 
@@ -214,21 +181,9 @@ const BusSchedule = () => {
           />
         </div>
 
-        {/* <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-          <select
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div> */}
+        
       </div>
 
-      {/* Submit Button */}
       <div className="mt-6 text-center">
         <button
           onClick={handleSubmit}

@@ -84,7 +84,6 @@ const BusList = () => {
       {loading && <div className="text-center text-lg text-gray-600">Loading...</div>}
       {error && <div className="text-center text-lg text-red-500">{error}</div>}
 
-      {/* Pending Buses Table */}
       <div className="overflow-x-auto mb-8">
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">Pending Buses</h2>
         <table className="min-w-full table-auto border-collapse border border-gray-300">
@@ -129,7 +128,6 @@ const BusList = () => {
       )}
     
 
-      {/* Approved Buses Table */}
       <div className="overflow-x-auto">
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">Approved Buses</h2>
         <table className="min-w-full table-auto border-collapse border border-gray-300">

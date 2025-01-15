@@ -41,7 +41,7 @@ const SignUp = () => {
             return (age > 18 || (age === 18 && isBirthdayPassed)) || "You must be at least 18 years old.";
         },
         gender: value => !!value || "Gender is required.",
-        password: value => value.trim().length >= 5 || "Password must be at least 8 characters.",
+        password: value => value.trim().length >= 5 || "Password must be at least 5 characters.",
         confirmPassword: value => value === formData.password || "Passwords do not match."
     };
 
