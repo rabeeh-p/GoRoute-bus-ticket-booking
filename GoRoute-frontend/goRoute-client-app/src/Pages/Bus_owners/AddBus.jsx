@@ -34,7 +34,6 @@ const AddBus = () => {
             })
             .catch((error) => {
                 if (error.response && error.response.status === 401) {
-                    // If the error is unauthorized, call the logout function
                     handleLogout();
                   } else {
                     setError('Failed to fetch bus types');

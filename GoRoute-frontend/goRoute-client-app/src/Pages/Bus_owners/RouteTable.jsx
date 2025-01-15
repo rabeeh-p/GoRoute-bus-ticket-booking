@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from '../../axios/axios';
+import useLogout from '../../Hook/useLogout';
 
 const RouteTable = () => {
   const [routes, setRoutes] = useState([]);
@@ -8,12 +9,40 @@ const RouteTable = () => {
   const navigate = useNavigate();
 
   console.log('routes', routes);
+  const { handleLogout } = useLogout();
 
+
+  // useEffect(() => {
+  //   const accessToken = localStorage.getItem('accessToken');
+
+
+  //   const fetchRoutes = async () => {
+  //     try {
+  //       const response = await axiosInstance.get('routes/my_routes/', {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //         },
+  //       });
+
+  //       if (response.status === 200) {
+  //         setRoutes(response.data);
+  //       } else {
+  //         console.error("Failed to fetch routes:", response.status);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching routes:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchRoutes();
+  // }, [])
+  // ;
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
-
-
+  
     const fetchRoutes = async () => {
       try {
         const response = await axiosInstance.get('routes/my_routes/', {
@@ -21,21 +50,26 @@ const RouteTable = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-
+  
         if (response.status === 200) {
           setRoutes(response.data);
         } else {
           console.error("Failed to fetch routes:", response.status);
         }
       } catch (error) {
-        console.error("Error fetching routes:", error);
+        if (error.response && error.response.status === 401) {
+          handleLogout();  
+        } else {
+          console.error("Error fetching routes:", error);
+        }
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchRoutes();
   }, []);
+  
 
 
 
