@@ -195,9 +195,9 @@ class Seat(models.Model):
         choices=[('available', 'Available'), ('booked', 'Booked')],
         default='available'
     )
-    from_city = models.CharField(max_length=100, blank=True, null=True)  # Optional field
-    to_city = models.CharField(max_length=100, blank=True, null=True)  # Optional field
-    date = models.DateField(blank=True, null=True)  # Optional fiel
+    from_city = models.CharField(max_length=100, blank=True, null=True)   
+    to_city = models.CharField(max_length=100, blank=True, null=True)   
+    date = models.DateField(blank=True, null=True)   
 
 
     def __str__(self):

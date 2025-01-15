@@ -44,7 +44,7 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    tickets = TicketSerializer(many=True, read_only=True)  # Include tickets related to the order
+    tickets = TicketSerializer(many=True, read_only=True)  
     bus = ScheduledBusSerializer()
     class Meta:
         model = Order

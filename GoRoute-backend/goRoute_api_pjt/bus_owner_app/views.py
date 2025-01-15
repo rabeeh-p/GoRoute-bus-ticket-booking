@@ -7,6 +7,7 @@ from admin_app.serializers import *
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
 from decimal import Decimal
+from datetime import datetime
 
 from django.shortcuts import get_object_or_404
 from .Serializers import *
@@ -117,25 +118,29 @@ class RouteByOwnerView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
-    # def get(self, request):
-    #     user = request.user
-    #     try:
-    #         bus_owner = BusOwnerModel.objects.get(user=user)
-    #     except BusOwnerModel.DoesNotExist:
-    #         return Response(
-    #             {"error": "Bus owner does not exist for the authenticated user."},
-    #             status=status.HTTP_404_NOT_FOUND
-    #         )
-
-    #     routes = RouteModel.objects.filter(bus_owner=bus_owner)
-
-    #     serializer = RouteModelSerializer(routes, many=True)
-
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
-    
-
     def get(self, request):
         user = request.user
+        try:
+            bus_owner = BusOwnerModel.objects.get(user=user)
+        except BusOwnerModel.DoesNotExist:
+            return Response(
+                {"error": "Bus owner does not exist for the authenticated user."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        routes = RouteModel.objects.filter(bus_owner=bus_owner)
+
+        serializer = RouteModelSerializer(routes, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    
+
+class RouteByOwnerViewInScheduleTime(APIView):
+    def get(self, request):
+        user = request.user
+        print(user,'user')
         try:
             bus_owner = BusOwnerModel.objects.get(user=user)
         except BusOwnerModel.DoesNotExist:
@@ -149,8 +154,6 @@ class RouteByOwnerView(APIView):
         serializer = RouteModelSerializer(routes, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
     
 
 
@@ -376,6 +379,16 @@ class ScheduleBusView(APIView):
             scheduled_date = request.data.get('scheduled_date')
             if not scheduled_date:
                 return Response({"error": "scheduled_date is required"}, status=status.HTTP_400_BAD_REQUEST)
+            print(scheduled_date,'date')
+            try:
+                scheduled_date = datetime.fromisoformat(scheduled_date).date()
+
+                if scheduled_date <= datetime.now().date():
+                    return Response({"error": "Scheduled date must be in the future"}, status=status.HTTP_400_BAD_REQUEST)
+
+            except ValueError:
+                return Response({"error": "Invalid date format. Please use a valid ISO 8601 format (e.g., YYYY-MM-DDTHH:MM)"}, status=status.HTTP_400_BAD_REQUEST)
+
 
             scheduled_bus = ScheduledBus.objects.create(
                 bus_number=bus.bus_number,

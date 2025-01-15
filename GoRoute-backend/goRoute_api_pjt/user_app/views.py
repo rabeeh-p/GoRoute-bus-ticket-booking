@@ -287,7 +287,7 @@ class BusSearchView(APIView):
                 distance = stops_on_bus[i].distance_km or 0
                 total_distance += distance
 
-            price_per_km = 30 if bus.bus_type.lower() == 'ac' else 20
+            price_per_km = 5 if bus.bus_type.lower() == 'ac' else 3
             total_price = total_distance * price_per_km
 
             buses_with_distances_and_prices.append({

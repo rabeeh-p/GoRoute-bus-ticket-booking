@@ -243,6 +243,7 @@ class UserProfileListView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self, request, *args, **kwargs):
+        print('admn is workign')
         profiles = NormalUserProfile.objects.all()
         serializer = NormalUserProfileSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -533,11 +534,10 @@ class RejectBusRequestView(APIView):
 
 
 class CreateUserByAdmin(APIView):
-    # authentication_classes = [JWTAuthentication]  
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]  
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # Get the required fields from the request body
         username = request.data.get("username")
         email = request.data.get("email")
         password = request.data.get("password")
@@ -547,25 +547,21 @@ class CreateUserByAdmin(APIView):
         phone_number = request.data.get("phone_number")
         gender = request.data.get("gender")
 
-        # Validate the required fields
         if not username or not email or not password or not first_name or not last_name or not date_of_birth or not phone_number or not gender:
             return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if the username or email already exists
         if get_user_model().objects.filter(username=username).exists():
             return Response({"error": "Username already exists."}, status=status.HTTP_400_BAD_REQUEST)
         
         if get_user_model().objects.filter(email=email).exists():
             return Response({"error": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Create the user
         user = get_user_model().objects.create_user(
             username=username,
             email=email,
             password=password,
         )
 
-        # Create the user's profile
         profile = NormalUserProfile.objects.create(
             user=user,
             first_name=first_name,
