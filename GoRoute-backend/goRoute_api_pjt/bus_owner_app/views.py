@@ -220,6 +220,56 @@ class RouteStopView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+    # def post(self, request, route_id):
+    #     try:
+    #         route = RouteModel.objects.get(id=route_id)
+    #     except RouteModel.DoesNotExist:
+    #         return Response({"detail": "Route not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    #     stop_order = RouteStopModel.objects.filter(route=route).count() + 1
+        
+    #     data = request.data
+
+    #     if RouteStopModel.objects.filter(route=route, stop_name=data.get("stop_name")).exists():
+    #         return Response({"detail": "Stop name already exists for this route."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     arrival_time = data.get("arrival_time")
+    #     departure_time = data.get("departure_time")
+    #     if arrival_time and departure_time:
+    #         if arrival_time >= departure_time:
+    #             return Response({"detail": "Departure time must be after arrival time."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     distance_in_km = data.get("distance_in_km")
+    #     if distance_in_km is not None:
+    #         try:
+    #             distance_in_km = float(distance_in_km)
+    #         except ValueError:
+    #             return Response({"detail": "Distance in kilometers must be a valid number."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #         if distance_in_km <= 0:
+    #             return Response({"detail": "Distance in kilometers must be positive."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #         total_stop_distance = (
+    #             RouteStopModel.objects.filter(route=route).aggregate(total_distance=models.Sum('distance_in_km'))['total_distance'] or Decimal(0)
+    #         )
+
+    #         distance_in_km = Decimal(str(distance_in_km))
+
+    #         if total_stop_distance + distance_in_km > route.distance_in_km:
+    #             return Response(
+    #                 {"detail": "The total distance of stops cannot exceed the main route distance."},
+    #                 status=status.HTTP_400_BAD_REQUEST
+    #             )
+
+
+    #     serializer = RouteStopSerializer(data=data)
+    #     if serializer.is_valid():
+    #         serializer.save(route=route, stop_order=stop_order)
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     else:
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
     def post(self, request, route_id):
         try:
             route = RouteModel.objects.get(id=route_id)
@@ -227,7 +277,6 @@ class RouteStopView(APIView):
             return Response({"detail": "Route not found."}, status=status.HTTP_404_NOT_FOUND)
 
         stop_order = RouteStopModel.objects.filter(route=route).count() + 1
-        
         data = request.data
 
         if RouteStopModel.objects.filter(route=route, stop_name=data.get("stop_name")).exists():
@@ -235,9 +284,35 @@ class RouteStopView(APIView):
 
         arrival_time = data.get("arrival_time")
         departure_time = data.get("departure_time")
-        if arrival_time and departure_time:
-            if arrival_time >= departure_time:
-                return Response({"detail": "Departure time must be after arrival time."}, status=status.HTTP_400_BAD_REQUEST)
+
+        def parse_time(time_str):
+            
+            try:
+                if "AM" in time_str.upper() or "PM" in time_str.upper():
+                    return datetime.strptime(time_str, '%I:%M %p').time()
+                if len(time_str) == 5:   
+                    time_str += ":00"
+                return datetime.strptime(time_str, '%H:%M:%S').time()
+            except ValueError:
+                return None
+
+        arrival_time_obj = parse_time(arrival_time)
+        departure_time_obj = parse_time(departure_time)
+
+        if not arrival_time_obj or not departure_time_obj:
+            return Response({"detail": "Invalid time format. Please use HH:MM or HH:MM AM/PM format."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if arrival_time_obj >= departure_time_obj:
+            return Response({"detail": "Departure time must be after arrival time."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if stop_order > 1:   
+            last_stop = RouteStopModel.objects.filter(route=route).order_by('-stop_order').first()
+            if last_stop:
+                last_departure = last_stop.departure_time
+                if arrival_time_obj <= last_departure:
+                    return Response({"detail": "New stop's arrival time must be after the previous stop's departure time."}, status=status.HTTP_400_BAD_REQUEST)
+                if departure_time_obj <= last_departure:
+                    return Response({"detail": "New stop's departure time must be after the previous stop's departure time."}, status=status.HTTP_400_BAD_REQUEST)
 
         distance_in_km = data.get("distance_in_km")
         if distance_in_km is not None:
@@ -260,7 +335,6 @@ class RouteStopView(APIView):
                     {"detail": "The total distance of stops cannot exceed the main route distance."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
 
         serializer = RouteStopSerializer(data=data)
         if serializer.is_valid():
