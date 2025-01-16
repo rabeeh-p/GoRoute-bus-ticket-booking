@@ -233,7 +233,7 @@ const TripBooking = () => {
                                     >
                                         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
 
-                                            {/* Bus Owner Section */}
+                                            
                                             <div className="flex-1 flex items-center gap-3">
                                                 {bus.bus_owner_logo ? (
                                                     <img
@@ -251,12 +251,12 @@ const TripBooking = () => {
                                             
                                             <div className="flex-1 flex items-center gap-2">
                                                 <span className="text-red-500">
-                                                    {/* <Bus className="w-5 h-5" /> */}
+                                                   
                                                 </span>
                                                 <p className="text-lg font-medium text-gray-800">{bus.name}</p>
                                             </div>
 
-                                            {/* Scheduled Date Section */}
+                                           
                                             <div className="flex-1 flex items-center gap-2">
                                                 <Clock className="w-5 h-5 text-gray-500" />
                                                 <div>

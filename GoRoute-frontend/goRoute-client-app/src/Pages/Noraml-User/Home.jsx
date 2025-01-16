@@ -15,7 +15,7 @@ const Home = () => {
     <Navbar />
     
     
-    {/* Hero Section */}
+   
     <div 
       className="pt-24 pb-12 px-4 bg-gradient-to-r from-red-600 to-red-800"
       style={{
@@ -30,7 +30,7 @@ const Home = () => {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Book Bus Tickets Online 
           </h1>
-          {/* <h1>{userType}user hello</h1> */}
+           
           <p className="text-xl">
             Travel safely and comfortably across the country
           </p>
@@ -39,10 +39,10 @@ const Home = () => {
       </div>
     </div>
 
-    {/* Features Section */}
+     
     <Features />
 
-    {/* Popular Routes Section */}
+     
     <div className="max-w-7xl mx-auto px-4 py-12">
       <h2 className="text-3xl font-bold text-center mb-8">Popular Routes</h2>
       <div className="grid md:grid-cols-3 gap-6">

@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../Components/Normal/Navbar";
 import { Calendar, Clock, IndianRupee, MapPin, Star } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const UserBusView = () => {
     const [busDetails, setBusDetails] = useState(null);
@@ -11,7 +12,7 @@ const UserBusView = () => {
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [bookedSeats, setBookedSeats] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    // const [isBooking, setIsBooking] = useState(false); // B
+    
 
     console.log(busDetails, 'details');
     console.log(logo, 'logo');
@@ -38,7 +39,7 @@ const UserBusView = () => {
                 console.log(response.data, 'dataaas');
 
                 setBusDetails(response.data.bus);
-                // setBookedSeats([3, 7, 12,20]);
+                
                 setBookedSeats(response.data.booked_seats);
                 setLogo(response.data.bus_log)
             })
@@ -57,18 +58,14 @@ const UserBusView = () => {
             setIsModalOpen(true);
         }
 
-        // setIsModalOpen(true);  
+          
     };
 
     const handleModalClose = () => {
         setIsModalOpen(false);
     };
 
-    // const handleFormSubmit = (e) => {
-    //     e.preventDefault();
-    //     alert("Booking successful!");
-    //     setIsModalOpen(false);
-    // };
+    
 
     const handleFormSubmit = (e) => {
 
@@ -81,19 +78,18 @@ const UserBusView = () => {
         const searchParams = JSON.parse(localStorage.getItem('searchParams'));
         const { from, to, date } = searchParams;
 
-        // Prepare the data to be sent to the server
+        
         const formData = {
-            bus_id: busId, // Replace with the correct bus ID if needed
-            seat_numbers: selectedSeats, // Array of selected seats
+            bus_id: busId,  
+            seat_numbers: selectedSeats,  
             userName: e.target.userName.value,
             email: e.target.email.value,
             phone: e.target.phone.value,
-            to: to,      // Added toCity from localStorage
+            to: to,       
             from: from,
             date: date
         };
 
-        // Make the API call to submit the booking
         axios.post('http://127.0.0.1:8000/seat-booking/', formData,
             {
                 headers: {
@@ -101,27 +97,41 @@ const UserBusView = () => {
                 },
             }
         )
+            // .then((response) => {
+            //     if (response.data.message) {
+            //         alert("Booking successful!");
+            //         setIsModalOpen(false);
+            //         window.location.reload();
+            //     } else {
+            //         alert(`Unexpected response: ${JSON.stringify(response.data)}`);
+            //     }
+            // })
             .then((response) => {
                 if (response.data.message) {
-                    // Handle success - Booking successful
-                    alert("Booking successful!");
-                    setIsModalOpen(false);
-                    window.location.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Booking Successful!',
+                        text: 'Your booking has been completed successfully.',
+                        confirmButtonText: 'OK',
+                    }).then(() => {
+                        setIsModalOpen(false);
+                        window.location.reload();
+                    });
                 } else {
-                    // Handle unexpected response format
-                    alert(`Unexpected response: ${JSON.stringify(response.data)}`);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unexpected Response',
+                        text: `Response: ${JSON.stringify(response.data)}`,
+                        confirmButtonText: 'OK',
+                    });
                 }
             })
             .catch((error) => {
-                // Handle any errors (network, server, etc.)
                 if (error.response) {
-                    // The server responded with a status other than 200 range
                     alert(`Error: ${error.response.data.error || 'Something went wrong'}`);
                 } else if (error.request) {
-                    // No response was received
                     alert('Error: No response from the server.');
                 } else {
-                    // Something else went wrong
                     alert(`Error: ${error.message}`);
                 }
             });
@@ -170,7 +180,6 @@ const UserBusView = () => {
                 baseStyle = "w-8 h-8 text-white rounded-md shadow-md cursor-pointer transition-all duration-200";
         }
 
-        // Add color based on seat status
         if (bookedSeats.includes(seatNumber)) {
             return `${baseStyle} bg-red-500 cursor-not-allowed opacity-70`;
         } else if (selectedSeats.includes(seatNumber)) {
@@ -332,8 +341,8 @@ const UserBusView = () => {
                     </div>
                 </div>
                 <div className="flex space-x-12">
-                    <div className="w-1/2">{renderDeck(upperDeckSeats, "Upper Deck")}</div>
-                    <div className="w-1/2">{renderDeck(lowerDeckSeats, "Lower Deck")}</div>
+                    <div className="w-1/2">{renderDeck(upperDeckSeats, "Lower Deck")}</div>
+                    <div className="w-1/2">{renderDeck(lowerDeckSeats, "Upper Deck")}</div>
                 </div>
             </div>
         );
@@ -371,9 +380,9 @@ const UserBusView = () => {
                         <h2 className="text-3xl font-semibold text-gray-800 mb-4 flex items-center">
                             {/* Add the logo image here */}
                             <img
-                                src={`http://127.0.0.1:8000/${logo}`} // Replace with actual path to the logo
+                                src={`http://127.0.0.1:8000/${logo}`}  
                                 alt="Bus Owner Logo"
-                                className="w-12 h-12 rounded-full mr-4" // Circular logo with size
+                                className="w-12 h-12 rounded-full mr-4" 
                             />
                             {busDetails.bus_owner_name}
                         </h2>

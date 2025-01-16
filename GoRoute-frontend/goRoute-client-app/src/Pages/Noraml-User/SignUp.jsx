@@ -126,7 +126,7 @@ const SignUp = () => {
     
         const { confirmPassword, ...dataToSend } = formData;
     
-        // Show loading alert
+        
         Swal.fire({
             title: 'Registering...',
             text: 'Please wait while we process your registration.',
@@ -140,8 +140,8 @@ const SignUp = () => {
         try {
             const response = await axios.post('http://127.0.0.1:8000/register/', dataToSend);
     
-            // Close loading alert and show success message
-            Swal.close();  // Close loading
+             
+            Swal.close();  
             Swal.fire({
                 icon: 'success',
                 title: 'Registration Successful',
@@ -153,8 +153,8 @@ const SignUp = () => {
             localStorage.setItem('userData', JSON.stringify(dataToSend));
             setTimeout(() => navigate('/otp'), 2000);
         } catch (error) {
-            // Close loading alert and show error message
-            Swal.close();  // Close loading
+             
+            Swal.close();   
             console.error('Error during registration:', error);
             Swal.fire({
                 icon: 'error',
