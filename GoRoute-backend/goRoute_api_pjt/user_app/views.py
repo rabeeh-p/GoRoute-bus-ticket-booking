@@ -519,104 +519,76 @@ class SeatBookingView(APIView):
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
-   
+
 
     def post(self, request, *args, **kwargs):
         try:
             data = request.data if hasattr(request, 'data') else json.loads(request.body)
 
             bus_id = data.get('bus_id')
-            seat_numbers = data.get('seat_numbers')
+            seat_numbers = data.get('seat_numbers')  
             user_name = data.get('userName')
             email = data.get('email')
             phone_number = data.get('phone')
-            from_city = data.get('from')   
-            to_city = data.get('to')       
+            from_city = data.get('from')
+            to_city = data.get('to')
             date = data.get('date')
-            price_per_person = data.get('pricePerPerson')   
-
-            if price_per_person is None or price_per_person <= 0:
-                return JsonResponse({'error': 'Price per person is required and must be a positive value.'}, status=400)
+            price_per_person = data.get('pricePerPerson')
 
             if not bus_id or not seat_numbers or not email or not phone_number:
                 return JsonResponse({'error': 'Bus ID, Seat Numbers, Email, and Phone Number are required.'}, status=400)
 
+            if price_per_person is None or price_per_person <= 0:
+                return JsonResponse({'error': 'Price per person is required and must be a positive value.'}, status=400)
+
             bus = get_object_or_404(ScheduledBus, id=bus_id)
             profile_obj = NormalUserProfile.objects.get(user=request.user)
 
-            with transaction.atomic():
-                order = Order.objects.create(
-                    user=profile_obj,  
-                    bus=bus,
-                    email=email,   
-                    phone_number=phone_number,   
-                    name=user_name,
-                    amount=0.00,   
-                    status='pending',
-                    from_city=from_city,
-                    to_city=to_city,
-                    date=date
-                )
-                
-                total_amount = 0
-                booked_seats = []
+            order = Order.objects.create(
+                user=profile_obj,
+                bus=bus,
+                email=email,
+                phone_number=phone_number,
+                name=user_name,
+                amount=0.00,   
+                status='pending',   
+                from_city=from_city,
+                to_city=to_city,
+                date=date,
+                selected_seats=seat_numbers  
+            )
 
-                for seat_number in seat_numbers:
-                    if Seat.objects.filter(bus=bus, seat_number=seat_number).exists():
-                        return JsonResponse({'error': f'Seat {seat_number} is already booked.'}, status=400)
+            razorpay_key_id = os.getenv('RAZORPAY_KEY_ID')
+            razorpay_key_secret = os.getenv('RAZORPAY_KEY_SECRET')
+            client = razorpay.Client(auth=(razorpay_key_id, razorpay_key_secret))
 
-                    seat = Seat.objects.create(
-                        bus=bus,
-                        seat_number=seat_number,
-                        status='booked',
-                        from_city=from_city,
-                        to_city=to_city,
-                        date=date
-                    )
-                    booked_seats.append(seat)
+            razorpay_order = client.order.create({
+                "amount": int(price_per_person * len(seat_numbers) * 100),   
+                "currency": "INR",
+                "receipt": f"order_rcptid_{order.id}",
+                "payment_capture": 1,
+            })
 
-                    total_amount += price_per_person   
-
-                    Ticket.objects.create(
-                        order=order,
-                        seat=seat,
-                        amount=price_per_person,   
-                        status='pending'
-                    )
-                
-                order.amount = total_amount
-                order.save()
-
-                razorpay_key_id = os.getenv('RAZORPAY_KEY_ID')
-                razorpay_key_secret = os.getenv('RAZORPAY_KEY_SECRET')
-                client = razorpay.Client(auth=(razorpay_key_id, razorpay_key_secret))
-                razorpay_order = client.order.create({
-                    "amount": int(total_amount * 100),   
-                    "currency": "INR",
-                    "receipt": f"order_rcptid_{order.id}",
-                    "payment_capture": 1,
-                })
-                
-                order.razorpay_order_id = razorpay_order['id']
-                order.save()
+            order.razorpay_order_id = razorpay_order['id']
+            order.amount = price_per_person * len(seat_numbers)
+            order.save()
 
             return JsonResponse({
-                'message': 'Order created successfully.',
+                'message': 'Order created successfully. Please proceed with payment.',
                 'order_id': order.id,
                 'razorpay_order_id': order.razorpay_order_id,
-                'seat_numbers': [seat.seat_number for seat in booked_seats],
-                'price_per_person': price_per_person,   
-                'total_amount': total_amount   
+                'price_per_person': price_per_person,
             })
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
-
- 
+    
+        
 
 class PaymentSuccessAPIView(APIView):
    
+    
     def post(self, request, *args, **kwargs):
         try:
             data = request.data if hasattr(request, 'data') else json.loads(request.body)
@@ -636,25 +608,58 @@ class PaymentSuccessAPIView(APIView):
             razorpay_key_id = os.getenv('RAZORPAY_KEY_ID')
             razorpay_key_secret = os.getenv('RAZORPAY_KEY_SECRET')
             client = razorpay.Client(auth=(razorpay_key_id, razorpay_key_secret))
-            response = client.utility.verify_payment_signature({
-                'razorpay_order_id': order_id,
-                'razorpay_payment_id': payment_id,
-                'razorpay_signature': signature
+            
+            try:
+                client.utility.verify_payment_signature({
+                    'razorpay_order_id': order_id,
+                    'razorpay_payment_id': payment_id,
+                    'razorpay_signature': signature
+                })
+            except razorpay.errors.SignatureVerificationError:
+                return JsonResponse({'error': 'Payment verification failed.'}, status=400)
+
+            order.status = 'confirmed'
+            order.save()
+
+            seat_numbers = order.selected_seats   
+            if not seat_numbers:
+                return JsonResponse({'error': 'No seats specified in the order.'}, status=400)
+
+            booked_seats = []
+            total_amount = 0
+
+            for seat_number in seat_numbers:
+                 
+                seat = Seat.objects.create(
+                    bus=order.bus,
+                    seat_number=seat_number,
+                    status='booked',   
+                    from_city=order.from_city,
+                    to_city=order.to_city,
+                    date=order.date
+                )
+
+                ticket = Ticket.objects.create(
+                    order=order,
+                    seat=seat,
+                    amount=order.amount / len(seat_numbers),   
+                    status='confirmed'
+                )
+
+                booked_seats.append(ticket)
+                total_amount += ticket.amount
+
+            order.amount = total_amount
+            order.save()
+
+            return JsonResponse({
+                'message': 'Payment successful and order confirmed.',
+                'seat_numbers': [ticket.seat.seat_number for ticket in booked_seats],
+                'total_amount': total_amount
             })
-
-            if response:
-                order.status = 'confirmed'
-                order.save()
-                return JsonResponse({'message': 'Payment successful and order confirmed.'})
-
-            return JsonResponse({'error': 'Payment verification failed.'}, status=400)
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
-
-
-
-
 
 
 class OrderListView(APIView):
