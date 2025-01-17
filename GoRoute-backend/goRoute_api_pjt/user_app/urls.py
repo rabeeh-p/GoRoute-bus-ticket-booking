@@ -26,6 +26,9 @@ urlpatterns = [
     path('orders/<int:order_id>/tickets/', TicketListView.as_view(), name='ticket-list'),
 
 
+    path('api/wallet/', WalletAPIView.as_view(), name='wallet-api'),
+
+
 
 
 

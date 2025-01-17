@@ -153,3 +153,9 @@ class BusOwnerSerializerWithoutLogo(serializers.ModelSerializer):
     class Meta:
         model = BusOwnerModel
         fields = ['user', 'travel_name', 'address', 'contact_number', 'created_date'] 
+
+
+
+
+
+        

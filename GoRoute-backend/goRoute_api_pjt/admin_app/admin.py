@@ -19,6 +19,10 @@ admin.site.register(Seat)
 admin.site.register(Order)
 admin.site.register(Ticket)
 
+admin.site.register(Wallet)
+admin.site.register(Transaction)
+
+
 
 
 

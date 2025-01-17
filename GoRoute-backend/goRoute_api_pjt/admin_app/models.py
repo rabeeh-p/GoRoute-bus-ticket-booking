@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from decimal import Decimal
 # Create your models here.
 
 
@@ -165,6 +165,7 @@ class ScheduledBus(models.Model):
     description = models.TextField(blank=True, null=True)   
     started= models.BooleanField(default=False)
     name = models.CharField(max_length=100, null=True, blank=True)
+    bus_owner_id = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"Scheduled Bus {self.bus_number} on {self.scheduled_date}"
@@ -247,3 +248,54 @@ class Ticket(models.Model):
 
     def __str__(self):
         return f"Ticket for Seat {self.seat.seat_number} - Status: {self.status}"
+    
+
+
+
+
+
+class Wallet(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    def __str__(self):
+        return f"{self.user.username}'s Wallet"
+
+    def credit(self, amount):
+        """Credits the given amount to the user's wallet."""
+        amount = Decimal(amount)
+        self.balance += amount
+        self.save()
+    
+        
+    def debit(self, amount):
+        """Debits the given amount from the user's wallet."""
+        amount = Decimal(amount)
+        if self.balance >= amount:
+            self.balance -= amount
+            self.save()
+        else:
+            raise ValueError("Insufficient balance")
+        
+
+
+
+
+class Transaction(models.Model):
+    TRANSACTION_TYPES = [
+        ('credit', 'Credit'),
+        ('debit', 'Debit'),
+    ]
+
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    transaction_type = models.CharField(max_length=6, choices=TRANSACTION_TYPES)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    description = models.TextField()
+
+    def __str__(self):
+        return f"Transaction {self.id} - {self.transaction_type} of {self.amount}"
+
+
+
+

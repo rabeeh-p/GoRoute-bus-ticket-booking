@@ -49,3 +49,26 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id','from_city','to_city','date', 'bus', 'status', 'amount', 'created_at', 'email', 'phone_number', 'name', 'tickets']
+
+
+
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+    """Serializer for the Transaction model."""
+    class Meta:
+        model = Transaction
+        fields = ['id', 'amount', 'transaction_type', 'timestamp', 'description']
+
+class WalletSerializer(serializers.ModelSerializer):
+    """Serializer for the Wallet model with nested Transaction serializer."""
+    transactions = TransactionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Wallet
+        fields = ['id', 'user', 'balance', 'transactions'] 
+
+
+
+
+
