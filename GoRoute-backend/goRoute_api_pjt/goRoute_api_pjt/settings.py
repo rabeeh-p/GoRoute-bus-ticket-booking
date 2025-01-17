@@ -120,6 +120,14 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
+# RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID')
+# RAZORPAY_SECRET_KEY = config('RAZORPAY_SECRET_KEY')
+
+RAZORPAY_KEY_ID ="rzp_test_Y1IK2jrJDfFSb5"
+RAZORPAY_SECRET_KEY ="rmosXgafQcUObgAVKu5Rpvs0"
+
+
+
 
 ROOT_URLCONF = 'goRoute_api_pjt.urls'
 

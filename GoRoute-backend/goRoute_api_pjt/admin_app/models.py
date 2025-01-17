@@ -225,6 +225,7 @@ class Order(models.Model):
     from_city = models.CharField(max_length=255, blank=True, null=True)
     to_city = models.CharField(max_length=255, blank=True, null=True)
     date = models.DateField(blank=True, null=True)
+    razorpay_order_id = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"Order by {self.user} - Status: {self.status}"
