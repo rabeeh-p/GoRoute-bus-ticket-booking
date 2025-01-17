@@ -82,8 +82,7 @@ const UserBusView = () => {
         }
         const searchParams = JSON.parse(localStorage.getItem('searchParams'));
         const { from, to, date } = searchParams;
-         // Assuming `price` is the price per person
-        const pricePerPerson = price; // Price per single ticket
+        const pricePerPerson = price;  
         const totalAmount = pricePerPerson * selectedSeats.length;
         console.log(totalAmount,'tottelllllllllll');
         
