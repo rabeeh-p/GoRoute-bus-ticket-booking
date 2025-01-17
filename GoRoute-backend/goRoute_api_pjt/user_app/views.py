@@ -326,6 +326,92 @@ class BusSearchView(APIView):
 class BusSeatDetailsView(APIView):
     
    
+    # def get(self, request, bus_id):
+    #     print('Bus view is working')
+    #     print('Bus ID:', bus_id)
+
+    #     try:
+    #         bus = ScheduledBus.objects.get(id=bus_id)
+    #         from_city = request.query_params.get('from_city')
+    #         to_city = request.query_params.get('to_city')
+    #         date = request.query_params.get('date')
+    #         print('From City:', from_city)
+    #         print('To City:', to_city)
+    #         print('Date:', date)
+
+    #         if not from_city or not to_city or not date:
+    #             return Response(
+    #                 {'error': 'from_city, to_city, and date are required query parameters.'},
+    #                 status=status.HTTP_400_BAD_REQUEST
+    #             )
+
+    #         try:
+    #             date = datetime.strptime(date, '%Y-%m-%d').date()
+    #         except ValueError:
+    #             return Response(
+    #                 {'error': 'Invalid date format. Please use YYYY-MM-DD.'},
+    #                 status=status.HTTP_400_BAD_REQUEST
+    #             )
+
+    #         seats = Seat.objects.filter(bus=bus, date=date)
+    #         stops = bus.stops.order_by('stop_order')
+    #         print('Stops:', [stop.stop_name for stop in stops])
+
+    #         search_from_stop = stops.filter(stop_name__iexact=from_city).first()
+    #         search_to_stop = stops.filter(stop_name__iexact=to_city).first()
+
+    #         if not search_from_stop or not search_to_stop:
+    #             return Response(
+    #                 {
+    #                     'error': f'Invalid from_city "{from_city}" or to_city "{to_city}". '
+    #                              'Please check the route and try again.'
+    #                 },
+    #                 status=status.HTTP_400_BAD_REQUEST
+    #             )
+
+    #         search_from_index = search_from_stop.stop_order
+    #         search_to_index = search_to_stop.stop_order
+    #         print('Search From Index:', search_from_index)
+    #         print('Search To Index:', search_to_index)
+
+    #         booked_seat_numbers = []
+    #         for seat in seats:
+    #             if seat.status == 'booked':
+    #                 from_stop = stops.filter(stop_name__iexact=seat.from_city).first()
+    #                 to_stop = stops.filter(stop_name__iexact=seat.to_city).first()
+
+    #                 if not from_stop or not to_stop:
+    #                     continue
+
+    #                 from_index = from_stop.stop_order
+    #                 to_index = to_stop.stop_order
+
+    #                 if from_index < search_to_index and to_index > search_from_index:
+    #                     booked_seat_numbers.append(seat.seat_number)
+
+    #         print('Booked Seats:', booked_seat_numbers)
+    #         try:
+    #             bus_owner = BusOwnerModel.objects.get(travel_name=bus.bus_owner_name)
+    #             bus_owner_logo_url = bus_owner.logo_image.url if bus_owner.logo_image else None
+    #         except BusOwnerModel.DoesNotExist:
+    #             bus_owner_logo_url = None
+
+    #         print(bus_owner_logo_url,'url')
+
+    #         return Response(
+    #             {
+    #                 'bus': ScheduledBusSerializer(bus).data,
+    #                 'booked_seats': booked_seat_numbers,
+    #                 'bus_log':bus_owner_logo_url
+    #             },
+    #             status=status.HTTP_200_OK
+    #         )
+    #     except ScheduledBus.DoesNotExist:
+    #         return Response(
+    #             {'error': 'Bus not found'},
+    #             status=status.HTTP_404_NOT_FOUND
+    #         )
+
     def get(self, request, bus_id):
         print('Bus view is working')
         print('Bus ID:', bus_id)
@@ -353,59 +439,72 @@ class BusSeatDetailsView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            seats = Seat.objects.filter(bus=bus, date=date)
             stops = bus.stops.order_by('stop_order')
-            print('Stops:', [stop.stop_name for stop in stops])
+            stop_names = [stop.stop_name.lower() for stop in stops]
+            print('Stops:', stop_names)
 
-            search_from_stop = stops.filter(stop_name__iexact=from_city).first()
-            search_to_stop = stops.filter(stop_name__iexact=to_city).first()
-
-            if not search_from_stop or not search_to_stop:
+            if from_city.lower() not in stop_names or to_city.lower() not in stop_names:
                 return Response(
-                    {
-                        'error': f'Invalid from_city "{from_city}" or to_city "{to_city}". '
-                                 'Please check the route and try again.'
-                    },
+                    {'error': f'Invalid from_city "{from_city}" or to_city "{to_city}". Please check the route and try again.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            search_from_index = search_from_stop.stop_order
-            search_to_index = search_to_stop.stop_order
-            print('Search From Index:', search_from_index)
-            print('Search To Index:', search_to_index)
+            start_index = stop_names.index(from_city.lower())
+            end_index = stop_names.index(to_city.lower())
+            print('Start Index:', start_index)
+            print('End Index:', end_index)
 
+            if start_index >= end_index:
+                return Response(
+                    {'error': 'Invalid route. From city must come before To city.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            total_distance = 0
+            for i in range(start_index + 1, end_index + 1):
+                distance = stops[i].distance_km or 0
+                total_distance += distance
+
+            price_per_km = 5 if bus.bus_type.lower() == 'ac' else 3
+            total_price = total_distance * price_per_km
+
+            # Fetch booked seats
+            seats = Seat.objects.filter(bus=bus, date=date)
             booked_seat_numbers = []
             for seat in seats:
                 if seat.status == 'booked':
                     from_stop = stops.filter(stop_name__iexact=seat.from_city).first()
                     to_stop = stops.filter(stop_name__iexact=seat.to_city).first()
 
-                    if not from_stop or not to_stop:
-                        continue
+                    if from_stop and to_stop:
+                        from_index = from_stop.stop_order
+                        to_index = to_stop.stop_order
 
-                    from_index = from_stop.stop_order
-                    to_index = to_stop.stop_order
-
-                    if from_index < search_to_index and to_index > search_from_index:
-                        booked_seat_numbers.append(seat.seat_number)
+                        if from_index < end_index and to_index > start_index:
+                            booked_seat_numbers.append(seat.seat_number)
 
             print('Booked Seats:', booked_seat_numbers)
+
             try:
                 bus_owner = BusOwnerModel.objects.get(travel_name=bus.bus_owner_name)
                 bus_owner_logo_url = bus_owner.logo_image.url if bus_owner.logo_image else None
             except BusOwnerModel.DoesNotExist:
                 bus_owner_logo_url = None
-
-            print(bus_owner_logo_url,'url')
+            
+            print(total_price,'pricee')
+            print(bus_owner_logo_url,'pricee')
 
             return Response(
                 {
                     'bus': ScheduledBusSerializer(bus).data,
                     'booked_seats': booked_seat_numbers,
-                    'bus_log':bus_owner_logo_url
+                    'total_distance': total_distance,
+                    'total_price': total_price,
+                    'bus_log': bus_owner_logo_url
                 },
                 status=status.HTTP_200_OK
             )
+
         except ScheduledBus.DoesNotExist:
             return Response(
                 {'error': 'Bus not found'},
@@ -413,12 +512,14 @@ class BusSeatDetailsView(APIView):
             )
 
 
+
+
    
 class SeatBookingView(APIView):
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
-
+   
 
     def post(self, request, *args, **kwargs):
         try:
@@ -432,6 +533,10 @@ class SeatBookingView(APIView):
             from_city = data.get('from')   
             to_city = data.get('to')       
             date = data.get('date')
+            price_per_person = data.get('pricePerPerson')   
+
+            if price_per_person is None or price_per_person <= 0:
+                return JsonResponse({'error': 'Price per person is required and must be a positive value.'}, status=400)
 
             if not bus_id or not seat_numbers or not email or not phone_number:
                 return JsonResponse({'error': 'Bus ID, Seat Numbers, Email, and Phone Number are required.'}, status=400)
@@ -469,21 +574,21 @@ class SeatBookingView(APIView):
                         date=date
                     )
                     booked_seats.append(seat)
-                    total_amount += 500.00   
+
+                    total_amount += price_per_person   
 
                     Ticket.objects.create(
                         order=order,
                         seat=seat,
-                        amount=500.00,   
+                        amount=price_per_person,   
                         status='pending'
                     )
                 
                 order.amount = total_amount
                 order.save()
+
                 razorpay_key_id = os.getenv('RAZORPAY_KEY_ID')
                 razorpay_key_secret = os.getenv('RAZORPAY_KEY_SECRET')
-
-                
                 client = razorpay.Client(auth=(razorpay_key_id, razorpay_key_secret))
                 razorpay_order = client.order.create({
                     "amount": int(total_amount * 100),   
@@ -491,6 +596,7 @@ class SeatBookingView(APIView):
                     "receipt": f"order_rcptid_{order.id}",
                     "payment_capture": 1,
                 })
+                
                 order.razorpay_order_id = razorpay_order['id']
                 order.save()
 
@@ -499,7 +605,8 @@ class SeatBookingView(APIView):
                 'order_id': order.id,
                 'razorpay_order_id': order.razorpay_order_id,
                 'seat_numbers': [seat.seat_number for seat in booked_seats],
-                'total_amount': total_amount
+                'price_per_person': price_per_person,   
+                'total_amount': total_amount   
             })
 
         except Exception as e:
