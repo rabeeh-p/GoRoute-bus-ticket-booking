@@ -44,6 +44,8 @@ import EditBusOwnerForm from './Pages/Admin/BusOwner/EditBusOwnerForm';
 import UserCreating from './Pages/Admin/User/UserCreating';
 import EditOwnerProfile from './Pages/Bus_owners/EditOwnerProfile';
 import UserProfileEdit from './Pages/Noraml-User/Profile/UserProfileEdit';
+import Wallet from './Pages/Noraml-User/Profile/Wallet';
+import BusWallet from './Pages/Bus_owners/BusWallet';
 function App() {
 
 
@@ -67,6 +69,7 @@ function App() {
           <Route path="orders/:orderId/tickets" element={<UserTickets />} />
           <Route path="orders" element={<UserOrders />} />
           <Route path="profile-edit" element={<UserProfileEdit />} />
+          <Route path="wallet" element={<Wallet />} />
         </Route>
 
 
@@ -110,6 +113,7 @@ function App() {
           <Route path="scheduled-bus-details/:busId" element={<ScheduledBusDetails />} />
           <Route path="edit-route/:routeId" element={<EditRouteForm />} />
           <Route path="edit-owner-profile/:id" element={<EditOwnerProfile />} />
+          <Route path="bus-wallet" element={<BusWallet />} />
         </Route>
       </Routes>
 
