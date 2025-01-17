@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../Components/Normal/Navbar";
 import { Calendar, Clock, IndianRupee, MapPin, Star } from 'lucide-react';
 import Swal from 'sweetalert2';
@@ -67,75 +67,101 @@ const UserBusView = () => {
 
     
 
-    const handleFormSubmit = (e) => {
+   
 
+    
+
+    const handleFormSubmit = (e) => {
         e.preventDefault();
         const accessToken = localStorage.getItem('accessToken');
         if (!accessToken) {
-            naviagate('/login');
+            navigate('/login');
             return;
         }
         const searchParams = JSON.parse(localStorage.getItem('searchParams'));
         const { from, to, date } = searchParams;
-
-        
+    
         const formData = {
-            bus_id: busId,  
-            seat_numbers: selectedSeats,  
+            bus_id: busId,
+            seat_numbers: selectedSeats,
             userName: e.target.userName.value,
             email: e.target.email.value,
             phone: e.target.phone.value,
-            to: to,       
+            to: to,
             from: from,
             date: date
         };
-
-        axios.post('http://127.0.0.1:8000/seat-booking/', formData,
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
+    
+        Swal.fire({
+            title: 'Do you want to simulate a successful payment?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Proceed with Success',
+            cancelButtonText: 'No, Simulate Failure'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post('http://127.0.0.1:8000/seat-booking/', formData, {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                }).then((response) => {
+                    if (response.data.message) {
+                        const options = {
+                            key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
+                            amount: response.data.total_amount * 100,  
+                            currency: "INR",
+                            name: "Bus Booking",
+                            description: "Test Transaction",
+                            order_id: response.data.razorpay_order_id,
+                            handler: function (paymentResponse) {
+                                console.log("Payment Response:", paymentResponse);   
+    
+                                const paymentId = paymentResponse.razorpay_payment_id;
+                                const orderId = response.data.razorpay_order_id;  
+                                const signature = paymentResponse.razorpay_signature;
+    
+                                if (!paymentId || !orderId || !signature) {
+                                    Swal.fire("Error", "Missing payment details in the response.", "error");
+                                    return;
+                                }
+    
+                                axios.post('http://127.0.0.1:8000/payment-success/', {
+                                    payment_id: paymentId,
+                                    order_id: orderId,
+                                    signature: signature
+                                })
+                                .then((paymentResponseBackend) => {
+                                    Swal.fire("Success!", "Payment completed successfully.", "success");
+                                    window.location.reload();
+                                })
+                                .catch((err) => {
+                                    console.error("Payment verification error:", err.response.data);
+                                    Swal.fire("Error!", "Payment verification failed.", "error");
+                                });
+                            },
+                            prefill: {
+                                name: e.target.userName.value,
+                                email: e.target.email.value,
+                                contact: e.target.phone.value,
+                            },
+                            theme: { color: "#3399cc" },
+                        };
+                        const rzp = new Razorpay(options);
+                        rzp.open();
+                    } else {
+                        Swal.fire("Error", "Order creation failed.", "error");
+                    }
+                }).catch((error) => {
+                    Swal.fire("Error", "Failed to connect to the server.", "error");
+                });
+            } else {
+                Swal.fire("Payment Failed", "The payment was not successful. No seats have been booked.", "error");
             }
-        )
-            // .then((response) => {
-            //     if (response.data.message) {
-            //         alert("Booking successful!");
-            //         setIsModalOpen(false);
-            //         window.location.reload();
-            //     } else {
-            //         alert(`Unexpected response: ${JSON.stringify(response.data)}`);
-            //     }
-            // })
-            .then((response) => {
-                if (response.data.message) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Booking Successful!',
-                        text: 'Your booking has been completed successfully.',
-                        confirmButtonText: 'OK',
-                    }).then(() => {
-                        setIsModalOpen(false);
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Unexpected Response',
-                        text: `Response: ${JSON.stringify(response.data)}`,
-                        confirmButtonText: 'OK',
-                    });
-                }
-            })
-            .catch((error) => {
-                if (error.response) {
-                    alert(`Error: ${error.response.data.error || 'Something went wrong'}`);
-                } else if (error.request) {
-                    alert('Error: No response from the server.');
-                } else {
-                    alert(`Error: ${error.message}`);
-                }
-            });
+        });
     };
+    
+
+
+
+
 
     const handleSeatClick = (seatNumber) => {
         if (bookedSeats.includes(seatNumber)) {
