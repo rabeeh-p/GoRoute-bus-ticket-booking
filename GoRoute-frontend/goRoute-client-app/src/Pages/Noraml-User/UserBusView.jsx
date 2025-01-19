@@ -27,6 +27,11 @@ const UserBusView = () => {
     const { from, to, date } = searchParams;
 
     useEffect(() => {
+        const ws = new WebSocket(`ws://localhost:8000/ws/seats/${busId}/`);
+    
+        ws.onopen = () => {
+        console.log('Connected to WebSocket');
+        };
         axios
             .get(`http://127.0.0.1:8000/bus-details/${busId}/`, {
                 params: {
@@ -69,6 +74,10 @@ const UserBusView = () => {
 
     
 
+
+
+
+    
    
 
     
