@@ -52,6 +52,7 @@ import ConductorsList from './Pages/Bus_owners/Conductor/ConductorsList';
 import ConductorLogin from './Pages/Conductor/ConductorLogin';
 import ConductorLandingPage from './Pages/Conductor/ConductorLandingPage';
 import DashboardConductor from './Pages/Conductor/DashboardConductor';
+import ConductorProtect from './Protect/ConductorProtect';
 function App() {
 
 
@@ -104,9 +105,9 @@ function App() {
 
         <Route path="/users-list" element={<UsersList />} />
 
-        <Route path="/conductor-login" element={<ConductorLogin />} />
-        <Route path="/conductor-home" element={<ConductorLandingPage />} />
-        <Route path="/conductor-dashboard" element={<DashboardConductor />} />
+        <Route path="/conductor-login" element={<ConductorLogin />    } />
+        <Route path="/conductor-home" element={<ConductorProtect> <ConductorLandingPage /> </ConductorProtect>  } />
+        <Route path="/conductor-dashboard" element={<ConductorProtect>   <DashboardConductor /> </ConductorProtect> } />
 
 
 

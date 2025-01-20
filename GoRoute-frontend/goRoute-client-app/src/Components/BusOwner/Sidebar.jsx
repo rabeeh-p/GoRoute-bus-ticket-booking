@@ -1,4 +1,4 @@
-import { Home, Calendar, Settings, HelpCircle, LogOut, Bus, PlusCircle, MapPin,Truck } from 'lucide-react';
+import { Home, Calendar, Settings, HelpCircle, LogOut, Bus, PlusCircle, MapPin, Truck, Wallet, UserPlus, Users } from 'lucide-react';
 import { useDispatch } from "react-redux";
 import { clearUserData } from "../../slice/userSlicer";
 import { useNavigate } from 'react-router-dom';
@@ -68,12 +68,7 @@ export default function Sidebar() {
                             <span className="mx-3">Dashboard</span>
                         </a>
                     </li>
-                    {/* <li onClick={() => navigate('bus-owner/route-table')}>
-                        <a  className="flex items-center px-6 py-3 hover:bg-red-800">
-                            <Calendar className="h-5 w-5" />
-                            <span className="mx-3">Route</span>
-                        </a>
-                    </li> */}
+                    
 
                     <li onClick={() => navigate('bus-owner/route-table')}>
                         <a className="flex items-center px-6 py-3 hover:bg-red-800">
@@ -81,12 +76,7 @@ export default function Sidebar() {
                             <span className="mx-3">Route</span>
                         </a>
                     </li>
-                    {/* <li onClick={() => navigate('bus-owner/add-bus-type/')}>
-                        <a className="flex items-center px-6 py-3 hover:bg-red-800">
-                            <Settings className="h-5 w-5" />
-                            <span className="mx-3">Add bus</span>
-                        </a>
-                    </li> */}
+                    
                     <li onClick={() => navigate('bus-owner/add-bus-type/')}>
                         <a className="flex items-center px-6 py-3 hover:bg-red-800">
                             <PlusCircle className="h-5 w-5" /> {/* Replaced Bus icon with PlusCircle */}
@@ -94,12 +84,7 @@ export default function Sidebar() {
                         </a>
                     </li>
 
-                    {/* <li onClick={() => navigate('bus-owner/bus-list/')}>
-                        <a className="flex items-center px-6 py-3 hover:bg-red-800">
-                            <HelpCircle className="h-5 w-5" />
-                            <span className="mx-3">Bus List</span>
-                        </a>
-                    </li> */}
+                    
                     <li onClick={() => navigate('bus-owner/bus-list/')}>
                         <a className="flex items-center px-6 py-3 hover:bg-red-800">
                             <Bus className="h-5 w-5" /> {/* Replaced HelpCircle with Bus icon */}
@@ -108,26 +93,29 @@ export default function Sidebar() {
                     </li>
                     <li onClick={() => navigate('/busowner-dashboard/scheduled-bus-list')}>
                         <a className="flex items-center px-6 py-3 hover:bg-red-800">
-                        <Calendar className="h-5 w-5" />
+                            <Calendar className="h-5 w-5" />
                             <span className="mx-3">Scheduled Bus</span>
                         </a>
                     </li>
+                    
                     <li onClick={() => navigate('/busowner-dashboard/bus-wallet')}>
                         <a className="flex items-center px-6 py-3 hover:bg-red-800">
-                        <Calendar className="h-5 w-5" />
+                            <Wallet className="h-5 w-5" />  {/* Updated icon */}
                             <span className="mx-3">Bus Wallet</span>
                         </a>
                     </li>
+                    
                     <li onClick={() => navigate('/busowner-dashboard/conductor-registration')}>
                         <a className="flex items-center px-6 py-3 hover:bg-red-800">
-                        <Calendar className="h-5 w-5" />
-                            <span className="mx-3">Add condctor</span>
+                            <UserPlus className="h-5 w-5" />  {/* Updated icon */}
+                            <span className="mx-3">Add Conductor</span>
                         </a>
                     </li>
+                   
                     <li onClick={() => navigate('/busowner-dashboard/conductor-list')}>
                         <a className="flex items-center px-6 py-3 hover:bg-red-800">
-                        <Calendar className="h-5 w-5" />
-                            <span className="mx-3">conductor list</span>
+                            <Users className="h-5 w-5" />  {/* Updated icon */}
+                            <span className="mx-3">Conductor List</span>
                         </a>
                     </li>
                 </ul>
