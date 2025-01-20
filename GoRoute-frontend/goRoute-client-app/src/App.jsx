@@ -46,6 +46,12 @@ import EditOwnerProfile from './Pages/Bus_owners/EditOwnerProfile';
 import UserProfileEdit from './Pages/Noraml-User/Profile/UserProfileEdit';
 import Wallet from './Pages/Noraml-User/Profile/Wallet';
 import BusWallet from './Pages/Bus_owners/BusWallet';
+import BusTracking from './Pages/Noraml-User/Profile/BusTracking';
+import ConductorRegistrationForm from './Pages/Bus_owners/Conductor/ConductorRegistrationForm';
+import ConductorsList from './Pages/Bus_owners/Conductor/ConductorsList';
+import ConductorLogin from './Pages/Conductor/ConductorLogin';
+import ConductorLandingPage from './Pages/Conductor/ConductorLandingPage';
+import DashboardConductor from './Pages/Conductor/DashboardConductor';
 function App() {
 
 
@@ -70,6 +76,7 @@ function App() {
           <Route path="orders" element={<UserOrders />} />
           <Route path="profile-edit" element={<UserProfileEdit />} />
           <Route path="wallet" element={<Wallet />} />
+          <Route path="bus-tracking" element={<BusTracking />} />
         </Route>
 
 
@@ -97,6 +104,10 @@ function App() {
 
         <Route path="/users-list" element={<UsersList />} />
 
+        <Route path="/conductor-login" element={<ConductorLogin />} />
+        <Route path="/conductor-home" element={<ConductorLandingPage />} />
+        <Route path="/conductor-dashboard" element={<DashboardConductor />} />
+
 
 
         <Route path="/busowner-dashboard" element={<BusOwnerProtect> <BusOwnerDashboard /> </BusOwnerProtect>} >
@@ -114,6 +125,8 @@ function App() {
           <Route path="edit-route/:routeId" element={<EditRouteForm />} />
           <Route path="edit-owner-profile/:id" element={<EditOwnerProfile />} />
           <Route path="bus-wallet" element={<BusWallet />} />
+          <Route path="conductor-registration" element={<ConductorRegistrationForm />} />
+          <Route path="conductor-list" element={<ConductorsList />} />
         </Route>
       </Routes>
 

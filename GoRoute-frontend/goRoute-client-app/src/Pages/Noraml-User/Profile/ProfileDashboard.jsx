@@ -7,6 +7,7 @@ import UserTickets from './UserTickets'
 import UserOrders from './UserOrders'
 import UserProfileEdit from './UserProfileEdit'
 import Wallet from './Wallet'
+import BusTracking from './BusTracking'
 
 const ProfileDashboard = () => {
     return (
@@ -22,6 +23,7 @@ const ProfileDashboard = () => {
                     <Route path="orders" element={<UserOrders />} />
                     <Route path="profile-edit" element={<UserProfileEdit />} />
                     <Route path="wallet" element={<Wallet />} />
+                    <Route path="bus-tracking" element={<BusTracking />} />
                 </Routes>
             </div>
         </div>

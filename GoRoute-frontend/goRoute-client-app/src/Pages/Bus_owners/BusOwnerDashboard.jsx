@@ -16,6 +16,8 @@ import ScheduledBusDetails from './ScheduledBusDetails'
 import EditRouteForm from './Route/EditRouteForm'
 import EditOwnerProfile from './EditOwnerProfile'
 import BusWallet from './BusWallet'
+import ConductorRegistrationForm from './Conductor/ConductorRegistrationForm'
+import ConductorsList from './Conductor/ConductorsList'
 
 const BusOwnerDashboard = () => {
     return (
@@ -39,6 +41,8 @@ const BusOwnerDashboard = () => {
                         <Route path="edit-route/:routeId" element={<EditRouteForm />} />
                         <Route path="edit-owner-profile/:id" element={<EditOwnerProfile />} />
                         <Route path="bus-wallet" element={<BusWallet />} />
+                        <Route path="conductor-registration" element={<ConductorRegistrationForm />} />
+                        <Route path="conductor-list" element={<ConductorsList />} />
                         
                     </Routes>
                 </main>

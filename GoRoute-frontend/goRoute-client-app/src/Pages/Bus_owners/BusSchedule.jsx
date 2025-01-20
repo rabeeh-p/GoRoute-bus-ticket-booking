@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../axios/axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import useLogout from '../../Hook/useLogout';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 
 const BusSchedule = () => {
   const { busId } = useParams();  
@@ -17,6 +17,8 @@ const BusSchedule = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { handleLogout } = useLogout();
+  const [conductors, setConductors] = useState([]);
+  const [selectedConductor, setSelectedConductor] = useState(null);  // State to store selected conductor
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -25,6 +27,7 @@ const BusSchedule = () => {
       return;
     }
 
+    // Fetch bus details
     axiosInstance.get(`/buses/${busId}/`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -39,6 +42,7 @@ const BusSchedule = () => {
       setLoading(false);
     });
 
+    // Fetch routes
     axiosInstance.get('/routes/my_routes/schedule-time/', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -46,17 +50,31 @@ const BusSchedule = () => {
     })
     .then(response => {
       setRoutes(response.data);
-      console.log(response,'data');
-      
     })
     .catch(err => {
       if (err.response && err.response.status === 401) {
         handleLogout();  
       } else {
-        setError('Failed to fetch bus details');
+        setError('Failed to fetch routes');
         setLoading(false);
       }
-      // setError('Failed to fetch routes');
+    });
+
+    // Fetch conductors
+    axiosInstance.get('/conductors/', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+    .then(response => {
+      const inactiveConductors = response.data.filter(conductor => !conductor.is_active);
+      setConductors(inactiveConductors);
+      console.log(response.data,'conduc');
+      
+    })
+    .catch(err => {
+      setError('Failed to fetch conductors');
+      setLoading(false);
     });
   }, [busId, navigate]);
 
@@ -67,10 +85,8 @@ const BusSchedule = () => {
     setSelectedStops(selected ? selected.stops : []);
   };
 
- 
-
   const handleSubmit = () => {
-    if (!selectedRoute || !scheduledDate) {
+    if (!selectedRoute || !scheduledDate || !selectedConductor) {
       setError('Please fill all fields before submitting.');
       return;
     }
@@ -80,6 +96,7 @@ const BusSchedule = () => {
       route_id: selectedRoute.id,
       scheduled_date: scheduledDate,
       status: status,
+      conductor_id: selectedConductor.id,  // Add selected conductor to payload
     };
   
     axiosInstance.post(`/schedule-bus/${busId}/`, payload, {
@@ -155,7 +172,7 @@ const BusSchedule = () => {
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Select Route and Schedule</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Select Route, Conductor, and Schedule</h2>
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">Choose Route</label>
@@ -172,6 +189,20 @@ const BusSchedule = () => {
         </div>
 
         <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Choose Conductor</label>
+          <select
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+            onChange={(e) => setSelectedConductor(conductors.find(conductor => conductor.id === parseInt(e.target.value)))}
+            value={selectedConductor ? selectedConductor.id : ''}
+          >
+            <option value="">-- Select Conductor --</option>
+            {conductors.map(conductor => (
+              <option key={conductor.id} value={conductor.id}>{conductor.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">Scheduled Date</label>
           <input
             type="datetime-local"
@@ -180,8 +211,6 @@ const BusSchedule = () => {
             onChange={(e) => setScheduledDate(e.target.value)}
           />
         </div>
-
-        
       </div>
 
       <div className="mt-6 text-center">

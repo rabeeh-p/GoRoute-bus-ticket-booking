@@ -37,58 +37,17 @@ const UserTickets = () => {
 
 
 
-    // const handleCancel = (ticketId) => {
-    //     Swal.fire({
-    //       title: 'Are you sure?',
-    //       text: 'Do you want to cancel this ticket?',
-    //       icon: 'warning',
-    //       showCancelButton: true,
-    //       confirmButtonColor: '#d33',
-    //       cancelButtonColor: '#3085d6',
-    //       confirmButtonText: 'Yes, cancel it!',
-    //     }).then((result) => {
-    //       if (result.isConfirmed) {
-    //         axios
-    //           .post(`/api/tickets/${ticketId}/cancel/`, {}, {
-    //             headers: {
-    //               'Content-Type': 'application/json',
-    //               'X-CSRFToken': getCSRFToken(), // Add this if CSRF protection is enabled
-    //             },
-    //           })
-    //           .then((response) => {
-    //             const { data } = response;
-    //             if (data.success) {
-    //               Swal.fire(
-    //                 'Cancelled!',
-    //                 `Your ticket has been cancelled. Refund of $${data.refund_amount} issued.`,
-    //                 'success'
-    //               );
-    //               // Optionally refresh or update the UI
-    //             } else {
-    //               Swal.fire('Error!', data.message, 'error');
-    //             }
-    //           })
-    //           .catch((error) => {
-    //             Swal.fire(
-    //               'Error!',
-    //               error.response?.data?.message || 'An error occurred. Please try again.',
-    //               'error'
-    //             );
-    //           });
-    //       }
-    //     });
-    //   };
-    
+
 
     const handleCancel = (ticketId) => {
         const accessToken = localStorage.getItem('accessToken'); // Get the access token from localStorage
-    
+
         // Check if the access token is available
         if (!accessToken) {
             Swal.fire('Error!', 'You need to be logged in to cancel a ticket.', 'error');
             return; // Stop further execution if no token is found
         }
-    
+
         Swal.fire({
             title: 'Are you sure?',
             text: 'Do you want to cancel this ticket?',
@@ -129,8 +88,8 @@ const UserTickets = () => {
             }
         });
     };
-    
-      
+
+
 
     return (
         <div className="bg-red-50 p-6 sm:p-8 md:p-10 min-h-screen">
@@ -183,60 +142,68 @@ const UserTickets = () => {
                             </div>
                         )}
 
-{tickets.length > 0 ? (
-    <div className="p-6 bg-gray-50 rounded-lg shadow-md">
-        <h2 className="text-3xl font-bold text-red-600 mb-6 text-center">Your Tickets</h2>
-        <table className="min-w-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-            <thead>
-                <tr className="bg-red-200 text-gray-700">
-                    <th className="px-6 py-3 text-left text-lg font-medium">Seat Number</th>
-                    <th className="px-6 py-3 text-left text-lg font-medium">Amount</th>
-                    <th className="px-6 py-3 text-left text-lg font-medium">Status</th>
-                    <th className="px-6 py-3 text-left text-lg font-medium">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {tickets.map((ticket) => (
-                    <tr
-                        key={ticket.id}
-                        className="hover:bg-red-50 transition duration-300 ease-in-out"
-                    >
-                        <td className="border px-6 py-4 text-gray-800 text-base">
-                            {ticket.seat.seat_number}
-                        </td>
-                        <td className="border px-6 py-4 text-gray-800 text-base">
-                            ${ticket.amount}
-                        </td>
-                        <td
-                            className={`border px-6 py-4 text-base ${
-                                ticket.status === 'confirmed'
-                                    ? 'text-green-600 font-semibold'
-                                    : 'text-red-600 font-semibold'
-                            }`}
-                        >
-                            {ticket.status}
-                        </td>
-                        <td className="border px-6 py-4">
-                            {ticket.status === 'confirmed' && (
-                                <button
-                                    className="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
-                                    onClick={() => handleCancel(ticket.id)}
-                                >
-                                    Cancel
-                                </button>
-                            )}
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
-) : (
-    <div className="text-center text-gray-500 p-6">
-        <h2 className="text-2xl font-semibold mb-4">No tickets found</h2>
-        <p className="text-lg">You don't have any tickets for this order. Try booking now!</p>
-    </div>
-)}
+                        <div className="text-center py-4">
+                            <button
+                                className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition-all"
+                                onClick={() => navigate('/profile-dashboard/bus-tracking')}
+                            >
+                                Watch Live Showing
+                            </button>
+                        </div>
+
+                        {tickets.length > 0 ? (
+                            <div className="p-6 bg-gray-50 rounded-lg shadow-md">
+                                <h2 className="text-3xl font-bold text-red-600 mb-6 text-center">Your Tickets</h2>
+                                <table className="min-w-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                                    <thead>
+                                        <tr className="bg-red-200 text-gray-700">
+                                            <th className="px-6 py-3 text-left text-lg font-medium">Seat Number</th>
+                                            <th className="px-6 py-3 text-left text-lg font-medium">Amount</th>
+                                            <th className="px-6 py-3 text-left text-lg font-medium">Status</th>
+                                            <th className="px-6 py-3 text-left text-lg font-medium">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {tickets.map((ticket) => (
+                                            <tr
+                                                key={ticket.id}
+                                                className="hover:bg-red-50 transition duration-300 ease-in-out"
+                                            >
+                                                <td className="border px-6 py-4 text-gray-800 text-base">
+                                                    {ticket.seat.seat_number}
+                                                </td>
+                                                <td className="border px-6 py-4 text-gray-800 text-base">
+                                                    ${ticket.amount}
+                                                </td>
+                                                <td
+                                                    className={`border px-6 py-4 text-base ${ticket.status === 'confirmed'
+                                                            ? 'text-green-600 font-semibold'
+                                                            : 'text-red-600 font-semibold'
+                                                        }`}
+                                                >
+                                                    {ticket.status}
+                                                </td>
+                                                <td className="border px-6 py-4">
+                                                    {ticket.status === 'confirmed' && (
+                                                        <button
+                                                            className="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
+                                                            onClick={() => handleCancel(ticket.id)}
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div className="text-center text-gray-500 p-6">
+                                <h2 className="text-2xl font-semibold mb-4">No tickets found</h2>
+                                <p className="text-lg">You don't have any tickets for this order. Try booking now!</p>
+                            </div>
+                        )}
 
                     </>
                 )}

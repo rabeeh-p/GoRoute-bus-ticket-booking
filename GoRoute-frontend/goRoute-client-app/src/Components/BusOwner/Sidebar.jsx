@@ -118,6 +118,18 @@ export default function Sidebar() {
                             <span className="mx-3">Bus Wallet</span>
                         </a>
                     </li>
+                    <li onClick={() => navigate('/busowner-dashboard/conductor-registration')}>
+                        <a className="flex items-center px-6 py-3 hover:bg-red-800">
+                        <Calendar className="h-5 w-5" />
+                            <span className="mx-3">Add condctor</span>
+                        </a>
+                    </li>
+                    <li onClick={() => navigate('/busowner-dashboard/conductor-list')}>
+                        <a className="flex items-center px-6 py-3 hover:bg-red-800">
+                        <Calendar className="h-5 w-5" />
+                            <span className="mx-3">conductor list</span>
+                        </a>
+                    </li>
                 </ul>
 
                 {/* Logout */}
