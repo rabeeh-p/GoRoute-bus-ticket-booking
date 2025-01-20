@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 
 const Wallet = () => {
-  const [totalAmount, setTotalAmount] = useState(0);
+  const [Amount, setTotalAmount] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [error, setError] = useState(null);
 
@@ -12,10 +12,12 @@ const Wallet = () => {
       try {
         const response = await axios.get('http://127.0.0.1:8000/api/wallet/', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,  
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,  
           },
         });
-        setTotalAmount(response.data.total_amount);
+        console.log(response.data,'data walllet');
+        
+        setTotalAmount(response.data.balance);
         setTransactions(response.data.transactions);
       } catch (err) {
         console.error(err);
@@ -51,9 +53,12 @@ const Wallet = () => {
               <span className="text-xl font-semibold text-white mb-2 md:mb-0">
                 Total Balance
               </span>
-              <span className="text-3xl font-bold text-white">
+              {/* <span className="text-3xl font-bold text-white">
                 ₹{totalAmount.toFixed(2)}
-              </span>
+              </span> */}
+              <span className="text-3xl font-bold text-white">
+  ₹{(parseFloat(Amount) || 0).toFixed(2)}
+</span>
             </motion.div>
 
             <motion.div

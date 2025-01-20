@@ -4,6 +4,7 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../Components/Normal/Navbar";
 import { Calendar, Clock, IndianRupee, MapPin, Star } from 'lucide-react';
 import Swal from 'sweetalert2';
+import io from 'socket.io-client';
 
 const UserBusView = () => {
     const [busDetails, setBusDetails] = useState(null);
@@ -27,11 +28,26 @@ const UserBusView = () => {
     const { from, to, date } = searchParams;
 
     useEffect(() => {
-        const ws = new WebSocket(`ws://localhost:8000/ws/seats/${busId}/`);
-    
-        ws.onopen = () => {
-        console.log('Connected to WebSocket');
-        };
+        console.log('Bus ID:', busId);
+        
+
+        const socket = new WebSocket(`ws://127.0.0.1:8000/ws/seats/${busId}/`);
+
+socket.onopen = () => {
+    console.log("WebSocket connection established");
+    // Now you can send messages safely
+};
+
+socket.onerror = (error) => {
+    console.error("WebSocket error:", error);
+    // alert("WebSocket connection failed!");
+};
+
+socket.onclose = (event) => {
+    console.log("WebSocket closed:", event);
+};
+
+        
         axios
             .get(`http://127.0.0.1:8000/bus-details/${busId}/`, {
                 params: {
@@ -55,6 +71,39 @@ const UserBusView = () => {
                 setError("Could not fetch bus details.");
             });
     }, [busId]);
+
+
+// useEffect(() => {
+//     console.log('Bus ID:', busId);
+
+//     // Create WebSocket connection.
+//     // const socket = io(`http://127.0.0.1:8000/ws/seats/${busId}`, {
+//     //     query: { busId, from_city: from, to_city: to, date: date }
+//     // });
+//     const socket = new WebSocket(`ws://127.0.0.1:8000/ws/seats/${busId}/?from_city=${from}&to_city=${to}&date=${date}`);
+
+
+//     // Listen for messages from the server.
+//     socket.on('bus_details', (data) => {
+//         console.log(data, 'real-time data');
+//         setBusDetails(data.bus);
+//         setPrice(data.total_price);
+//         setBookedSeats(data.booked_seats);
+//         setLogo(data.bus_log);
+//     });
+
+//     // Handle errors
+//     socket.onopen ('error', (err) => {
+//         console.error("Error from WebSocket:", err);
+//         setError("Could not fetch bus details.");
+//     });
+
+//     // Cleanup on component unmount.
+//     return () => {
+//         socket.disconnect();
+//     };
+// }, [busId, from, to, date]);
+
 
     const handleBookNowClick = () => {
         const userType = localStorage.getItem('userType');
