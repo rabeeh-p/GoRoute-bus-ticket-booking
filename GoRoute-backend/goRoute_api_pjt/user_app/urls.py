@@ -27,6 +27,8 @@ urlpatterns = [
 
 
     path('api/wallet/', WalletAPIView.as_view(), name='wallet-api'),
+    path('cancel-ticket/<int:ticket_id>/', CancelTicketAPIView.as_view(), name='cancel_ticket'),
+    
 
 
 

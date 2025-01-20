@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'admin_app',
     'bus_owner_app',
+    'channels',
     'user_app',
 
 
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'dj_rest_auth.registration',
+    
 
 ]
 
@@ -92,7 +94,27 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
 ]
 
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django_redis.cache.RedisCache',
+#         'LOCATION': 'redis://127.0.0.1:6379/1',  # Change the Redis host and database number as needed
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#         }
+#     }
+# }
 
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django_redis.cache.RedisCache',  
+#         'LOCATION': 'redis://127.0.0.1:6379/1',   
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#         }
+#     }
+# }
+# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+# SESSION_CACHE_ALIAS = "default"
 
 
 
@@ -147,7 +169,29 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'goRoute_api_pjt.wsgi.application'
+# WSGI_APPLICATION = 'goRoute_api_pjt.wsgi.application'
+ASGI_APPLICATION = 'goRoute_api_pjt.asgi.application'
+
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
+#     },
+# }
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],  # Redis on localhost
+        },
+    },
+}
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Use in-memory channel layer for testing
+    },
+}
 
 
 # Database

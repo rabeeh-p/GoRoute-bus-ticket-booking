@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from admin_app.models import *
 from .serializers import *
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+from django.utils.timezone import now
 
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -14,7 +14,7 @@ import jwt
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from decouple import config
-
+from django.utils import timezone
 from django.db.models import Q
 from django.utils.dateparse import parse_datetime
 from dotenv import load_dotenv
@@ -322,97 +322,12 @@ class BusSearchView(APIView):
 
 
 
-
+from asgiref.sync import async_to_sync
 
 class BusSeatDetailsView(APIView):
     
    
-    # def get(self, request, bus_id):
-    #     print('Bus view is working')
-    #     print('Bus ID:', bus_id)
-
-    #     try:
-    #         bus = ScheduledBus.objects.get(id=bus_id)
-    #         from_city = request.query_params.get('from_city')
-    #         to_city = request.query_params.get('to_city')
-    #         date = request.query_params.get('date')
-    #         print('From City:', from_city)
-    #         print('To City:', to_city)
-    #         print('Date:', date)
-
-    #         if not from_city or not to_city or not date:
-    #             return Response(
-    #                 {'error': 'from_city, to_city, and date are required query parameters.'},
-    #                 status=status.HTTP_400_BAD_REQUEST
-    #             )
-
-    #         try:
-    #             date = datetime.strptime(date, '%Y-%m-%d').date()
-    #         except ValueError:
-    #             return Response(
-    #                 {'error': 'Invalid date format. Please use YYYY-MM-DD.'},
-    #                 status=status.HTTP_400_BAD_REQUEST
-    #             )
-
-    #         seats = Seat.objects.filter(bus=bus, date=date)
-    #         stops = bus.stops.order_by('stop_order')
-    #         print('Stops:', [stop.stop_name for stop in stops])
-
-    #         search_from_stop = stops.filter(stop_name__iexact=from_city).first()
-    #         search_to_stop = stops.filter(stop_name__iexact=to_city).first()
-
-    #         if not search_from_stop or not search_to_stop:
-    #             return Response(
-    #                 {
-    #                     'error': f'Invalid from_city "{from_city}" or to_city "{to_city}". '
-    #                              'Please check the route and try again.'
-    #                 },
-    #                 status=status.HTTP_400_BAD_REQUEST
-    #             )
-
-    #         search_from_index = search_from_stop.stop_order
-    #         search_to_index = search_to_stop.stop_order
-    #         print('Search From Index:', search_from_index)
-    #         print('Search To Index:', search_to_index)
-
-    #         booked_seat_numbers = []
-    #         for seat in seats:
-    #             if seat.status == 'booked':
-    #                 from_stop = stops.filter(stop_name__iexact=seat.from_city).first()
-    #                 to_stop = stops.filter(stop_name__iexact=seat.to_city).first()
-
-    #                 if not from_stop or not to_stop:
-    #                     continue
-
-    #                 from_index = from_stop.stop_order
-    #                 to_index = to_stop.stop_order
-
-    #                 if from_index < search_to_index and to_index > search_from_index:
-    #                     booked_seat_numbers.append(seat.seat_number)
-
-    #         print('Booked Seats:', booked_seat_numbers)
-    #         try:
-    #             bus_owner = BusOwnerModel.objects.get(travel_name=bus.bus_owner_name)
-    #             bus_owner_logo_url = bus_owner.logo_image.url if bus_owner.logo_image else None
-    #         except BusOwnerModel.DoesNotExist:
-    #             bus_owner_logo_url = None
-
-    #         print(bus_owner_logo_url,'url')
-
-    #         return Response(
-    #             {
-    #                 'bus': ScheduledBusSerializer(bus).data,
-    #                 'booked_seats': booked_seat_numbers,
-    #                 'bus_log':bus_owner_logo_url
-    #             },
-    #             status=status.HTTP_200_OK
-    #         )
-    #     except ScheduledBus.DoesNotExist:
-    #         return Response(
-    #             {'error': 'Bus not found'},
-    #             status=status.HTTP_404_NOT_FOUND
-    #         )
-
+   
     def get(self, request, bus_id):
         print('Bus view is working')
         print('Bus ID:', bus_id)
@@ -512,9 +427,98 @@ class BusSeatDetailsView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+    # def get(self, request, bus_id):
+        print('Bus view is working')
+        print('Bus ID:', bus_id)
+
+        try:
+            bus = ScheduledBus.objects.get(id=bus_id)
+            from_city = request.query_params.get('from_city')
+            to_city = request.query_params.get('to_city')
+            date = request.query_params.get('date')
+
+            if not from_city or not to_city or not date:
+                return Response(
+                    {'error': 'from_city, to_city, and date are required query parameters.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            try:
+                date = datetime.strptime(date, '%Y-%m-%d').date()
+            except ValueError:
+                return Response(
+                    {'error': 'Invalid date format. Please use YYYY-MM-DD.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            stops = bus.stops.order_by('stop_order')
+            stop_names = [stop.stop_name.lower() for stop in stops]
+
+            if from_city.lower() not in stop_names or to_city.lower() not in stop_names:
+                return Response(
+                    {'error': f'Invalid from_city "{from_city}" or to_city "{to_city}". Please check the route and try again.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            start_index = stop_names.index(from_city.lower())
+            end_index = stop_names.index(to_city.lower())
+
+            if start_index >= end_index:
+                return Response(
+                    {'error': 'Invalid route. From city must come before To city.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            total_distance = 0
+            for i in range(start_index + 1, end_index + 1):
+                distance = stops[i].distance_km or 0
+                total_distance += distance
+
+            price_per_km = 5 if bus.bus_type.lower() == 'ac' else 3
+            total_price = total_distance * price_per_km
+
+            # Fetch booked seats
+            seats = Seat.objects.filter(bus=bus, date=date)
+            booked_seat_numbers = []
+            for seat in seats:
+                if seat.status == 'booked':
+                    from_stop = stops.filter(stop_name__iexact=seat.from_city).first()
+                    to_stop = stops.filter(stop_name__iexact=seat.to_city).first()
+
+                    if from_stop and to_stop:
+                        from_index = from_stop.stop_order
+                        to_index = to_stop.stop_order
+
+                        if from_index < end_index and to_index > start_index:
+                            booked_seat_numbers.append(seat.seat_number)
+
+            # Send the seat updates to WebSocket clients
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f'bus_{bus_id}_seat_updates', {
+                    'type': 'seat_update',
+                    'booked_seats': booked_seat_numbers,
+                }
+            )
+
+            return Response(
+                {
+                    'bus': ScheduledBusSerializer(bus).data,
+                    'booked_seats': booked_seat_numbers,
+                    'total_distance': total_distance,
+                    'total_price': total_price,
+                },
+                status=status.HTTP_200_OK
+            )
+
+        except ScheduledBus.DoesNotExist:
+            return Response(
+                {'error': 'Bus not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
-
+# from channels.layers import get_channel_layer
    
 class SeatBookingView(APIView):
 
@@ -584,120 +588,97 @@ class SeatBookingView(APIView):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
-    
-        
 
-class PaymentSuccessAPIView(APIView):
-   
-    
     # def post(self, request, *args, **kwargs):
     #     try:
     #         data = request.data if hasattr(request, 'data') else json.loads(request.body)
 
-    #         payment_id = data.get('payment_id')
-    #         order_id = data.get('order_id')
-    #         signature = data.get('signature')
+    #         bus_id = data.get('bus_id')
+    #         seat_numbers = data.get('seat_numbers')
+    #         user_name = data.get('userName')
+    #         email = data.get('email')
+    #         phone_number = data.get('phone')
+    #         from_city = data.get('from')
+    #         to_city = data.get('to')
+    #         date = data.get('date')
+    #         price_per_person = data.get('pricePerPerson')
 
-    #         if not payment_id or not order_id or not signature:
-    #             return JsonResponse({'error': 'Payment ID, Order ID, and Signature are required.'}, status=400)
+    #         if not bus_id or not seat_numbers or not email or not phone_number:
+    #             return JsonResponse({'error': 'Bus ID, Seat Numbers, Email, and Phone Number are required.'}, status=400)
 
-    #         order = Order.objects.filter(razorpay_order_id=order_id).first()
+    #         if price_per_person is None or price_per_person <= 0:
+    #             return JsonResponse({'error': 'Price per person is required and must be a positive value.'}, status=400)
 
-    #         if not order:
-    #             return JsonResponse({'error': 'Order not found.'}, status=404)
+    #         bus = get_object_or_404(ScheduledBus, id=bus_id)
+    #         profile_obj = NormalUserProfile.objects.get(user=request.user)
+
+    #         order = Order.objects.create(
+    #             user=profile_obj,
+    #             bus=bus,
+    #             email=email,
+    #             phone_number=phone_number,
+    #             name=user_name,
+    #             amount=0.00,
+    #             status='pending',
+    #             from_city=from_city,
+    #             to_city=to_city,
+    #             date=date,
+    #             selected_seats=seat_numbers
+    #         )
 
     #         razorpay_key_id = os.getenv('RAZORPAY_KEY_ID')
     #         razorpay_key_secret = os.getenv('RAZORPAY_KEY_SECRET')
     #         client = razorpay.Client(auth=(razorpay_key_id, razorpay_key_secret))
-            
-    #         try:
-    #             client.utility.verify_payment_signature({
-    #                 'razorpay_order_id': order_id,
-    #                 'razorpay_payment_id': payment_id,
-    #                 'razorpay_signature': signature
-    #             })
-    #         except razorpay.errors.SignatureVerificationError:
-    #             return JsonResponse({'error': 'Payment verification failed.'}, status=400)
 
-    #         order.status = 'confirmed'
+    #         razorpay_order = client.order.create({
+    #             "amount": int(price_per_person * len(seat_numbers) * 100),
+    #             "currency": "INR",
+    #             "receipt": f"order_rcptid_{order.id}",
+    #             "payment_capture": 1,
+    #         })
+
+    #         order.razorpay_order_id = razorpay_order['id']
+    #         order.amount = price_per_person * len(seat_numbers)
     #         order.save()
 
-    #         seat_numbers = order.selected_seats   
-    #         if not seat_numbers:
-    #             return JsonResponse({'error': 'No seats specified in the order.'}, status=400)
-
-    #         booked_seats = []
-    #         total_amount = 0
-
+    #         # Send WebSocket message to all users viewing this bus
     #         for seat_number in seat_numbers:
-                 
-    #             seat = Seat.objects.create(
-    #                 bus=order.bus,
-    #                 seat_number=seat_number,
-    #                 status='booked',   
-    #                 from_city=order.from_city,
-    #                 to_city=order.to_city,
-    #                 date=order.date
-    #             )
-
-    #             ticket = Ticket.objects.create(
-    #                 order=order,
-    #                 seat=seat,
-    #                 amount=order.amount / len(seat_numbers),   
-    #                 status='confirmed'
-    #             )
-
-    #             booked_seats.append(ticket)
-    #             total_amount += ticket.amount
-
-    #         order.amount = total_amount
-    #         order.save()
-    #         print(order.bus,'bus')
-    #         print(order.bus.id,'bus')
-    #         # print(order.bus.owner,'owner')
-
-    #         bus_owner = CustomUser.objects.get(id=order.bus.bus_owner_id)
-
-
-    #         bus_owner_wallet, created = Wallet.objects.get_or_create(user=bus_owner)
-    #         # Credit the bus owner's wallet 
-    #         bus_owner_wallet.credit(total_amount)
-
-    #         # Create transaction for bus owner
-    #         Transaction.objects.create(
-    #             wallet=bus_owner_wallet,
-    #             amount=total_amount,
-    #             transaction_type='credit',
-    #             description="Amount credited to bus owner's wallet after ticket booking"
-    #         )
-
-
-    #         admin_wallet, created = Wallet.objects.get_or_create(user=CustomUser.objects.get(role='super_admin'))
-
-    #         # Credit 5% to the admin's wallet
-    #         admin_wallet.credit(total_amount * 0.05)
-
-    #         # Create transaction for admin
-    #         Transaction.objects.create(
-    #             wallet=admin_wallet,
-    #             amount=total_amount * 0.05,
-    #             transaction_type='credit',
-    #             description="5% credited to admin's wallet from booking"
-    #         )
-            
-
-
-            
+    #             # Send each booked seat status update via WebSocket
+    #             self.send_seat_update_to_group(bus_id, seat_number, 'booked')
 
     #         return JsonResponse({
-    #             'message': 'Payment successful and order confirmed.',
-    #             'seat_numbers': [ticket.seat.seat_number for ticket in booked_seats],
-    #             'total_amount': total_amount
+    #             'message': 'Order created successfully. Please proceed with payment.',
+    #             'order_id': order.id,
+    #             'razorpay_order_id': order.razorpay_order_id,
+    #             'price_per_person': price_per_person,
     #         })
 
     #     except Exception as e:
     #         return JsonResponse({'error': str(e)}, status=500)
 
+    # def send_seat_update_to_group(self, bus_id, seat_number, status):
+    #     # Get the channel layer
+    #     channel_layer = get_channel_layer()
+
+    #     # Send the message to the WebSocket group (bus_id)
+    #     group_name = f"bus_{bus_id}_seats"
+
+    #     # Use async_to_sync to call async method in a synchronous view
+    #     async_to_sync(channel_layer.group_send)(
+    #         group_name,
+    #         {
+    #             'type': 'seat_update',
+    #             'seat_number': seat_number,
+    #             'status': status
+    #         }
+    #     )
+        
+        
+
+class PaymentSuccessAPIView(APIView):
+   
+    
+    
 
     def post(self, request, *args, **kwargs):
         try:
@@ -798,6 +779,102 @@ class PaymentSuccessAPIView(APIView):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
+    # def post(self, request, *args, **kwargs):
+    #     try:
+    #         data = request.data if hasattr(request, 'data') else json.loads(request.body)
+
+    #         payment_id = data.get('payment_id')
+    #         order_id = data.get('order_id')
+    #         signature = data.get('signature')
+
+    #         if not payment_id or not order_id or not signature:
+    #             return JsonResponse({'error': 'Payment ID, Order ID, and Signature are required.'}, status=400)
+
+    #         order = Order.objects.filter(razorpay_order_id=order_id).first()
+
+    #         if not order:
+    #             return JsonResponse({'error': 'Order not found.'}, status=404)
+
+    #         razorpay_key_id = os.getenv('RAZORPAY_KEY_ID')
+    #         razorpay_key_secret = os.getenv('RAZORPAY_KEY_SECRET')
+    #         client = razorpay.Client(auth=(razorpay_key_id, razorpay_key_secret))
+
+    #         try:
+    #             client.utility.verify_payment_signature({
+    #                 'razorpay_order_id': order_id,
+    #                 'razorpay_payment_id': payment_id,
+    #                 'razorpay_signature': signature
+    #             })
+    #         except razorpay.errors.SignatureVerificationError:
+    #             return JsonResponse({'error': 'Payment verification failed.'}, status=400)
+
+    #         # Update order status
+    #         order.status = 'confirmed'
+    #         order.save()
+
+    #         seat_numbers = order.selected_seats
+    #         if not seat_numbers:
+    #             return JsonResponse({'error': 'No seats specified in the order.'}, status=400)
+
+    #         booked_seats = []
+    #         total_amount = Decimal(0)  # Use Decimal for precise calculations
+
+    #         for seat_number in seat_numbers:
+    #             seat = Seat.objects.create(
+    #                 bus=order.bus,
+    #                 seat_number=seat_number,
+    #                 status='booked',
+    #                 from_city=order.from_city,
+    #                 to_city=order.to_city,
+    #                 date=order.date
+    #             )
+
+    #             ticket_amount = Decimal(order.amount) / Decimal(len(seat_numbers))
+    #             ticket = Ticket.objects.create(
+    #                 order=order,
+    #                 seat=seat,
+    #                 amount=ticket_amount,
+    #                 status='confirmed'
+    #             )
+
+    #             booked_seats.append(ticket)
+    #             total_amount += ticket.amount
+
+    #             # Notify all clients about the booked seat via WebSocket
+    #             self.send_seat_update_to_group(order.bus.id, seat_number, 'booked')
+
+    #         order.amount = total_amount
+    #         order.save()
+
+    #         # Process wallet transactions for the bus owner and admin here...
+
+    #         return JsonResponse({
+    #             'message': 'Payment successful and order confirmed.',
+    #             'seat_numbers': [ticket.seat.seat_number for ticket in booked_seats],
+    #             'total_amount': float(total_amount)
+    #         })
+
+    #     except Exception as e:
+    #         return JsonResponse({'error': str(e)}, status=500)
+
+    # def send_seat_update_to_group(self, bus_id, seat_number, status):
+    #     # Get the channel layer
+    #     channel_layer = get_channel_layer()
+
+    #     # Send the message to the WebSocket group (bus_id)
+    #     group_name = f"bus_{bus_id}_seats"
+
+    #     # Use async_to_sync to call async method in a synchronous view
+    #     async_to_sync(channel_layer.group_send)(
+    #         group_name,
+    #         {
+    #             'type': 'seat_update',
+    #             'seat_number': seat_number,
+    #             'status': status
+    #         }
+    #     )
+
+
 
 
 class OrderListView(APIView):
@@ -864,3 +941,51 @@ class WalletAPIView(APIView):
 
     
       
+
+class CancelTicketAPIView(APIView):
+    """
+    API for ticket cancellation and refund.
+    """
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+   
+    def post(self, request, ticket_id):
+        try:
+            ticket = Ticket.objects.select_related('order__user', 'seat').get(id=ticket_id)
+
+            if ticket.status == 'cancelled':
+                return Response({'success': False, 'message': 'Ticket is already cancelled.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            ticket.status = 'cancelled'
+            ticket.related_data = f"Cancelled on {timezone.now()}"   
+            ticket.save()
+
+            wallet, _ = Wallet.objects.get_or_create(user=request.user)
+
+            refund_amount = Decimal(str(ticket.amount))  
+            wallet.balance += refund_amount
+            wallet.save() 
+
+            Transaction.objects.create(
+                wallet=wallet,
+                amount=refund_amount,
+                transaction_type='credit',
+                description=f"Refund for cancelled ticket (Seat: {ticket.seat.seat_number})"
+            )
+
+            if ticket.seat:
+                ticket.seat.status = 'available'   
+                ticket.seat.save()   
+
+            return Response({
+                'success': True,
+                'message': 'Ticket cancelled successfully, refund issued, and seat released.',
+                'refund_amount': str(refund_amount),   
+                'wallet_balance': str(wallet.balance)   
+            }, status=status.HTTP_200_OK)
+
+        except Ticket.DoesNotExist:
+            return Response({'success': False, 'message': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'success': False, 'message': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

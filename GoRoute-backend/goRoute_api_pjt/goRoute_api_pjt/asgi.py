@@ -7,10 +7,26 @@ For more information on this file, see
 https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
 """
 
-import os
+# import os
 
+# from django.core.asgi import get_asgi_application
+
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'goRoute_api_pjt.settings')
+
+# application = get_asgi_application()
+
+
+import os
 from django.core.asgi import get_asgi_application
+from channels.routing import ProtocolTypeRouter, URLRouter  # Import URLRouter here
+from channels.auth import AuthMiddlewareStack
+from user_app.routing import websocket_urlpatterns  # Import routing configuration
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'goRoute_api_pjt.settings')
 
-application = get_asgi_application()
+application = ProtocolTypeRouter({
+    "http": get_asgi_application(),
+    "websocket": AuthMiddlewareStack(
+        URLRouter(websocket_urlpatterns)  # This line correctly uses URLRouter
+    ),
+})
