@@ -30,6 +30,10 @@ import json
 import razorpay
 from django.conf import settings
 from decimal import Decimal
+
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 # Create your views here.
 
 
@@ -712,6 +716,8 @@ class PaymentSuccessAPIView(APIView):
             # Update order status
             order.status = 'confirmed'
             order.save()
+        
+            
 
             seat_numbers = order.selected_seats
             if not seat_numbers:
@@ -743,6 +749,58 @@ class PaymentSuccessAPIView(APIView):
 
             order.amount = total_amount
             order.save()
+
+
+            # user_email = order.email
+            # if user_email:
+            #     subject = f"Your Ticket Booking Confirmation - {order.id}"
+            #     context = {
+            #         'user_name': order.name,
+            #         'seat_numbers': [ticket.seat.seat_number for ticket in booked_seats],
+            #         'total_amount': total_amount,
+            #         'from_city': order.from_city,
+            #         'to_city': order.to_city,
+            #         'date': order.date,
+            #         'ticket_details': booked_seats
+            #     }
+
+            #     # Render email template for HTML and plain text
+            #     html_message = render_to_string('emails/ticket_confirmation.html', context)
+            #     plain_message = strip_tags(html_message)
+
+            #     send_mail(
+            #         subject,
+            #         plain_message,
+            #         'rabeehpuzhakkalakath8547@example.com',  # Sender email
+            #         [user_email],  # Recipient email
+            #         html_message=html_message  # HTML version
+            #     )
+
+            user_email = order.email
+            seat_details = "\n".join([f"Seat Number: {ticket.seat.seat_number}, Status: {ticket.status}" for ticket in booked_seats])
+            email_subject = "Your Ticket Booking Confirmation"
+            email_message = f"""
+            Dear {order.name},
+
+            Your booking has been confirmed. Below are your ticket details:
+
+            Seats:
+            {seat_details}
+
+            Total Amount: {total_amount}
+
+            Thank you for booking with us!
+
+            Best Regards,
+            The Booking Team
+            """
+
+            send_mail(
+                subject=email_subject,
+                message=email_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user_email],
+            )
 
             # Bus Owner Wallet
             bus_owner = CustomUser.objects.get(id=order.bus.bus_owner_id)
@@ -779,101 +837,7 @@ class PaymentSuccessAPIView(APIView):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
-    # def post(self, request, *args, **kwargs):
-    #     try:
-    #         data = request.data if hasattr(request, 'data') else json.loads(request.body)
-
-    #         payment_id = data.get('payment_id')
-    #         order_id = data.get('order_id')
-    #         signature = data.get('signature')
-
-    #         if not payment_id or not order_id or not signature:
-    #             return JsonResponse({'error': 'Payment ID, Order ID, and Signature are required.'}, status=400)
-
-    #         order = Order.objects.filter(razorpay_order_id=order_id).first()
-
-    #         if not order:
-    #             return JsonResponse({'error': 'Order not found.'}, status=404)
-
-    #         razorpay_key_id = os.getenv('RAZORPAY_KEY_ID')
-    #         razorpay_key_secret = os.getenv('RAZORPAY_KEY_SECRET')
-    #         client = razorpay.Client(auth=(razorpay_key_id, razorpay_key_secret))
-
-    #         try:
-    #             client.utility.verify_payment_signature({
-    #                 'razorpay_order_id': order_id,
-    #                 'razorpay_payment_id': payment_id,
-    #                 'razorpay_signature': signature
-    #             })
-    #         except razorpay.errors.SignatureVerificationError:
-    #             return JsonResponse({'error': 'Payment verification failed.'}, status=400)
-
-    #         # Update order status
-    #         order.status = 'confirmed'
-    #         order.save()
-
-    #         seat_numbers = order.selected_seats
-    #         if not seat_numbers:
-    #             return JsonResponse({'error': 'No seats specified in the order.'}, status=400)
-
-    #         booked_seats = []
-    #         total_amount = Decimal(0)  # Use Decimal for precise calculations
-
-    #         for seat_number in seat_numbers:
-    #             seat = Seat.objects.create(
-    #                 bus=order.bus,
-    #                 seat_number=seat_number,
-    #                 status='booked',
-    #                 from_city=order.from_city,
-    #                 to_city=order.to_city,
-    #                 date=order.date
-    #             )
-
-    #             ticket_amount = Decimal(order.amount) / Decimal(len(seat_numbers))
-    #             ticket = Ticket.objects.create(
-    #                 order=order,
-    #                 seat=seat,
-    #                 amount=ticket_amount,
-    #                 status='confirmed'
-    #             )
-
-    #             booked_seats.append(ticket)
-    #             total_amount += ticket.amount
-
-    #             # Notify all clients about the booked seat via WebSocket
-    #             self.send_seat_update_to_group(order.bus.id, seat_number, 'booked')
-
-    #         order.amount = total_amount
-    #         order.save()
-
-    #         # Process wallet transactions for the bus owner and admin here...
-
-    #         return JsonResponse({
-    #             'message': 'Payment successful and order confirmed.',
-    #             'seat_numbers': [ticket.seat.seat_number for ticket in booked_seats],
-    #             'total_amount': float(total_amount)
-    #         })
-
-    #     except Exception as e:
-    #         return JsonResponse({'error': str(e)}, status=500)
-
-    # def send_seat_update_to_group(self, bus_id, seat_number, status):
-    #     # Get the channel layer
-    #     channel_layer = get_channel_layer()
-
-    #     # Send the message to the WebSocket group (bus_id)
-    #     group_name = f"bus_{bus_id}_seats"
-
-    #     # Use async_to_sync to call async method in a synchronous view
-    #     async_to_sync(channel_layer.group_send)(
-    #         group_name,
-    #         {
-    #             'type': 'seat_update',
-    #             'seat_number': seat_number,
-    #             'status': status
-    #         }
-    #     )
-
+   
 
 
 
@@ -943,9 +907,7 @@ class WalletAPIView(APIView):
       
 
 class CancelTicketAPIView(APIView):
-    """
-    API for ticket cancellation and refund.
-    """
+   
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 

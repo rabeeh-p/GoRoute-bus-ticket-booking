@@ -9,6 +9,7 @@ ROLE_CHOICES = (
     ('super_admin', 'Super Admin'),
     ('bus_owner', 'Bus Owner'),
     ('normal_user', 'Normal User'),
+    ('conductor', 'Conductor'), 
 )
 
 class CustomUser(AbstractUser):
@@ -166,6 +167,8 @@ class ScheduledBus(models.Model):
     started= models.BooleanField(default=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     bus_owner_id = models.PositiveIntegerField(null=True, blank=True)
+    current_stop = models.CharField(max_length=255, null=True, blank=True)
+    stop_number = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"Scheduled Bus {self.bus_number} on {self.scheduled_date}"
@@ -298,4 +301,52 @@ class Transaction(models.Model):
 
 
 
+
+class StopStatusUpdate(models.Model):
+    stop = models.ForeignKey(ScheduledStop, on_delete=models.CASCADE, related_name='status_updates')   
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)   
+    scheduled_bus = models.ForeignKey(ScheduledBus, on_delete=models.CASCADE, related_name='status_updates')   
+    status = models.CharField(max_length=50, choices=[('on_time', 'On Time'), ('delayed', 'Delayed'), ('arrived', 'Arrived')])  
+    updated_at = models.DateTimeField(auto_now=True)   
+
+    def __str__(self):
+        return f"Status update for {self.stop.stop_name} on Bus {self.scheduled_bus.bus_number} by {self.user.username} at {self.updated_at}"
+
+
+
+class Conductor(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='conductor_profile')  
+    license_number = models.CharField(max_length=100, unique=True)   
+    phone_number = models.CharField(max_length=15, null=True, blank=True)   
+    hired_date = models.DateField(null=True, blank=True)   
+    name = models.CharField(max_length=255,null=True, blank=True) 
+    travels = models.ForeignKey(
+        BusOwnerModel, 
+        on_delete=models.CASCADE, 
+        related_name='conductors'
+    )  
+    is_active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Conductor {self.user.username} (License: {self.license_number})"
+    
+
+
+class ConductorScheduledBus(models.Model):
+    conductor = models.OneToOneField(
+        Conductor, 
+        on_delete=models.CASCADE, 
+        related_name='scheduled_bus'   
+    )
+    scheduled_bus = models.ForeignKey(
+        ScheduledBus, 
+        on_delete=models.CASCADE, 
+        related_name='conductor_schedules'
+    )   
+    shift_date = models.DateField(null=True, blank=True)   
+    shift_start_time = models.TimeField(null=True, blank=True)   
+    shift_end_time = models.TimeField(null=True, blank=True)  
+
+    def __str__(self):
+        return f"Conductor {self.conductor.user.username} on Bus {self.scheduled_bus.bus_number} - {self.shift_date or 'No Date'}"
 

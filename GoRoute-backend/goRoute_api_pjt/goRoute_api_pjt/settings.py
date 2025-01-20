@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'bus_owner_app',
     'channels',
     'user_app',
+    'conductor_app',
 
 
     'allauth',

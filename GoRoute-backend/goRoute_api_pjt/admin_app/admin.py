@@ -21,6 +21,10 @@ admin.site.register(Ticket)
 
 admin.site.register(Wallet)
 admin.site.register(Transaction)
+admin.site.register(StopStatusUpdate)
+
+admin.site.register(Conductor)
+admin.site.register(ConductorScheduledBus)
 
 
 

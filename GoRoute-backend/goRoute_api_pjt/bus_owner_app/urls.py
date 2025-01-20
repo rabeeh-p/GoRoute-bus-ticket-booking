@@ -27,4 +27,7 @@ urlpatterns = [
 
     path('busowner-dashboard/scheduled-buses/', ScheduledBusListView.as_view(), name='scheduled-buses-list'),
     path('scheduled-buses/<int:busId>/', ScheduledBusDetailView.as_view(), name='scheduled-bus-detail'),
+
+    path('register_conductor/', ConductorRegistrationAPIView.as_view(), name='register_conductor'),
+    path('conductors/', BusOwnerConductorsAPIView.as_view(), name='bus-owner-conductors'),
 ]

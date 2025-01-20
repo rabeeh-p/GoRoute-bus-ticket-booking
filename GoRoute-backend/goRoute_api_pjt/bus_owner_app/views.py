@@ -431,6 +431,79 @@ class AddBusView(APIView):
 
 
 
+# working
+# class ScheduleBusView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     authentication_classes = [JWTAuthentication]
+
+#     def post(self, request, bus_id):
+#         try:
+#             bus = BusModel.objects.get(id=bus_id)
+
+#             route_id = request.data.get('route_id')
+#             if not route_id:
+#                 return Response({"error": "route_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+#             route = RouteModel.objects.get(id=route_id)
+
+#             stops = RouteStopModel.objects.filter(route_id=route_id).order_by('stop_order')
+#             if not stops.exists():
+#                 return Response({"error": "No stops found for the provided route"}, status=status.HTTP_404_NOT_FOUND)
+
+#             scheduled_date = request.data.get('scheduled_date')
+#             if not scheduled_date:
+#                 return Response({"error": "scheduled_date is required"}, status=status.HTTP_400_BAD_REQUEST)
+#             print(scheduled_date,'date')
+#             try:
+#                 scheduled_date = datetime.fromisoformat(scheduled_date).date()
+
+#                 if scheduled_date <= datetime.now().date():
+#                     return Response({"error": "Scheduled date must be in the future"}, status=status.HTTP_400_BAD_REQUEST)
+
+#             except ValueError:
+#                 return Response({"error": "Invalid date format. Please use a valid ISO 8601 format (e.g., YYYY-MM-DDTHH:MM)"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+#             scheduled_bus = ScheduledBus.objects.create(
+#                 bus_number=bus.bus_number,
+#                 name=bus.name,
+#                 bus_owner_name=bus.bus_owner.travel_name,  
+#                 bus_type=bus.bus_type.name,   
+#                 seat_type=bus.bus_type.seat_type,  
+#                 seat_count=bus.bus_type.seat_count,   
+#                 route=route.route_name,   
+#                 scheduled_date=scheduled_date,
+#                 description=bus.description,
+#                 started=False,
+#                 bus_owner_id=bus.bus_owner.user.id,
+#                 # bus_owner_id=bus.bus_owner.id 
+#             )
+
+#             for stop in stops:
+#                 ScheduledStop.objects.create(
+#                     scheduled_bus=scheduled_bus,
+#                     stop_name=stop.stop_name,
+#                     stop_order=stop.stop_order,
+#                     arrival_time=stop.arrival_time,
+#                     departure_time=stop.departure_time,
+#                     distance_km=stop.distance_in_km
+#                 )
+
+#             bus.Scheduled = True
+#             bus.save()
+
+#             return Response({
+#                 "message": "Bus scheduled successfully",
+#                 "scheduled_bus_id": scheduled_bus.id,
+#             }, status=status.HTTP_201_CREATED)
+
+#         except BusModel.DoesNotExist:
+#             return Response({"error": "Bus not found"}, status=status.HTTP_404_NOT_FOUND)
+#         except RouteModel.DoesNotExist:
+#             return Response({"error": "Route not found"}, status=status.HTTP_404_NOT_FOUND)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ScheduleBusView(APIView):
     permission_classes = [IsAuthenticated]
@@ -453,7 +526,6 @@ class ScheduleBusView(APIView):
             scheduled_date = request.data.get('scheduled_date')
             if not scheduled_date:
                 return Response({"error": "scheduled_date is required"}, status=status.HTTP_400_BAD_REQUEST)
-            print(scheduled_date,'date')
             try:
                 scheduled_date = datetime.fromisoformat(scheduled_date).date()
 
@@ -461,22 +533,20 @@ class ScheduleBusView(APIView):
                     return Response({"error": "Scheduled date must be in the future"}, status=status.HTTP_400_BAD_REQUEST)
 
             except ValueError:
-                return Response({"error": "Invalid date format. Please use a valid ISO 8601 format (e.g., YYYY-MM-DDTHH:MM)"}, status=status.HTTP_400_BAD_REQUEST)
-
+                return Response({"error": "Invalid date format. Please use a valid ISO 8601 format (e.g., YYYY-MM-DD)"}, status=status.HTTP_400_BAD_REQUEST)
 
             scheduled_bus = ScheduledBus.objects.create(
                 bus_number=bus.bus_number,
                 name=bus.name,
-                bus_owner_name=bus.bus_owner.travel_name,  
-                bus_type=bus.bus_type.name,   
-                seat_type=bus.bus_type.seat_type,  
-                seat_count=bus.bus_type.seat_count,   
-                route=route.route_name,   
+                bus_owner_name=bus.bus_owner.travel_name,
+                bus_type=bus.bus_type.name,
+                seat_type=bus.bus_type.seat_type,
+                seat_count=bus.bus_type.seat_count,
+                route=route.route_name,
                 scheduled_date=scheduled_date,
                 description=bus.description,
                 started=False,
                 bus_owner_id=bus.bus_owner.user.id,
-                # bus_owner_id=bus.bus_owner.id 
             )
 
             for stop in stops:
@@ -491,6 +561,19 @@ class ScheduleBusView(APIView):
 
             bus.Scheduled = True
             bus.save()
+
+            conductor_id = request.data.get('conductor_id')   
+            if conductor_id:
+                try:
+                    conductor = Conductor.objects.get(id=conductor_id)
+                    conductor.is_active=True
+                    conductor.save()
+                    ConductorScheduledBus.objects.create(
+                        conductor=conductor,
+                        scheduled_bus=scheduled_bus
+                    )
+                except Conductor.DoesNotExist:
+                    return Response({"error": f"Conductor with ID {conductor_id} not found"}, status=status.HTTP_404_NOT_FOUND)
 
             return Response({
                 "message": "Bus scheduled successfully",
@@ -686,3 +769,82 @@ class OrderDetailsView(APIView):
             "order": order_data,
             "tickets": tickets_data
         }, status=status.HTTP_200_OK)
+    
+
+
+
+# class ConductorRegistrationAPIView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     authentication_classes = [JWTAuthentication]
+
+#     def post(self, request, *args, **kwargs):
+#         # Ensure the user is a bus owner
+#         if not hasattr(request.user, 'bus_owner_profile'):
+#             return Response(
+#                 {"error": "Only bus owners can register conductors."},
+#                 status=status.HTTP_403_FORBIDDEN,
+#             )
+
+#         # Get the bus owner's travels
+#         travels = request.user.bus_owner_profile
+
+#         # Add the travels to the serializer data
+#         serializer = ConductorRegistrationSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save(travels=travels)
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class ConductorRegistrationAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response(
+                {"error": "Authentication required."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        if not hasattr(request.user, 'bus_owner'):
+            return Response(
+                {"error": "Only bus owners can register conductors."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        bus_owner_profile = request.user.bus_owner
+
+        serializer = ConductorRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(travels=bus_owner_profile)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class BusOwnerConductorsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        if not hasattr(request.user, 'bus_owner'):
+            return Response(
+                {"error": "Only bus owners can view conductors."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        
+        bus_owner_profile = request.user.bus_owner
+        print(bus_owner_profile,'prifile')
+        conductors = Conductor.objects.filter(travels=bus_owner_profile)
+
+        serializer = ConductorSerializer(conductors, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+
+
+

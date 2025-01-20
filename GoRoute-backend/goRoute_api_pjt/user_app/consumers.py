@@ -3,21 +3,19 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 class SeatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print("WebSocket connected")  # Confirm connection
+        print("WebSocket connected")  
         await self.accept()
 
     async def disconnect(self, close_code):
-        # Log disconnection
-        print("WebSocket disconnected")  # Confirm disconnection
-        
+        print("WebSocket disconnected")   
+    
     async def receive(self, text_data):
-        # Log the received message for debugging
         print(f"Received message: {text_data}")
         try:
-            data = json.loads(text_data)  # Decode the incoming message
+            data = json.loads(text_data)  
             message = data.get('message', 'Hello from Django WebSocket!')
-            print(f"Sending message back: {message}")  # Log the message to be sent
-            await self.send(text_data=json.dumps({'message': message}))  # Send the response
+            print(f"Sending message back: {message}")  
+            await self.send(text_data=json.dumps({'message': message}))   
         except json.JSONDecodeError:
             print("Error: Received invalid JSON data.")
 
