@@ -740,7 +740,7 @@ class BusSeatsAPIView(APIView):
         
         for order in orders:
             seats = []
-            tickets = Ticket.objects.filter(order=order)
+            tickets = Ticket.objects.filter(order=order,seat__status='booked')
 
             for ticket in tickets:
                 seat_data = {

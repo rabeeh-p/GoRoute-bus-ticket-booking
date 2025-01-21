@@ -687,6 +687,137 @@ class PaymentSuccessAPIView(APIView):
     
     
 
+    # def post(self, request, *args, **kwargs):
+    #     try:
+    #         data = request.data if hasattr(request, 'data') else json.loads(request.body)
+
+    #         payment_id = data.get('payment_id')
+    #         order_id = data.get('order_id')
+    #         signature = data.get('signature')
+
+    #         if not payment_id or not order_id or not signature:
+    #             return JsonResponse({'error': 'Payment ID, Order ID, and Signature are required.'}, status=400)
+
+    #         order = Order.objects.filter(razorpay_order_id=order_id).first()
+
+    #         if not order:
+    #             return JsonResponse({'error': 'Order not found.'}, status=404)
+
+    #         razorpay_key_id = os.getenv('RAZORPAY_KEY_ID')
+    #         razorpay_key_secret = os.getenv('RAZORPAY_KEY_SECRET')
+    #         client = razorpay.Client(auth=(razorpay_key_id, razorpay_key_secret))
+
+    #         try:
+    #             client.utility.verify_payment_signature({
+    #                 'razorpay_order_id': order_id,
+    #                 'razorpay_payment_id': payment_id,
+    #                 'razorpay_signature': signature
+    #             })
+    #         except razorpay.errors.SignatureVerificationError:
+    #             return JsonResponse({'error': 'Payment verification failed.'}, status=400)
+
+    #         # Update order status
+    #         order.status = 'confirmed'
+    #         order.save()
+        
+            
+
+    #         seat_numbers = order.selected_seats
+    #         if not seat_numbers:
+    #             return JsonResponse({'error': 'No seats specified in the order.'}, status=400)
+
+    #         booked_seats = []
+    #         total_amount = Decimal(0)  # Use Decimal for precise calculations
+
+    #         for seat_number in seat_numbers:
+    #             seat = Seat.objects.create(
+    #                 bus=order.bus,
+    #                 seat_number=seat_number,
+    #                 status='booked',
+    #                 from_city=order.from_city,
+    #                 to_city=order.to_city,
+    #                 date=order.date
+    #             )
+
+    #             ticket_amount = Decimal(order.amount) / Decimal(len(seat_numbers))
+    #             ticket = Ticket.objects.create(
+    #                 order=order,
+    #                 seat=seat,
+    #                 amount=ticket_amount,
+    #                 status='confirmed'
+    #             )
+
+    #             booked_seats.append(ticket)
+    #             total_amount += ticket.amount
+
+    #         order.amount = total_amount
+    #         order.save()
+
+
+           
+
+    #         user_email = order.email
+    #         seat_details = "\n".join([f"Seat Number: {ticket.seat.seat_number}, Status: {ticket.status}" for ticket in booked_seats])
+    #         email_subject = "Your Ticket Booking Confirmation"
+    #         email_message = f"""
+    #         Dear {order.name},
+
+    #         Your booking has been confirmed. Below are your ticket details:
+
+    #         Seats:
+    #         {seat_details}
+
+    #         Total Amount: {total_amount}
+
+    #         Thank you for booking with us!
+
+    #         Best Regards,
+    #         The Booking Team
+    #         """
+
+    #         send_mail(
+    #             subject=email_subject,
+    #             message=email_message,
+    #             from_email=settings.DEFAULT_FROM_EMAIL,
+    #             recipient_list=[user_email],
+    #         )
+
+    #         # Bus Owner Wallet
+    #         bus_owner = CustomUser.objects.get(id=order.bus.bus_owner_id)
+    #         bus_owner_wallet, _ = Wallet.objects.get_or_create(user=bus_owner)
+
+    #         bus_owner_wallet.credit(total_amount)
+    #         Transaction.objects.create(
+    #             wallet=bus_owner_wallet,
+    #             amount=total_amount,
+    #             transaction_type='credit',
+    #             description="Amount credited to bus owner's wallet after ticket booking1"
+    #         )
+
+    #         # Admin Wallet (5% commission)
+    #         super_admin = CustomUser.objects.filter(role='super_admin').first()
+    #         if super_admin:
+    #             admin_wallet, _ = Wallet.objects.get_or_create(user=super_admin)
+    #             admin_credit = total_amount * Decimal('0.05')
+    #             admin_wallet.credit(admin_credit)
+
+    #             Transaction.objects.create(
+    #                 wallet=admin_wallet,
+    #                 amount=admin_credit,
+    #                 transaction_type='credit',
+    #                 description="5% credited to admin's wallet from booking"
+    #             )
+
+    #         return JsonResponse({
+    #             'message': 'Payment successful and order confirmed.',
+    #             'seat_numbers': [ticket.seat.seat_number for ticket in booked_seats],
+    #             'total_amount': float(total_amount)  # Convert Decimal to float for response
+    #         })
+
+    #     except Exception as e:
+    #         return JsonResponse({'error': str(e)}, status=500)
+
+
     def post(self, request, *args, **kwargs):
         try:
             data = request.data if hasattr(request, 'data') else json.loads(request.body)
@@ -719,15 +850,13 @@ class PaymentSuccessAPIView(APIView):
             # Update order status
             order.status = 'confirmed'
             order.save()
-        
-            
 
             seat_numbers = order.selected_seats
             if not seat_numbers:
                 return JsonResponse({'error': 'No seats specified in the order.'}, status=400)
 
             booked_seats = []
-            total_amount = Decimal(0)  # Use Decimal for precise calculations
+            total_amount = Decimal(0)
 
             for seat_number in seat_numbers:
                 seat = Seat.objects.create(
@@ -753,32 +882,7 @@ class PaymentSuccessAPIView(APIView):
             order.amount = total_amount
             order.save()
 
-
-            # user_email = order.email
-            # if user_email:
-            #     subject = f"Your Ticket Booking Confirmation - {order.id}"
-            #     context = {
-            #         'user_name': order.name,
-            #         'seat_numbers': [ticket.seat.seat_number for ticket in booked_seats],
-            #         'total_amount': total_amount,
-            #         'from_city': order.from_city,
-            #         'to_city': order.to_city,
-            #         'date': order.date,
-            #         'ticket_details': booked_seats
-            #     }
-
-            #     # Render email template for HTML and plain text
-            #     html_message = render_to_string('emails/ticket_confirmation.html', context)
-            #     plain_message = strip_tags(html_message)
-
-            #     send_mail(
-            #         subject,
-            #         plain_message,
-            #         'rabeehpuzhakkalakath8547@example.com',  # Sender email
-            #         [user_email],  # Recipient email
-            #         html_message=html_message  # HTML version
-            #     )
-
+            # Send email confirmation
             user_email = order.email
             seat_details = "\n".join([f"Seat Number: {ticket.seat.seat_number}, Status: {ticket.status}" for ticket in booked_seats])
             email_subject = "Your Ticket Booking Confirmation"
@@ -805,42 +909,51 @@ class PaymentSuccessAPIView(APIView):
                 recipient_list=[user_email],
             )
 
-            # Bus Owner Wallet
-            bus_owner = CustomUser.objects.get(id=order.bus.bus_owner_id)
-            bus_owner_wallet, _ = Wallet.objects.get_or_create(user=bus_owner)
-
-            bus_owner_wallet.credit(total_amount)
-            Transaction.objects.create(
-                wallet=bus_owner_wallet,
-                amount=total_amount,
-                transaction_type='credit',
-                description="Amount credited to bus owner's wallet after ticket booking1"
-            )
-
-            # Admin Wallet (5% commission)
             super_admin = CustomUser.objects.filter(role='super_admin').first()
             if super_admin:
                 admin_wallet, _ = Wallet.objects.get_or_create(user=super_admin)
-                admin_credit = total_amount * Decimal('0.05')
-                admin_wallet.credit(admin_credit)
 
+                admin_wallet.credit(total_amount)
                 Transaction.objects.create(
                     wallet=admin_wallet,
-                    amount=admin_credit,
+                    amount=total_amount,
                     transaction_type='credit',
-                    description="5% credited to admin's wallet from booking"
+                    description="Total amount credited to admin's wallet from booking"
                 )
+
+                bus_owner = CustomUser.objects.get(id=order.bus.bus_owner_id)
+                bus_owner_wallet, _ = Wallet.objects.get_or_create(user=bus_owner)
+
+                bus_owner_credit = total_amount * Decimal('0.95')   
+                if admin_wallet.balance >= bus_owner_credit:
+                    admin_wallet.debit(bus_owner_credit)
+                    Transaction.objects.create(
+                        wallet=admin_wallet,
+                        amount=bus_owner_credit,
+                        transaction_type='debit',
+                        description="Amount debited from admin's wallet to bus owner's wallet"
+                    )
+
+                    bus_owner_wallet.credit(bus_owner_credit)
+                    Transaction.objects.create(
+                        wallet=bus_owner_wallet,
+                        amount=bus_owner_credit,
+                        transaction_type='credit',
+                        description="Amount credited to bus owner's wallet after ticket booking"
+                    )
+                else:
+                    raise ValueError("Admin wallet does not have sufficient balance to transfer funds to the bus owner.")
 
             return JsonResponse({
                 'message': 'Payment successful and order confirmed.',
                 'seat_numbers': [ticket.seat.seat_number for ticket in booked_seats],
-                'total_amount': float(total_amount)  # Convert Decimal to float for response
+                'total_amount': float(total_amount)   
             })
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
-   
+    
 
 
 
