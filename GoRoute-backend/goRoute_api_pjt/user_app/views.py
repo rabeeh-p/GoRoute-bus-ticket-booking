@@ -34,6 +34,8 @@ from decimal import Decimal
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+
+from rest_framework.exceptions import NotFound
 # Create your views here.
 
 
@@ -864,6 +866,7 @@ class TicketListView(APIView):
             order = Order.objects.get(id=order_id, user=profile_obj)
             tickets = Ticket.objects.filter(order=order)
             serializer = TicketSerializer(tickets, many=True)
+            print(order.bus,'order')
             order_details = {
             "id": order.id,
             "date": order.date,
@@ -871,6 +874,7 @@ class TicketListView(APIView):
             "status": order.status,
             "from_city":order.from_city,
             "to_city":order.to_city,
+            "bus_id": order.bus.id,
             }
             return Response({
                 "tickets": serializer.data,
@@ -951,3 +955,51 @@ class CancelTicketAPIView(APIView):
             return Response({'success': False, 'message': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'success': False, 'message': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+
+
+class BusTrackingAPIView(APIView):
+    def get(self, request, bus_id):
+        try:
+            print('is working veiew')
+            print(bus_id,'bus id')
+            scheduled_bus = ScheduledBus.objects.get(id=bus_id)
+            stops = ScheduledStop.objects.filter(scheduled_bus=scheduled_bus).order_by('stop_order')
+
+            current_stop = scheduled_bus.current_stop
+            current_stop_data = None
+            next_stops = []
+            total_stops = []
+
+            for stop in stops:
+                total_stops.append(stop)
+                if stop.stop_name == current_stop:
+                    current_stop_data = stop
+                elif current_stop_data:
+                    next_stops.append(stop)
+
+            bus_data = ScheduledBusSerializer(scheduled_bus).data
+            current_stop_serialized = ScheduledStopSerializer(current_stop_data).data if current_stop_data else None
+            if current_stop_serialized:
+                current_stop_serialized['stop_number'] = scheduled_bus.stop_number  
+            next_stops_serialized = ScheduledStopSerializer(next_stops, many=True).data
+            total_stops_serialized = ScheduledStopSerializer(total_stops, many=True).data   
+
+            response_data = {
+                "bus": bus_data,
+                "current_stop": current_stop_serialized,
+                "next_stops": next_stops_serialized,
+                "total_stops": total_stops_serialized,
+            }
+
+            return Response(response_data)
+
+        except ScheduledBus.DoesNotExist:
+            raise NotFound("Bus not found")
+        
+
+
+

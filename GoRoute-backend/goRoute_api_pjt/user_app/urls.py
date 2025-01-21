@@ -31,7 +31,7 @@ urlpatterns = [
     
 
 
-
+    path('bus-tracking/<int:bus_id>/', BusTrackingAPIView.as_view(), name='bus_tracking'),
 
 
 

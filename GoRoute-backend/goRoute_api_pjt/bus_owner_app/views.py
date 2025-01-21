@@ -773,28 +773,33 @@ class OrderDetailsView(APIView):
 
 
 
+
+
 # class ConductorRegistrationAPIView(APIView):
 #     permission_classes = [IsAuthenticated]
 #     authentication_classes = [JWTAuthentication]
 
 #     def post(self, request, *args, **kwargs):
-#         # Ensure the user is a bus owner
-#         if not hasattr(request.user, 'bus_owner_profile'):
+#         if not request.user.is_authenticated:
 #             return Response(
-#                 {"error": "Only bus owners can register conductors."},
-#                 status=status.HTTP_403_FORBIDDEN,
+#                 {"error": "Authentication required."},
+#                 status=status.HTTP_401_UNAUTHORIZED
 #             )
 
-#         # Get the bus owner's travels
-#         travels = request.user.bus_owner_profile
+#         if not hasattr(request.user, 'bus_owner'):
+#             return Response(
+#                 {"error": "Only bus owners can register conductors."},
+#                 status=status.HTTP_403_FORBIDDEN
+#             )
 
-#         # Add the travels to the serializer data
+#         bus_owner_profile = request.user.bus_owner
+
 #         serializer = ConductorRegistrationSerializer(data=request.data)
 #         if serializer.is_valid():
-#             serializer.save(travels=travels)
+#             serializer.save(travels=bus_owner_profile)
 #             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
 
 class ConductorRegistrationAPIView(APIView):
@@ -815,6 +820,21 @@ class ConductorRegistrationAPIView(APIView):
             )
 
         bus_owner_profile = request.user.bus_owner
+
+        username = request.data.get('username')
+        license_number = request.data.get('license_number')
+
+        if CustomUser.objects.filter(username=username).exists():
+            return Response(
+                {"error": "A conductor with this username already exists."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if Conductor.objects.filter(license_number=license_number).exists():
+            return Response(
+                {"error": "A conductor with this license number already exists."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         serializer = ConductorRegistrationSerializer(data=request.data)
         if serializer.is_valid():
