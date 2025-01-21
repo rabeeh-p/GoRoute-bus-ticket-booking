@@ -425,6 +425,8 @@ const ScheduledBusDetails = () => {
         </div>
       </div>
 
+      
+
       <div className="bg-white shadow-lg rounded-lg p-6 mt-6">
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">Bus Layout</h2>
         <div className="flex flex-col items-center">

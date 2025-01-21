@@ -53,6 +53,7 @@ import ConductorLogin from './Pages/Conductor/ConductorLogin';
 import ConductorLandingPage from './Pages/Conductor/ConductorLandingPage';
 import DashboardConductor from './Pages/Conductor/DashboardConductor';
 import ConductorProtect from './Protect/ConductorProtect';
+import AdminWallet from './Pages/Admin/AdminWallet';
 function App() {
 
 
@@ -99,6 +100,7 @@ function App() {
           <Route path="bus-details/:busId" element={<BusDetails />} />
           <Route path="edit-bus-owner/:id" element={<EditBusOwnerForm />} />
           <Route path="user-creating" element={<UserCreating />} />
+          <Route path="admin-wallet" element={<AdminWallet />} />
 
 
         </Route>

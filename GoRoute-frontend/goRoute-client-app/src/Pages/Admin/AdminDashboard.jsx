@@ -14,6 +14,7 @@ import BusDetails from "./BusDetails";
 import BusSchedule from "../Bus_owners/BusSchedule";
 import EditBusOwnerForm from "./BusOwner/EditBusOwnerForm";
 import UserCreating from "./User/UserCreating";
+import AdminWallet from "./AdminWallet";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -78,6 +79,14 @@ const AdminDashboard = () => {
               </li>
               <li>
                 <a
+                  onClick={() => navigate('/admin-home/admin-wallet/')} 
+                  className="block py-2 px-4 hover:bg-red-700 rounded-lg transition duration-300"
+                >
+                  Wallet
+                </a>
+              </li>
+              <li>
+                <a
                   onClick={() => navigate('/admin-home/busowners-list')} 
                   className="block py-2 px-4 hover:bg-red-700 rounded-lg transition duration-300"
                 >
@@ -121,6 +130,8 @@ const AdminDashboard = () => {
               <Route path="bus-details/:busId" element={<BusDetails />} />
               <Route path="edit-bus-owner/:id" element={<EditBusOwnerForm />} />
               <Route path="user-creating" element={<UserCreating />} />
+              <Route path="admin-wallet" element={<AdminWallet />} />
+
             </Routes>
           </div>
         </main>

@@ -9,9 +9,6 @@ const BusTracking = () => {
   const [currentStopIndex, setCurrentStopIndex] = useState(0);
   const [busPosition, setBusPosition] = useState(0);
   const { busId } = useParams();
-  console.log(currentStopIndex,'index1');
-  console.log(busData,'bus');
-  
 
   useEffect(() => {
     const fetchBusData = async () => {
@@ -21,15 +18,9 @@ const BusTracking = () => {
         setBusData(data);
         setLoading(false);
 
-      
         if (data && data.current_stop && data.total_stops) {
-          
-          const currentIndex = data.current_stop.stop_number
-          console.log(currentIndex,'index2');
-          
-          setCurrentStopIndex(data.current_stop.stop_number);
-          console.log();
-          
+          const currentIndex = data.current_stop.stop_number;
+          setCurrentStopIndex(currentIndex);
 
           if (data.total_stops.length > 1) {
             setBusPosition((currentIndex / (data.total_stops.length - 1)) * 100);
@@ -42,7 +33,7 @@ const BusTracking = () => {
     };
 
     fetchBusData();
-  }, [busId]);  
+  }, [busId]);
 
   if (loading) {
     return <div className="text-center text-red-600 text-xl mt-8">Loading...</div>;
@@ -77,49 +68,48 @@ const BusTracking = () => {
           </div>
 
           {/* Full Route Progress */}
-          <div className="mb-8">
+          <div className="mb-8 relative">
             <h2 className="text-2xl font-semibold text-red-600 mb-4">Route Progress</h2>
             <div className="relative w-full h-6 bg-gray-200 rounded-full">
-              {/* Bus Progress Line */}
+              {/* Bus Stops */}
               {total_stops.map((stop, index) => (
                 <div
                   key={stop.stop_name}
-                  className={`absolute top-0 transform -translate-x-1/2 w-3 h-3 rounded-full ${index === currentStopIndex ? "bg-red-600" : "bg-gray-600"}`}
+                  className={`absolute top-0 transform -translate-x-1/2 w-4 h-4 rounded-full ${
+                    index === currentStopIndex ? "bg-red-600" : "bg-gray-600"
+                  }`}
                   style={{
                     left: `${(index / (total_stops.length - 1)) * 100}%`,
                   }}
                 />
               ))}
+
+              {/* Moving Bus Indicator */}
               <div
                 className="absolute top-0 w-8 h-8 bg-red-600 rounded-full shadow-lg flex items-center justify-center transition-all duration-500 ease-in-out"
-                style={{ left: `calc(${busPosition}% - 16px)`, top: "-8px" }}
+                style={{
+                  left: `calc(${busPosition}% - 16px)`,
+                  top: "-12px",
+                }}
               >
                 <Bus className="text-white w-5 h-5" />
               </div>
             </div>
-             
-            <div className="absolute top-8 w-full flex justify-between text-xs">
+
+            {/* Stop Labels */}
+            <div className="flex justify-between mt-2 text-xs">
               {total_stops.map((stop, index) => (
-                index === currentStopIndex ? (
-                  <div
-                    key={stop.stop_name}
-                    className="text-center text-red-600 font-medium"
-                    style={{
-                      left: `${(index / (total_stops.length - 1)) * 100}%`,
-                    }}
-                  >
-                    <div className="relative">
-                      <div
-                        className="absolute bottom-[-20px] text-center w-full text-xs text-red-600"
-                        style={{
-                          left: `calc(${(index / (total_stops.length - 1)) * 100}% - 12px)`,
-                        }}
-                      >
-                        {stop.stop_name}
-                      </div>
-                    </div>
-                  </div>
-                ) : null
+                <div
+                  key={stop.stop_name}
+                  className={`text-center ${
+                    index === currentStopIndex ? "text-red-600 font-medium" : "text-gray-600"
+                  }`}
+                  style={{
+                    width: `${100 / total_stops.length}%`,
+                  }}
+                >
+                  {stop.stop_name}
+                </div>
               ))}
             </div>
           </div>
@@ -128,8 +118,11 @@ const BusTracking = () => {
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-red-600 mb-4">Upcoming Stops</h2>
             <div className="space-y-4">
-              {next_stops.map((stop, index) => (
-                <div key={stop.stop_name} className="flex items-center justify-between bg-red-100 p-4 rounded-lg">
+              {next_stops.map((stop) => (
+                <div
+                  key={stop.stop_name}
+                  className="flex items-center justify-between bg-red-100 p-4 rounded-lg"
+                >
                   <div className="flex items-center space-x-4">
                     <MapPin className="text-red-600" />
                     <span className="text-lg font-medium text-red-600">{stop.stop_name}</span>
@@ -160,7 +153,9 @@ const BusTracking = () => {
               </div>
               <div className="bg-white p-4 shadow rounded-lg">
                 <div className="font-medium text-gray-600">Estimated Arrival</div>
-                <div className="text-lg text-red-600">{next_stops[currentStopIndex]?.arrival_time || "N/A"}</div>
+                <div className="text-lg text-red-600">
+                  {next_stops[currentStopIndex]?.arrival_time || "N/A"}
+                </div>
               </div>
             </div>
           </div>

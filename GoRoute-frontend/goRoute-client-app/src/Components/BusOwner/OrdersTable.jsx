@@ -6,8 +6,8 @@ const OrdersTable = ({ orders }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [confirmCancel, setConfirmCancel] = useState(false); // State for cancellation confirmation
-  const [ticketToCancel, setTicketToCancel] = useState(null); // Store ticket to cancel
+  const [confirmCancel, setConfirmCancel] = useState(false);  
+  const [ticketToCancel, setTicketToCancel] = useState(null);  
 
   const handleViewClick = async (order) => {
     setSelectedOrder(order);
@@ -30,11 +30,9 @@ const OrdersTable = ({ orders }) => {
   };
 
   const handleCancelClick = (ticket) => {
-    // Set ticket to be cancelled
     console.log(ticket, 'iddddddd');
     
-    setTicketToCancel(ticket);
-    // Show confirmation prompt
+    setTicketToCancel(ticket.id);
     setConfirmCancel(true);
   };
 
@@ -46,7 +44,6 @@ const OrdersTable = ({ orders }) => {
           alert('No access token found');
           return;
         }
-        // Make API call to cancel ticket
         await axiosInstance.post(`http://127.0.0.1:8000/api/tickets/${ticketToCancel}/cancel/`, { 
           headers: { 
             Authorization: `Bearer ${accessToken}`,
@@ -59,12 +56,13 @@ const OrdersTable = ({ orders }) => {
           tickets: prevState.tickets.filter((ticket) => ticket.id !== ticketToCancel.id),
         }));
         alert('Ticket cancelled successfully.');
+        window.location.reload();
       } catch (error) {
         console.error('Error canceling ticket:', error);
         alert('Failed to cancel ticket.');
       } finally {
-        setConfirmCancel(false); // Hide confirmation
-        setTicketToCancel(null); // Clear the ticket
+        setConfirmCancel(false);  
+        setTicketToCancel(null);  
       }
     }
   };
@@ -72,19 +70,17 @@ const OrdersTable = ({ orders }) => {
   const handleCloseModal = () => {
     setModalOpen(false);
     setSelectedOrder(null);
-    setConfirmCancel(false); // Reset confirmation when closing modal
+    setConfirmCancel(false);  
   };
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 mt-6">
       <h2 className="text-2xl font-semibold text-gray-700 mb-4">Booking Details</h2>
 
-      {/* Check if there are no orders */}
       {orders.length === 0 ? (
         <p>No Booking available.</p>
       ) : (
         <div className="overflow-x-auto">
-          {/* Responsive Table */}
           <table className="min-w-full table-auto">
             <thead>
               <tr className="bg-gray-200">
