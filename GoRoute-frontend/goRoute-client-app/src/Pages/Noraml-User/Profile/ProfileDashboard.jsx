@@ -23,7 +23,7 @@ const ProfileDashboard = () => {
                     <Route path="orders" element={<UserOrders />} />
                     <Route path="profile-edit" element={<UserProfileEdit />} />
                     <Route path="wallet" element={<Wallet />} />
-                    <Route path="bus-tracking" element={<BusTracking />} />
+                    <Route path="bus-tracking/:busId" element={<BusTracking />} />
                 </Routes>
             </div>
         </div>

@@ -9,6 +9,8 @@ const UserTickets = () => {
     const [loading, setLoading] = useState(true);
     const { orderId } = useParams();
     const navigate = useNavigate();
+    console.log(orderDetails,'order details');
+    
 
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken');
@@ -138,18 +140,20 @@ const UserTickets = () => {
                                         <span className="font-medium text-gray-700">date</span>
                                         <p>{new Date(orderDetails.date).toLocaleDateString()}</p>
                                     </div> */}
+
+                                    <div className="text-center py-4">
+                                        <button
+                                            className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition-all"
+                                            onClick={() => navigate(`/profile-dashboard/bus-tracking/${orderDetails.bus_id}`)}
+                                        >
+                                            Watch Live Showing
+                                        </button>
+                                    </div>
+
                                 </div>
                             </div>
                         )}
 
-                        <div className="text-center py-4">
-                            <button
-                                className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition-all"
-                                onClick={() => navigate('/profile-dashboard/bus-tracking')}
-                            >
-                                Watch Live Showing
-                            </button>
-                        </div>
 
                         {tickets.length > 0 ? (
                             <div className="p-6 bg-gray-50 rounded-lg shadow-md">
@@ -177,8 +181,8 @@ const UserTickets = () => {
                                                 </td>
                                                 <td
                                                     className={`border px-6 py-4 text-base ${ticket.status === 'confirmed'
-                                                            ? 'text-green-600 font-semibold'
-                                                            : 'text-red-600 font-semibold'
+                                                        ? 'text-green-600 font-semibold'
+                                                        : 'text-red-600 font-semibold'
                                                         }`}
                                                 >
                                                     {ticket.status}
