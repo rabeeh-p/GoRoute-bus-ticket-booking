@@ -155,7 +155,7 @@ const BusTracking = () => {
               <div className="bg-white p-4 shadow rounded-lg">
                 <div className="font-medium text-gray-600">Next Stop</div>
                 <div className="text-lg text-red-600">
-                  {next_stops[currentStopIndex]?.stop_name || "End of Route"}
+                  {next_stops[currentStopIndex - 2]?.stop_name || "End of Route"}
                 </div>
               </div>
               <div className="bg-white p-4 shadow rounded-lg">

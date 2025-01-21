@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import axiosInstance from '../../axios/axios';
 
 const OrdersTable = ({ orders }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false); // State for cancellation confirmation
+  const [ticketToCancel, setTicketToCancel] = useState(null); // Store ticket to cancel
 
   const handleViewClick = async (order) => {
     setSelectedOrder(order);
@@ -13,6 +16,7 @@ const OrdersTable = ({ orders }) => {
 
     try {
       const response = await axios.get(`http://127.0.0.1:8000/api/orders/${order.id}/details/`);
+      console.log(response.data, 'ticket');
       
       setSelectedOrder(prevState => ({
         ...prevState,
@@ -25,9 +29,50 @@ const OrdersTable = ({ orders }) => {
     }
   };
 
+  const handleCancelClick = (ticket) => {
+    // Set ticket to be cancelled
+    console.log(ticket, 'iddddddd');
+    
+    setTicketToCancel(ticket);
+    // Show confirmation prompt
+    setConfirmCancel(true);
+  };
+
+  const handleConfirmCancel = async () => {
+    if (ticketToCancel) {
+      try {
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          alert('No access token found');
+          return;
+        }
+        // Make API call to cancel ticket
+        await axiosInstance.post(`http://127.0.0.1:8000/api/tickets/${ticketToCancel}/cancel/`, { 
+          headers: { 
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data' 
+          }
+        });
+        
+        setSelectedOrder((prevState) => ({
+          ...prevState,
+          tickets: prevState.tickets.filter((ticket) => ticket.id !== ticketToCancel.id),
+        }));
+        alert('Ticket cancelled successfully.');
+      } catch (error) {
+        console.error('Error canceling ticket:', error);
+        alert('Failed to cancel ticket.');
+      } finally {
+        setConfirmCancel(false); // Hide confirmation
+        setTicketToCancel(null); // Clear the ticket
+      }
+    }
+  };
+
   const handleCloseModal = () => {
     setModalOpen(false);
     setSelectedOrder(null);
+    setConfirmCancel(false); // Reset confirmation when closing modal
   };
 
   return (
@@ -89,6 +134,16 @@ const OrdersTable = ({ orders }) => {
                       <p><strong>Seat Number:</strong> {ticket.seat_number}</p>
                       <p><strong>Status:</strong> {ticket.ticket_status}</p>
                       <p><strong>Amount:</strong> ${ticket.ticket_amount}</p>
+
+                      {/* Check if the ticket status is not 'cancelled' before showing the cancel button */}
+                      {ticket.ticket_status !== 'cancelled' && (
+                        <button
+                          onClick={() => handleCancelClick(ticket)}
+                          className="bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-700 mt-2"
+                        >
+                          Cancel Ticket
+                        </button>
+                      )}
                     </li>
                   ))
                 ) : (
@@ -97,9 +152,28 @@ const OrdersTable = ({ orders }) => {
               </ul>
             )}
 
+            {/* Confirmation Prompt for Cancel */}
+            {confirmCancel && (
+              <div className="mt-4 text-center">
+                <p>Are you sure you want to cancel this ticket?</p>
+                <button
+                  onClick={handleConfirmCancel}
+                  className="bg-red-600 text-white py-1 px-4 rounded-md hover:bg-red-700 mt-2"
+                >
+                  Yes, Cancel
+                </button>
+                <button
+                  onClick={() => setConfirmCancel(false)}
+                  className="bg-gray-500 text-white py-1 px-4 rounded-md hover:bg-gray-700 mt-2"
+                >
+                  No, Keep It
+                </button>
+              </div>
+            )}
+
             <button
               onClick={handleCloseModal}
-              className="mt-4 bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700"
+              className="mt-4 bg-gray-500 text-white py-1 px-4 rounded-md hover:bg-gray-700"
             >
               Close
             </button>
