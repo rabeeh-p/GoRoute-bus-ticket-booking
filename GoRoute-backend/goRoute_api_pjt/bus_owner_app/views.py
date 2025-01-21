@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from .Serializers import *
 
 from collections import defaultdict
-
+from django.db import transaction
 
 # Create your views here.
 
@@ -220,56 +220,6 @@ class RouteStopView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-    # def post(self, request, route_id):
-    #     try:
-    #         route = RouteModel.objects.get(id=route_id)
-    #     except RouteModel.DoesNotExist:
-    #         return Response({"detail": "Route not found."}, status=status.HTTP_404_NOT_FOUND)
-
-    #     stop_order = RouteStopModel.objects.filter(route=route).count() + 1
-        
-    #     data = request.data
-
-    #     if RouteStopModel.objects.filter(route=route, stop_name=data.get("stop_name")).exists():
-    #         return Response({"detail": "Stop name already exists for this route."}, status=status.HTTP_400_BAD_REQUEST)
-
-    #     arrival_time = data.get("arrival_time")
-    #     departure_time = data.get("departure_time")
-    #     if arrival_time and departure_time:
-    #         if arrival_time >= departure_time:
-    #             return Response({"detail": "Departure time must be after arrival time."}, status=status.HTTP_400_BAD_REQUEST)
-
-    #     distance_in_km = data.get("distance_in_km")
-    #     if distance_in_km is not None:
-    #         try:
-    #             distance_in_km = float(distance_in_km)
-    #         except ValueError:
-    #             return Response({"detail": "Distance in kilometers must be a valid number."}, status=status.HTTP_400_BAD_REQUEST)
-
-    #         if distance_in_km <= 0:
-    #             return Response({"detail": "Distance in kilometers must be positive."}, status=status.HTTP_400_BAD_REQUEST)
-
-    #         total_stop_distance = (
-    #             RouteStopModel.objects.filter(route=route).aggregate(total_distance=models.Sum('distance_in_km'))['total_distance'] or Decimal(0)
-    #         )
-
-    #         distance_in_km = Decimal(str(distance_in_km))
-
-    #         if total_stop_distance + distance_in_km > route.distance_in_km:
-    #             return Response(
-    #                 {"detail": "The total distance of stops cannot exceed the main route distance."},
-    #                 status=status.HTTP_400_BAD_REQUEST
-    #             )
-
-
-    #     serializer = RouteStopSerializer(data=data)
-    #     if serializer.is_valid():
-    #         serializer.save(route=route, stop_order=stop_order)
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     else:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
     def post(self, request, route_id):
         try:
             route = RouteModel.objects.get(id=route_id)
@@ -277,6 +227,7 @@ class RouteStopView(APIView):
             return Response({"detail": "Route not found."}, status=status.HTTP_404_NOT_FOUND)
 
         stop_order = RouteStopModel.objects.filter(route=route).count() + 1
+        
         data = request.data
 
         if RouteStopModel.objects.filter(route=route, stop_name=data.get("stop_name")).exists():
@@ -284,35 +235,9 @@ class RouteStopView(APIView):
 
         arrival_time = data.get("arrival_time")
         departure_time = data.get("departure_time")
-
-        def parse_time(time_str):
-            
-            try:
-                if "AM" in time_str.upper() or "PM" in time_str.upper():
-                    return datetime.strptime(time_str, '%I:%M %p').time()
-                if len(time_str) == 5:   
-                    time_str += ":00"
-                return datetime.strptime(time_str, '%H:%M:%S').time()
-            except ValueError:
-                return None
-
-        arrival_time_obj = parse_time(arrival_time)
-        departure_time_obj = parse_time(departure_time)
-
-        if not arrival_time_obj or not departure_time_obj:
-            return Response({"detail": "Invalid time format. Please use HH:MM or HH:MM AM/PM format."}, status=status.HTTP_400_BAD_REQUEST)
-
-        if arrival_time_obj >= departure_time_obj:
-            return Response({"detail": "Departure time must be after arrival time."}, status=status.HTTP_400_BAD_REQUEST)
-
-        if stop_order > 1:   
-            last_stop = RouteStopModel.objects.filter(route=route).order_by('-stop_order').first()
-            if last_stop:
-                last_departure = last_stop.departure_time
-                if arrival_time_obj <= last_departure:
-                    return Response({"detail": "New stop's arrival time must be after the previous stop's departure time."}, status=status.HTTP_400_BAD_REQUEST)
-                if departure_time_obj <= last_departure:
-                    return Response({"detail": "New stop's departure time must be after the previous stop's departure time."}, status=status.HTTP_400_BAD_REQUEST)
+        if arrival_time and departure_time:
+            if arrival_time >= departure_time:
+                return Response({"detail": "Departure time must be after arrival time."}, status=status.HTTP_400_BAD_REQUEST)
 
         distance_in_km = data.get("distance_in_km")
         if distance_in_km is not None:
@@ -336,12 +261,87 @@ class RouteStopView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
+
         serializer = RouteStopSerializer(data=data)
         if serializer.is_valid():
             serializer.save(route=route, stop_order=stop_order)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    # def post(self, request, route_id):
+    #     try:
+    #         route = RouteModel.objects.get(id=route_id)
+    #     except RouteModel.DoesNotExist:
+    #         return Response({"detail": "Route not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    #     stop_order = RouteStopModel.objects.filter(route=route).count() + 1
+    #     data = request.data
+
+    #     if RouteStopModel.objects.filter(route=route, stop_name=data.get("stop_name")).exists():
+    #         return Response({"detail": "Stop name already exists for this route."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     arrival_time = data.get("arrival_time")
+    #     departure_time = data.get("departure_time")
+
+    #     def parse_time(time_str):
+            
+    #         try:
+    #             if "AM" in time_str.upper() or "PM" in time_str.upper():
+    #                 return datetime.strptime(time_str, '%I:%M %p').time()
+    #             if len(time_str) == 5:   
+    #                 time_str += ":00"
+    #             return datetime.strptime(time_str, '%H:%M:%S').time()
+    #         except ValueError:
+    #             return None
+
+    #     arrival_time_obj = parse_time(arrival_time)
+    #     departure_time_obj = parse_time(departure_time)
+
+    #     if not arrival_time_obj or not departure_time_obj:
+    #         return Response({"detail": "Invalid time format. Please use HH:MM or HH:MM AM/PM format."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     if arrival_time_obj >= departure_time_obj:
+    #         return Response({"detail": "Departure time must be after arrival time."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     if stop_order > 1:   
+    #         last_stop = RouteStopModel.objects.filter(route=route).order_by('-stop_order').first()
+    #         if last_stop:
+    #             last_departure = last_stop.departure_time
+    #             if arrival_time_obj <= last_departure:
+    #                 return Response({"detail": "New stop's arrival time must be after the previous stop's departure time."}, status=status.HTTP_400_BAD_REQUEST)
+    #             if departure_time_obj <= last_departure:
+    #                 return Response({"detail": "New stop's departure time must be after the previous stop's departure time."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     distance_in_km = data.get("distance_in_km")
+    #     if distance_in_km is not None:
+    #         try:
+    #             distance_in_km = float(distance_in_km)
+    #         except ValueError:
+    #             return Response({"detail": "Distance in kilometers must be a valid number."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #         if distance_in_km <= 0:
+    #             return Response({"detail": "Distance in kilometers must be positive."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #         total_stop_distance = (
+    #             RouteStopModel.objects.filter(route=route).aggregate(total_distance=models.Sum('distance_in_km'))['total_distance'] or Decimal(0)
+    #         )
+
+    #         distance_in_km = Decimal(str(distance_in_km))
+
+    #         if total_stop_distance + distance_in_km > route.distance_in_km:
+    #             return Response(
+    #                 {"detail": "The total distance of stops cannot exceed the main route distance."},
+    #                 status=status.HTTP_400_BAD_REQUEST
+    #             )
+
+    #     serializer = RouteStopSerializer(data=data)
+    #     if serializer.is_valid():
+    #         serializer.save(route=route, stop_order=stop_order)
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     else:
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -547,6 +547,8 @@ class ScheduleBusView(APIView):
                 description=bus.description,
                 started=False,
                 bus_owner_id=bus.bus_owner.user.id,
+                current_stop=stops.first().stop_name,  # Set initial current stop
+                stop_number=stops.first().stop_order-1,
             )
 
             for stop in stops:
@@ -861,6 +863,156 @@ class BusOwnerConductorsAPIView(APIView):
 
         serializer = ConductorSerializer(conductors, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+# class CancelTicketView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request, ticket_id):
+#         print('cancel is working')
+#         # Start a transaction to ensure atomicity
+#         with transaction.atomic():
+#             try:
+#                 # Fetch the ticket to cancel
+#                 ticket = Ticket.objects.get(id=ticket_id)
+                
+#                 # Check if the ticket is already cancelled
+#                 if ticket.status == 'cancelled':
+#                     return Response({"error": "This ticket has already been cancelled."}, status=status.HTTP_400_BAD_REQUEST)
+
+#                 # Fetch the order related to the ticket
+#                 order = ticket.order
+
+#                 # Check if the order is confirmed before allowing cancellation
+#                 if order.status != 'confirmed':
+#                     return Response({"error": "Only confirmed orders can be cancelled."}, status=status.HTTP_400_BAD_REQUEST)
+
+#                 # Refund the user (assuming there’s a method in user profile for wallet balance management)
+#                 user_wallet = order.user.wallet  # Assuming there's a wallet attribute on the user model
+#                 user_wallet.balance += ticket.amount  # Add the ticket amount back to the user's wallet
+#                 user_wallet.save()
+
+#                 # Debit the bus owner's wallet
+#                 bus_owner_wallet = order.bus.bus_owner.wallet  # Assuming there's a wallet on the bus owner model
+#                 bus_owner_wallet.balance -= ticket.amount  # Debit the amount from the bus owner's wallet
+#                 bus_owner_wallet.save()
+
+#                 # Update ticket status to 'cancelled'
+#                 ticket.status = 'cancelled'
+#                 ticket.save()
+
+#                 # Make the seat available again
+#                 seat = ticket.seat
+#                 seat.status = 'available'  # Change seat status to 'available'
+#                 seat.save()
+
+#                 # Update the order status to 'cancelled' if all tickets are cancelled (optional)
+#                 if all(ticket.status == 'cancelled' for ticket in order.seats.all()):
+#                     order.status = 'cancelled'
+#                     order.save()
+
+#                 return Response({"message": "Ticket cancelled successfully, refund processed."}, status=status.HTTP_200_OK)
+
+#             except Ticket.DoesNotExist:
+#                 return Response({"error": "Ticket not found."}, status=status.HTTP_404_NOT_FOUND)
+#             except Exception as e:
+#                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class CancelTicketView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, ticket_id):
+        print('Cancel is working')
+
+        with transaction.atomic():
+            try:
+                ticket = Ticket.objects.get(id=ticket_id)
+
+                if ticket.status == 'cancelled':
+                    return Response({"error": "This ticket has already been cancelled."}, status=status.HTTP_400_BAD_REQUEST)
+
+                order = ticket.order
+
+                if order.status != 'confirmed':
+                    return Response({"error": "Only confirmed orders can be cancelled."}, status=status.HTTP_400_BAD_REQUEST)
+
+                print('Refund process started')
+                try:
+                    user = order.user.user  
+                    print(f'User: {user.username}')
+
+                    user_wallet = Wallet.objects.get(user=user)
+                    print(f'User Wallet: {user_wallet}, Current Balance: {user_wallet.balance}')
+
+                    user_wallet.balance += ticket.amount
+                    user_wallet.save()
+
+                    print(f'Updated User Wallet: {user_wallet}, New Balance: {user_wallet.balance}')
+                except Wallet.DoesNotExist:
+                    print('Wallet not found for the user')
+                    return Response({"error": "Wallet not found for the user."}, status=status.HTTP_400_BAD_REQUEST)
+
+                scheduled_bus = order.bus  
+                bus_owner_id = scheduled_bus.bus_owner_id
+
+                if not bus_owner_id:
+                    return Response({"error": "Bus owner ID not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+                try:
+                    bus_owner = CustomUser.objects.get(id=bus_owner_id)
+
+                    bus_owner_wallet = Wallet.objects.get(user=bus_owner)
+                    print(f'Bus Owner Wallet: {bus_owner_wallet}, Current Balance: {bus_owner_wallet.balance}')
+
+                    bus_owner_wallet.balance -= ticket.amount
+                    bus_owner_wallet.save()
+
+                    Transaction.objects.create(
+                        wallet=bus_owner_wallet,
+                        amount=ticket.amount,
+                        transaction_type='debit',
+                        description=f"Ticket cancellation refund (Ticket ID: {ticket.id})"
+                    )
+                except CustomUser.DoesNotExist:
+                    return Response({"error": "Bus owner not found."}, status=status.HTTP_404_NOT_FOUND)
+                except Wallet.DoesNotExist:
+                    return Response({"error": "Wallet not found for the bus owner."}, status=status.HTTP_400_BAD_REQUEST)
+
+                Transaction.objects.create(
+                    wallet=user_wallet,
+                    amount=ticket.amount,
+                    transaction_type='credit',
+                    description=f"Refund for cancelled ticket (Ticket ID: {ticket.id})"
+                )
+
+                ticket.status = 'cancelled'
+                ticket.save()
+
+                seat = ticket.seat
+                seat.status = 'available'
+                seat.save()
+
+                if all(ticket.status == 'cancelled' for ticket in order.seats.all()):
+                    order.status = 'cancelled'
+                    order.save()
+
+                return Response({"message": "Ticket cancelled successfully, refund processed."}, status=status.HTTP_200_OK)
+
+            except Ticket.DoesNotExist:
+                return Response({"error": "Ticket not found."}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 
 

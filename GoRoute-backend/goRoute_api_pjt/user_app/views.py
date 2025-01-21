@@ -106,6 +106,7 @@ class GoogleLoginAPIView(APIView):
                 defaults={
                     'first_name': name,
                     'is_active': True,   
+                    'username': email.split('@')[0],
                 }
             )
 
