@@ -37,7 +37,7 @@ const Wallet = () => {
           transition={{ duration: 0.5 }}
           className="text-center text-3xl font-bold text-red-600 mb-8"
         >
-          My RedBus Wallet
+          My Wallet
         </motion.h2>
 
         {error ? (

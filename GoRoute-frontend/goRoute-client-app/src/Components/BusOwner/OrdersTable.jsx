@@ -86,6 +86,7 @@ const OrdersTable = ({ orders }) => {
               <tr className="bg-gray-200">
                 <th className="px-4 py-2 text-left">Name</th>
                 <th className="px-4 py-2 text-left">Email</th>
+                <th className="px-4 py-2 text-left">place</th>
                 <th className="px-4 py-2 text-left">Actions</th>
               </tr>
             </thead>
@@ -94,6 +95,7 @@ const OrdersTable = ({ orders }) => {
                 <tr key={index} className="border-b hover:bg-gray-100">
                   <td className="px-4 py-2">{order.name}</td>
                   <td className="px-4 py-2">{order.email}</td>
+                  <td className="px-4 py-2">{order.from_city} to {order.to_city}</td>
                   <td className="px-4 py-2">
                     <button
                       onClick={() => handleViewClick(order)}

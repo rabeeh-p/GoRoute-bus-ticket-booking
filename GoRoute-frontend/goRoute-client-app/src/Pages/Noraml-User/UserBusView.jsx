@@ -14,6 +14,7 @@ const UserBusView = () => {
     const [bookedSeats, setBookedSeats] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [price, setPrice] = useState(0);
+    const navigate = useNavigate()
     
 
     console.log(busDetails, 'details');
@@ -31,21 +32,21 @@ const UserBusView = () => {
         console.log('Bus ID:', busId);
         
 
-        const socket = new WebSocket(`ws://127.0.0.1:8000/ws/seats/${busId}/`);
+        // const socket = new WebSocket(`ws://127.0.0.1:8000/ws/seats/${busId}/`);
 
-socket.onopen = () => {
-    console.log("WebSocket connection established");
-    // Now you can send messages safely
-};
+// socket.onopen = () => {
+//     console.log("WebSocket connection established");
+//     // Now you can send messages safely
+// };
 
-socket.onerror = (error) => {
-    console.error("WebSocket error:", error);
-    // alert("WebSocket connection failed!");
-};
+// socket.onerror = (error) => {
+//     console.error("WebSocket error:", error);
+//     // alert("WebSocket connection failed!");
+// };
 
-socket.onclose = (event) => {
-    console.log("WebSocket closed:", event);
-};
+// socket.onclose = (event) => {
+//     console.log("WebSocket closed:", event);
+// };
 
         
         axios
@@ -123,106 +124,6 @@ socket.onclose = (event) => {
 
     
 
-
-
-
-    
-   
-
-    
-
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
-        const accessToken = localStorage.getItem('accessToken');
-        if (!accessToken) {
-            navigate('/login');
-            return;
-        }
-        const searchParams = JSON.parse(localStorage.getItem('searchParams'));
-        const { from, to, date } = searchParams;
-        const pricePerPerson = price;  
-        const totalAmount = pricePerPerson * selectedSeats.length;
-        console.log(totalAmount,'tottelllllllllll');
-        
-    
-        const formData = {
-            bus_id: busId,
-            seat_numbers: selectedSeats,
-            userName: e.target.userName.value,
-            email: e.target.email.value,
-            phone: e.target.phone.value,
-            to: to,
-            from: from,
-            date: date,
-            total_amount: totalAmount,
-            pricePerPerson:pricePerPerson,
-        };
-    
-        Swal.fire({
-            title: 'Do you want to simulate a successful payment?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Proceed with Success',
-            cancelButtonText: 'No, Simulate Failure'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios.post('http://127.0.0.1:8000/seat-booking/', formData, {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                }).then((response) => {
-                    if (response.data.message) {
-                        const options = {
-                            key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
-                            amount: totalAmount  * 100,  
-                            currency: "INR",
-                            name: "Bus Booking",
-                            description: "Test Transaction",
-                            order_id: response.data.razorpay_order_id,
-                            handler: function (paymentResponse) {
-                                console.log("Payment Response:", paymentResponse);   
-    
-                                const paymentId = paymentResponse.razorpay_payment_id;
-                                const orderId = response.data.razorpay_order_id;  
-                                const signature = paymentResponse.razorpay_signature;
-    
-                                if (!paymentId || !orderId || !signature) {
-                                    Swal.fire("Error", "Missing payment details in the response.", "error");
-                                    return;
-                                }
-    
-                                axios.post('http://127.0.0.1:8000/payment-success/', {
-                                    payment_id: paymentId,
-                                    order_id: orderId,
-                                    signature: signature
-                                })
-                                .then((paymentResponseBackend) => {
-                                    Swal.fire("Success!", "Payment completed successfully.", "success");
-                                    window.location.reload();
-                                })
-                                .catch((err) => {
-                                    console.error("Payment verification error:", err.response.data);
-                                    Swal.fire("Error!", "Payment verification failed.", "error");
-                                });
-                            },
-                            prefill: {
-                                name: e.target.userName.value,
-                                email: e.target.email.value,
-                                contact: e.target.phone.value,
-                            },
-                            theme: { color: "#3399cc" },
-                        };
-                        const rzp = new Razorpay(options);
-                        rzp.open();
-                    } else {
-                        Swal.fire("Error", "Order creation failed.", "error");
-                    }
-                }).catch((error) => {
-                    Swal.fire("Error", "Failed to connect to the server.", "error");
-                });
-            } else {
-                Swal.fire("Payment Failed", "The payment was not successful. No seats have been booked.", "error");
-            }
-        });
-    };
     
 
     // const handleFormSubmit = (e) => {
@@ -234,11 +135,10 @@ socket.onclose = (event) => {
     //     }
     //     const searchParams = JSON.parse(localStorage.getItem('searchParams'));
     //     const { from, to, date } = searchParams;
-    
-    //     // Assuming `price` is the price per person
-    //     const pricePerPerson = price; // Price per single ticket
+    //     const pricePerPerson = price;  
     //     const totalAmount = pricePerPerson * selectedSeats.length;
-    //     console.log(totalAmount, 'totalAmount');
+    //     console.log(totalAmount,'tottelllllllllll');
+        
     
     //     const formData = {
     //         bus_id: busId,
@@ -250,6 +150,7 @@ socket.onclose = (event) => {
     //         from: from,
     //         date: date,
     //         total_amount: totalAmount,
+    //         pricePerPerson:pricePerPerson,
     //     };
     
     //     Swal.fire({
@@ -266,7 +167,7 @@ socket.onclose = (event) => {
     //                 if (response.data.message) {
     //                     const options = {
     //                         key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
-    //                         amount: totalAmount * 100,  // Convert amount to paise
+    //                         amount: totalAmount  * 100,  
     //                         currency: "INR",
     //                         name: "Bus Booking",
     //                         description: "Test Transaction",
@@ -317,98 +218,119 @@ socket.onclose = (event) => {
     //         }
     //     });
     // };
-    // const handleFormSubmit = (e) => {
-    //     e.preventDefault();
-    //     const accessToken = localStorage.getItem('accessToken');
-    //     if (!accessToken) {
-    //         navigate('/login');
-    //         return;
-    //     }
-    //     const searchParams = JSON.parse(localStorage.getItem('searchParams'));
-    //     const { from, to, date } = searchParams;
-    
-    //     const formData = {
-    //         bus_id: busId,
-    //         seat_numbers: selectedSeats,
-    //         userName: e.target.userName.value,
-    //         email: e.target.email.value,
-    //         phone: e.target.phone.value,
-    //         to: to,
-    //         from: from,
-    //         date: date,
-    //     };
-    
-    //     Swal.fire({
-    //         title: 'Do you want to simulate a successful payment?',
-    //         icon: 'question',
-    //         showCancelButton: true,
-    //         confirmButtonText: 'Yes, Proceed with Success',
-    //         cancelButtonText: 'No, Simulate Failure'
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             axios.post('http://127.0.0.1:8000/seat-booking/', formData, {
-    //                 headers: { Authorization: `Bearer ${accessToken}` },
-    //             }).then((response) => {
-    //                 if (response.data.message) {
-    //                     const totalAmount = response.data.total_amount;  // Use total_amount from backend
-    //                     console.log("Total Amount from Backend:", totalAmount);  // Log the backend total amount
-    
-    //                     const options = {
-    //                         key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
-    //                         amount: totalAmount * 100,  // Convert amount to paise
-    //                         currency: "INR",
-    //                         name: "Bus Booking",
-    //                         description: "Test Transaction",
-    //                         order_id: response.data.razorpay_order_id, // Ensure this is correct
-    //                         handler: function (paymentResponse) {
-    //                             console.log("Payment Response:", paymentResponse);
-    
-    //                             const paymentId = paymentResponse.razorpay_payment_id;
-    //                             const orderId = response.data.razorpay_order_id;
-    //                             const signature = paymentResponse.razorpay_signature;
-    
-    //                             if (!paymentId || !orderId || !signature) {
-    //                                 Swal.fire("Error", "Missing payment details in the response.", "error");
-    //                                 return;
-    //                             }
-    
-    //                             axios.post('http://127.0.0.1:8000/payment-success/', {
-    //                                 payment_id: paymentId,
-    //                                 order_id: orderId,
-    //                                 signature: signature
-    //                             })
-    //                             .then((paymentResponseBackend) => {
-    //                                 Swal.fire("Success!", "Payment completed successfully.", "success");
-    //                                 window.location.reload();
-    //                             })
-    //                             .catch((err) => {
-    //                                 console.error("Payment verification error:", err.response.data);
-    //                                 Swal.fire("Error!", "Payment verification failed.", "error");
-    //                             });
-    //                         },
-    //                         prefill: {
-    //                             name: e.target.userName.value,
-    //                             email: e.target.email.value,
-    //                             contact: e.target.phone.value,
-    //                         },
-    //                         theme: { color: "#3399cc" },
-    //                     };
-    //                     const rzp = new Razorpay(options);
-    //                     rzp.open();
-    //                 } else {
-    //                     Swal.fire("Error", "Order creation failed.", "error");
-    //                 }
-    //             }).catch((error) => {
-    //                 Swal.fire("Error", "Failed to connect to the server.", "error");
-    //             });
-    //         } else {
-    //             Swal.fire("Payment Failed", "The payment was not successful. No seats have been booked.", "error");
-    //         }
-    //     });
-    // };
-    
     
 
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+            navigate('/login');
+            return;
+        }
+    
+        const searchParams = JSON.parse(localStorage.getItem('searchParams'));
+        const { from, to, date } = searchParams;
+        const pricePerPerson = price;
+        const totalAmount = pricePerPerson * selectedSeats.length;
+    
+
+
+
+
+        const formData = {
+            bus_id: busId,
+            seat_numbers: selectedSeats,
+            userName: e.target.userName.value,
+            email: e.target.email.value,
+            phone: e.target.phone.value,
+            to: to,
+            from: from,
+            date: date,
+            total_amount: totalAmount,
+            pricePerPerson: pricePerPerson,
+        };
+    
+        Swal.fire({
+            title: 'Do you want to simulate a successful payment?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Proceed with Success',
+            cancelButtonText: 'No, Simulate Failure'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post('http://127.0.0.1:8000/seat-booking/', formData, {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                })
+                .then((response) => {
+                    if (response.data.message) {
+                        const options = {
+                            key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                            amount: totalAmount * 100,
+                            currency: "INR",
+                            name: "Bus Booking",
+                            description: "Test Transaction",
+                            order_id: response.data.razorpay_order_id,
+                            handler: function (paymentResponse) {
+                                Swal.fire({
+                                    title: 'Processing Payment...',
+                                    html: '<strong>Please wait while we verify your payment.</strong>',
+                                    allowOutsideClick: false,
+                                    showCancelButton: false,
+                                    didOpen: () => {
+                                        Swal.showLoading();
+                                    },
+                                });
+    
+                                const paymentId = paymentResponse.razorpay_payment_id;
+                                const orderId = response.data.razorpay_order_id;
+                                const signature = paymentResponse.razorpay_signature;
+    
+                                if (!paymentId || !orderId || !signature) {
+                                    Swal.close();  
+                                    Swal.fire("Error", "Missing payment details in the response.", "error");
+                                    return;
+                                }
+    
+                                axios.post('http://127.0.0.1:8000/payment-success/', {
+                                    payment_id: paymentId,
+                                    order_id: orderId,
+                                    signature: signature
+                                })
+                                .then((paymentResponseBackend) => {
+                                    Swal.close();  
+                                    Swal.fire("Success!", "Payment completed successfully.", "success");
+                                    window.location.reload();
+                                })
+                                .catch((err) => {
+                                    Swal.close();  
+                                    console.error("Payment verification error:", err.response.data);
+                                    Swal.fire("Error!", "Payment verification failed.", "error");
+                                });
+                            },
+                            prefill: {
+                                name: e.target.userName.value,
+                                email: e.target.email.value,
+                                contact: e.target.phone.value,
+                            },
+                            theme: { color: "#3399cc" },
+                        };
+                        const rzp = new Razorpay(options);
+                        rzp.open();
+                    } else {
+                        Swal.fire("Error", "Order creation failed.", "error");
+                    }
+                })
+                .catch((error) => {
+                    Swal.fire("Error", "Failed to connect to the server.", "error");
+                });
+            } else {
+                Swal.fire("Payment Failed", "The payment was not successful. No seats have been booked.", "error");
+            }
+        });
+    };
+    
+    
+    
 
 
 
