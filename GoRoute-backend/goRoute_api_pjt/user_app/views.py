@@ -284,6 +284,7 @@ class BusSearchView(APIView):
         buses_with_stops = [
             bus for bus in buses_with_stops
             if bus.scheduled_date.date() == date and bus.status == 'active'
+            and not bus.started 
         ]
 
         buses_with_distances_and_prices = []
@@ -1114,6 +1115,12 @@ class BusTrackingAPIView(APIView):
         except ScheduledBus.DoesNotExist:
             raise NotFound("Bus not found")
         
+
+
+
+
+
+
 
 
 
