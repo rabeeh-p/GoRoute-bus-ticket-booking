@@ -14,6 +14,8 @@ from .Serializers import *
 
 from collections import defaultdict
 from django.db import transaction
+from django.http import JsonResponse
+from rest_framework.exceptions import NotFound
 
 # Create your views here.
 
@@ -733,6 +735,7 @@ class BusSeatsAPIView(APIView):
 
     def get(self, request, bus_id):
         bus = get_object_or_404(ScheduledBus, id=bus_id)
+        print(bus,'bus')
 
         orders = Order.objects.filter(bus=bus)
 
@@ -1010,6 +1013,65 @@ class CancelTicketView(APIView):
                 return Response({"error": "Ticket not found."}, status=status.HTTP_404_NOT_FOUND)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+class BusOwnerTrackingAPIView(APIView):
+    def get(self, request, bus_id):
+        try:
+            print('Bus owner tracking view is working')
+
+            scheduled_bus = ScheduledBus.objects.get(id=bus_id)
+            stops = ScheduledStop.objects.filter(scheduled_bus=scheduled_bus).order_by('stop_order')
+
+            current_stop = scheduled_bus.current_stop
+            current_stop_data = None
+            next_stops = []
+            total_stops = []
+
+            for stop in stops:
+                total_stops.append(stop)
+                if stop.stop_name == current_stop:
+                    current_stop_data = stop
+                elif current_stop_data:
+                    next_stops.append(stop)
+
+            bus_data = ScheduledBusSerializer(scheduled_bus).data
+            current_stop_serialized = ScheduledStopSerializer(current_stop_data).data if current_stop_data else None
+            if current_stop_serialized:
+                current_stop_serialized['stop_number'] = scheduled_bus.stop_number
+
+            next_stops_serialized = ScheduledStopSerializer(next_stops, many=True).data
+            total_stops_serialized = ScheduledStopSerializer(total_stops, many=True).data
+
+            owner_info = {
+                "is_owner": True,   
+                "bus_status": scheduled_bus.status,   
+            }
+
+            response_data = {
+                "bus": bus_data,
+                "current_stop": current_stop_serialized,
+                "next_stops": next_stops_serialized,
+                "total_stops": total_stops_serialized,
+                "owner_info": owner_info,   
+            }
+
+            return Response(response_data)
+
+        except ScheduledBus.DoesNotExist:
+            raise NotFound("Bus not found")
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+
+
+
+
+
 
 
 

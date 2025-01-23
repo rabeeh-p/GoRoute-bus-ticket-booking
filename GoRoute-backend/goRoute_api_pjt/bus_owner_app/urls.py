@@ -32,4 +32,5 @@ urlpatterns = [
     path('conductors/', BusOwnerConductorsAPIView.as_view(), name='bus-owner-conductors'),
 
     path('api/tickets/<int:ticket_id>/cancel/', CancelTicketView.as_view(), name='cancel_ticket'),
+    path('owner-bus-tracking/<int:bus_id>/', BusOwnerTrackingAPIView.as_view(), name='owner-bus-tracking'),
 ]

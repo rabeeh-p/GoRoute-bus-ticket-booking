@@ -170,7 +170,40 @@ class ConductorRegistrationSerializer(serializers.ModelSerializer):
 
 
 
+# class ConductorSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Conductor
+#         fields = ['id', 'user', 'license_number', 'phone_number', 'hired_date', 'travels','name','is_active']
+
+
+
+class ScheduledBusSerializerForConductor(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduledBus
+        fields = ['id', 'bus_number', 'name', 'route', 'scheduled_date']
+
+
+class ConductorScheduledBusSerializer(serializers.ModelSerializer):
+    scheduled_bus = ScheduledBusSerializerForConductor()
+
+    class Meta:
+        model = ConductorScheduledBus
+        fields = ['scheduled_bus', 'shift_date', 'shift_start_time', 'shift_end_time']
+
+
 class ConductorSerializer(serializers.ModelSerializer):
+    scheduled_bus_details = ConductorScheduledBusSerializer(source='scheduled_bus', read_only=True)
+
     class Meta:
         model = Conductor
-        fields = ['id', 'user', 'license_number', 'phone_number', 'hired_date', 'travels','name','is_active']
+        fields = [
+            'id',
+            'user',
+            'license_number',
+            'phone_number',
+            'hired_date',
+            'name',
+            'travels',
+            'is_active',
+            'scheduled_bus_details',
+        ]

@@ -250,9 +250,7 @@ class BusSearchView(APIView):
         from_city = request.query_params.get('from', '').strip().lower()
         to_city = request.query_params.get('to', '').strip().lower()
         date = request.query_params.get('date')
-        print(from_city)
-        print(to_city)
-        print(date,'date')
+        
 
         if date:
             try:
@@ -338,7 +336,7 @@ class BusSeatDetailsView(APIView):
    
     def get(self, request, bus_id):
         print('Bus view is working')
-        print('Bus ID:', bus_id)
+         
 
         try:
             bus = ScheduledBus.objects.get(id=bus_id)
@@ -346,8 +344,7 @@ class BusSeatDetailsView(APIView):
             to_city = request.query_params.get('to_city')
             date = request.query_params.get('date')
             print('From City:', from_city)
-            print('To City:', to_city)
-            print('Date:', date)
+             
 
             if not from_city or not to_city or not date:
                 return Response(
@@ -375,8 +372,7 @@ class BusSeatDetailsView(APIView):
 
             start_index = stop_names.index(from_city.lower())
             end_index = stop_names.index(to_city.lower())
-            print('Start Index:', start_index)
-            print('End Index:', end_index)
+             
 
             if start_index >= end_index:
                 return Response(
@@ -392,7 +388,7 @@ class BusSeatDetailsView(APIView):
             price_per_km = 5 if bus.bus_type.lower() == 'ac' else 3
             total_price = total_distance * price_per_km
 
-            # Fetch booked seats
+           
             seats = Seat.objects.filter(bus=bus, date=date)
             booked_seat_numbers = []
             for seat in seats:
@@ -415,8 +411,7 @@ class BusSeatDetailsView(APIView):
             except BusOwnerModel.DoesNotExist:
                 bus_owner_logo_url = None
             
-            print(total_price,'pricee')
-            print(bus_owner_logo_url,'pricee')
+             
 
             return Response(
                 {
@@ -848,7 +843,7 @@ class PaymentSuccessAPIView(APIView):
             except razorpay.errors.SignatureVerificationError:
                 return JsonResponse({'error': 'Payment verification failed.'}, status=400)
 
-            # Update order status
+            
             order.status = 'confirmed'
             order.save()
 
@@ -981,7 +976,6 @@ class TicketListView(APIView):
             order = Order.objects.get(id=order_id, user=profile_obj)
             tickets = Ticket.objects.filter(order=order)
             serializer = TicketSerializer(tickets, many=True)
-            print(order.bus,'order')
             order_details = {
             "id": order.id,
             "date": order.date,
@@ -990,6 +984,10 @@ class TicketListView(APIView):
             "from_city":order.from_city,
             "to_city":order.to_city,
             "bus_id": order.bus.id,
+            "bus_number": order.bus.bus_number,
+            "bus": order.bus.bus_number,
+            "bus_owner_name": order.bus.bus_owner_name,
+            "bus_started": order.bus.started,
             }
             return Response({
                 "tickets": serializer.data,
@@ -1013,7 +1011,6 @@ class WalletAPIView(APIView):
             wallet, created = Wallet.objects.get_or_create(user=request.user)
            
             serializer = WalletSerializer(wallet)
-            print(serializer.data,'dataaa')
             transactions = wallet.transaction_set.all()
 
             wallet_data = serializer.data
@@ -1080,7 +1077,6 @@ class BusTrackingAPIView(APIView):
     def get(self, request, bus_id):
         try:
             print('is working veiew')
-            print(bus_id,'bus id')
             scheduled_bus = ScheduledBus.objects.get(id=bus_id)
             stops = ScheduledStop.objects.filter(scheduled_bus=scheduled_bus).order_by('stop_order')
 

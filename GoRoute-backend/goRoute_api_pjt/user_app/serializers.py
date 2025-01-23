@@ -21,7 +21,7 @@ class BusOwnerLogoSerializer(serializers.ModelSerializer):
 class ScheduledStopSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScheduledStop
-        fields = ['stop_name', 'arrival_time', 'departure_time']
+        fields = ['stop_name', 'arrival_time', 'departure_time','stop_order']
 
 class ScheduledBusSerializer(serializers.ModelSerializer):
     stops = ScheduledStopSerializer(many=True)
