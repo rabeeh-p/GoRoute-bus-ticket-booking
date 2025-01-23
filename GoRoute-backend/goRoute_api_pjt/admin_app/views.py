@@ -575,3 +575,18 @@ class CreateUserByAdmin(APIView):
 
 
 
+class AdminScheduledBusListView(APIView):
+    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can access
+
+    def get(self, request):
+        try:
+            # Fetch all scheduled buses
+            scheduled_buses = ScheduledBus.objects.all().order_by('scheduled_date')
+            serializer = ScheduledBusSerializer(scheduled_buses, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"detail": "An error occurred while fetching the bus schedule."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+

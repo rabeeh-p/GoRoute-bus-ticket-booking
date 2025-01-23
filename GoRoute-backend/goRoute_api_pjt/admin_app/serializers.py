@@ -156,6 +156,9 @@ class BusOwnerSerializerWithoutLogo(serializers.ModelSerializer):
 
 
 
-
+class ScheduledBusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduledBus
+        fields = '__all__' 
 
         

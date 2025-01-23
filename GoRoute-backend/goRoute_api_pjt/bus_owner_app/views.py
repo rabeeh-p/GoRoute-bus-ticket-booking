@@ -1000,8 +1000,9 @@ class CancelTicketView(APIView):
                 ticket.save()
 
                 seat = ticket.seat
-                seat.status = 'available'
-                seat.save()
+                # seat.status = 'available'
+                # seat.save()
+                seat.delete()
 
                 if all(ticket.status == 'cancelled' for ticket in order.seats.all()):
                     order.status = 'cancelled'
