@@ -71,7 +71,7 @@ const ConductorLogin = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="username">
-              Username (License Number)
+              Username 
             </label>
             <input
               type="text"

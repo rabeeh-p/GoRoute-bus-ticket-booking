@@ -18,6 +18,8 @@ const ScheduledBusDetails = () => {
 
   console.log(seatNumbers,'numbers');
   console.log(orders,'orders');
+  console.log(busDetails,'details');
+
   
 
  
@@ -42,7 +44,7 @@ const ScheduledBusDetails = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        console.log(seatNumbersResponse.data,'data respon');
+        console.log(seatNumbersResponse.data,'seat numbers');
         
         
         
@@ -423,7 +425,16 @@ const ScheduledBusDetails = () => {
             )}
           </div>
         </div>
+        
       </div>
+      <div className="mt-6 text-center">
+    <button
+      className="bg-red-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-all"
+      onClick={() => navigate(`/busowner-dashboard/bus-owner-tracking/${busId}`)}
+    >
+      Track Bus
+    </button>
+  </div>
 
       
 

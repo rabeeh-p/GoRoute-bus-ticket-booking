@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import axiosInstance from '../../../axios/axios';
 
 const ConductorsList = () => {
@@ -12,7 +11,7 @@ const ConductorsList = () => {
             try {
                 const accessToken = localStorage.getItem('accessToken');
                 if (!accessToken) {
-                    setError('No access token found');
+                    setErrorMessage('No access token found');
                     return;
                 }
                 const response = await axiosInstance.get("/conductors/", {
@@ -20,8 +19,7 @@ const ConductorsList = () => {
                         Authorization: `Bearer ${accessToken}`,
                     },
                 });
-                console.log(response.data, 'data');
-
+                console.log(response.data, 'API response data');
                 setConductors(Array.isArray(response.data) ? response.data : []);
                 setLoading(false);
             } catch (error) {
@@ -51,19 +49,42 @@ const ConductorsList = () => {
                             key={conductor.id}
                             className="p-6 border border-red-500 rounded-lg shadow-lg hover:shadow-xl transition duration-300 ease-in-out"
                         >
-                            <h3 className="text-2xl font-bold text-red-700">{conductor.name}</h3>
-                            <h4 className="text-xl text-gray-800 font-medium">{conductor.user.username}</h4>
+                            {/* <h3 className="text-2xl font-bold text-red-700">{conductor.name}</h3> */}
+                            <h3 className="text-2xl font-bold text-red-700">{conductor.name.charAt(0).toUpperCase() + conductor.name.slice(1)}</h3>
+                            {conductor.user?.username && (
+                                <h4 className="text-xl text-gray-800 font-medium">{conductor.user.username}</h4>
+                            )}
                             <p className="text-gray-600 mt-2">License Number: {conductor.license_number}</p>
                             <p className="text-gray-600">Phone: {conductor.phone_number}</p>
                             <p className="text-gray-600">Hired on: {conductor.hired_date}</p>
-                            {/* <p className="text-gray-600">Duty: {conductor.is_active}</p>
-               */}
                             <p className="text-gray-600">
                                 Duty:
                                 <span className={conductor.is_active ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>
                                     {conductor.is_active ? "On Duty" : "Not Scheduled"}
                                 </span>
                             </p>
+
+                            {conductor.scheduled_bus_details?.scheduled_bus ? (
+                                <div className="mt-4">
+                                    <h4 className="text-lg font-semibold text-gray-800">Scheduled Bus Details:</h4>
+                                    <p className="text-gray-600">
+                                        Bus Number: {conductor.scheduled_bus_details.scheduled_bus.bus_number}
+                                    </p>
+                                    <p className="text-gray-600">
+                                        Name: {conductor.scheduled_bus_details.scheduled_bus.name}
+                                    </p>
+                                    <p className="text-gray-600">
+                                        Route: {conductor.scheduled_bus_details.scheduled_bus.route}
+                                    </p>
+                                    <p className="text-gray-600">
+                                        Scheduled Date: {new Date(
+                                            conductor.scheduled_bus_details.scheduled_bus.scheduled_date
+                                        ).toLocaleDateString()}
+                                    </p>
+                                </div>
+                            ) : (
+                                <p className="text-gray-600 mt-2">No scheduled bus details available.</p>
+                            )}
                         </li>
                     ))
                 ) : (

@@ -18,6 +18,7 @@ import EditOwnerProfile from './EditOwnerProfile'
 import BusWallet from './BusWallet'
 import ConductorRegistrationForm from './Conductor/ConductorRegistrationForm'
 import ConductorsList from './Conductor/ConductorsList'
+import BusOwnerTracking from './BusOwnerTracking'
 
 const BusOwnerDashboard = () => {
     return (
@@ -43,6 +44,7 @@ const BusOwnerDashboard = () => {
                         <Route path="bus-wallet" element={<BusWallet />} />
                         <Route path="conductor-registration" element={<ConductorRegistrationForm />} />
                         <Route path="conductor-list" element={<ConductorsList />} />
+                        <Route path="bus-owner-tracking/:busId" element={<BusOwnerTracking />} />
                         
                     </Routes>
                 </main>

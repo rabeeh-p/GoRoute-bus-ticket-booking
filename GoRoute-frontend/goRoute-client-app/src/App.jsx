@@ -54,6 +54,7 @@ import ConductorLandingPage from './Pages/Conductor/ConductorLandingPage';
 import DashboardConductor from './Pages/Conductor/DashboardConductor';
 import ConductorProtect from './Protect/ConductorProtect';
 import AdminWallet from './Pages/Admin/AdminWallet';
+import BusOwnerTracking from './Pages/Bus_owners/BusOwnerTracking';
 function App() {
 
 
@@ -130,6 +131,7 @@ function App() {
           <Route path="bus-wallet" element={<BusWallet />} />
           <Route path="conductor-registration" element={<ConductorRegistrationForm />} />
           <Route path="conductor-list" element={<ConductorsList />} />
+          <Route path="bus-owner-tracking/:busId" element={<BusOwnerTracking />} />
         </Route>
       </Routes>
 

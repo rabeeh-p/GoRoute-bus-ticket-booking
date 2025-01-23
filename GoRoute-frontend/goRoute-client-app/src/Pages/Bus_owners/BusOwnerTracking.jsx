@@ -3,19 +3,20 @@ import { Bus, MapPin } from "lucide-react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
-const BusTracking = () => {
+const BusOwnerTracking = () => {
   const [busData, setBusData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentStopIndex, setCurrentStopIndex] = useState(0);
   const [busPosition, setBusPosition] = useState(0);
+  const [busStarted, setBusStarted] = useState(false); // Track if the bus has started
   const { busId } = useParams();
 
   useEffect(() => {
     const fetchBusData = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/bus-tracking/${busId}/`);
+        const response = await axios.get(`http://127.0.0.1:8000/owner-bus-tracking/${busId}/`);
         const data = response.data;
-        console.log(response.data,'data');
+        console.log(response.data,'bus tracing');
         
         setBusData(data);
         setLoading(false);
@@ -36,6 +37,10 @@ const BusTracking = () => {
 
     fetchBusData();
   }, [busId]);
+
+  
+
+  
 
   if (loading) {
     return <div className="text-center text-red-600 text-xl mt-8">Loading...</div>;
@@ -68,6 +73,8 @@ const BusTracking = () => {
               </span>
             </div>
           </div>
+
+          
 
           {/* Full Route Progress */}
           <div className="mb-8 relative">
@@ -103,9 +110,7 @@ const BusTracking = () => {
               {total_stops.map((stop, index) => (
                 <div
                   key={stop.stop_name}
-                  className={`text-center ${
-                    index === currentStopIndex ? "text-red-600 font-medium" : "text-gray-600"
-                  }`}
+                  className={`text-center ${index === currentStopIndex ? "text-red-600 font-medium" : "text-gray-600"}`}
                   style={{
                     width: `${100 / total_stops.length}%`,
                   }}
@@ -151,10 +156,6 @@ const BusTracking = () => {
                 <div className="font-medium text-gray-600">Next Stop</div>
                 <div className="text-lg text-red-600">
                   {next_stops[0]?.stop_name || "End of Route"}
-                  {console.log(currentStopIndex,'indexd')
-                  }
-                  {console.log(next_stops,'next')
-                  }
                 </div>
               </div>
               <div className="bg-white p-4 shadow rounded-lg">
@@ -173,7 +174,7 @@ const BusTracking = () => {
                 window.location.reload();
               }}
             >
-              Refresh Location
+              Refresh
             </button>
           </div>
         </div>
@@ -182,4 +183,4 @@ const BusTracking = () => {
   );
 };
 
-export default BusTracking;
+export default BusOwnerTracking;

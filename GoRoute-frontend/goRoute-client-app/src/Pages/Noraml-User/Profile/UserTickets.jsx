@@ -7,10 +7,12 @@ const UserTickets = () => {
     const [tickets, setTickets] = useState([]);
     const [orderDetails, setOrderDetails] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [busStarted, setBustStarted] = useState(false);
     const { orderId } = useParams();
     const navigate = useNavigate();
-    console.log(orderDetails,'order details');
-    
+
+    console.log(orderDetails, 'order details');
+
 
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken');
@@ -29,6 +31,9 @@ const UserTickets = () => {
                 setOrderDetails(response.data.order);
                 setTickets(response.data.tickets);
                 setLoading(false);
+                console.log(response.data, 'order now ');
+                setBustStarted(response.data.order.bus_started)
+
             })
             .catch((error) => {
                 console.error('Error fetching order details:', error);
@@ -42,12 +47,11 @@ const UserTickets = () => {
 
 
     const handleCancel = (ticketId) => {
-        const accessToken = localStorage.getItem('accessToken'); // Get the access token from localStorage
+        const accessToken = localStorage.getItem('accessToken');  
 
-        // Check if the access token is available
         if (!accessToken) {
             Swal.fire('Error!', 'You need to be logged in to cancel a ticket.', 'error');
-            return; // Stop further execution if no token is found
+            return;  
         }
 
         Swal.fire({
@@ -60,11 +64,10 @@ const UserTickets = () => {
             confirmButtonText: 'Yes, cancel it!',
         }).then((result) => {
             if (result.isConfirmed) {
-                // Sending the request with the Authorization header
                 axiosInstance
                     .post(`cancel-ticket/${ticketId}/`, {}, {
                         headers: {
-                            'Authorization': `Bearer ${accessToken}`, // Passing the JWT token in the Authorization header
+                            'Authorization': `Bearer ${accessToken}`,  
                         },
                     })
                     .then((response) => {
@@ -78,7 +81,6 @@ const UserTickets = () => {
                             setTimeout(() => {
                                 window.location.reload();
                             }, 5000);
-                            // Optionally refresh or update the UI (e.g., remove the cancelled ticket from the list)
                         } else {
                             Swal.fire('Error!', data.message, 'error');
                         }
@@ -115,6 +117,14 @@ const UserTickets = () => {
                                         <p className="text-gray-600">{orderDetails.id}</p>
                                     </div>
                                     <div>
+                                        <span className="font-medium text-gray-700">Bus Number:</span>
+                                        <p className="text-gray-600">{orderDetails.bus_number}</p>
+                                    </div>
+                                    <div>
+                                        <span className="font-medium text-gray-700">Travels Name:</span>
+                                        <p className="text-gray-600">{orderDetails.bus_owner_name}</p>
+                                    </div>
+                                    <div>
                                         <span className="font-medium text-gray-700">Date:</span>
                                         <p className="text-gray-600">
                                             {new Date(orderDetails.date).toLocaleDateString()}
@@ -124,6 +134,7 @@ const UserTickets = () => {
                                         <span className="font-medium text-gray-700">Total Amount:</span>
                                         <p className="text-gray-600">${orderDetails.total_amount}</p>
                                     </div>
+
                                     <div>
                                         <span className="font-medium text-gray-700">Status:</span>
                                         <p className="text-gray-600">{orderDetails.status}</p>
@@ -187,16 +198,22 @@ const UserTickets = () => {
                                                 >
                                                     {ticket.status}
                                                 </td>
+                                                
                                                 <td className="border px-6 py-4">
-                                                    {ticket.status === 'confirmed' && (
-                                                        <button
-                                                            className="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
-                                                            onClick={() => handleCancel(ticket.id)}
-                                                        >
-                                                            Cancel
-                                                        </button>
+                                                    {busStarted ? (
+                                                        <span className="text-gray-500">Bus has started, cancellation not allowed</span>
+                                                    ) : (
+                                                        ticket.status === 'confirmed' && (
+                                                            <button
+                                                                className="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
+                                                                onClick={() => handleCancel(ticket.id)}
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                        )
                                                     )}
                                                 </td>
+
                                             </tr>
                                         ))}
                                     </tbody>

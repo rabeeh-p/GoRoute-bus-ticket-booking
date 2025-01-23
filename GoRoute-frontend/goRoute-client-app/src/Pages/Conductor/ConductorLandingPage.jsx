@@ -39,6 +39,8 @@ const ConductorLandingPage = () => {
         });
         if (response.data) {
           setBusData(response.data);
+          console.log(response.data,'bus and stops detgails');
+          
           setLoading(false);
           setCurrentStop(response.data.current_stop);
           updateBusPosition(5);
@@ -70,7 +72,64 @@ const ConductorLandingPage = () => {
     }
   };
 
+  // const handleChangeStop = (stopIndex) => {
+  //   if (stopIndex <= currentStop) {
+  //     Swal.fire({
+  //       title: 'Action Not Allowed',
+  //       text: 'You can only move forward to the next stop. You cannot go back to a previous stop.',
+  //       icon: 'error',
+  //       confirmButtonText: 'Okay',
+  //     });
+  //     return;
+  //   }
+
+  //   const stopOrder = busData.stops[stopIndex].stop_order;
+
+  //   Swal.fire({
+  //     title: 'Are you sure?',
+  //     text: `You are about to move to the next stop: ${busData.stops[stopIndex].stop_name}`,
+  //     icon: 'warning',
+  //     showCancelButton: true,
+  //     confirmButtonText: 'Yes, move to next stop',
+  //     cancelButtonText: 'Cancel',
+  //     reverseButtons: true,
+  //   }).then(async (result) => {
+  //     if (result.isConfirmed) {
+  //       try {
+  //         const accessToken = localStorage.getItem('accessToken');
+  //         if (!accessToken) {
+  //           Swal.fire('Error', 'No access token found', 'error');
+  //           return;
+  //         }
+
+  //         const response = await axiosInstance.post("/update-stop/", {
+  //           bus_id: busData.bus.id,
+  //           stop_order: stopOrder - 1,
+  //         }, {
+  //           headers: {
+  //             Authorization: `Bearer ${accessToken}`,
+  //           }
+  //         });
+
+  //         if (response.data.success) {
+  //           setCurrentStop(stopIndex);
+  //           updateBusPosition(stopIndex);
+  //           Swal.fire('Success', 'Successfully moved to the next stop!', 'success');
+  //         } else {
+  //           Swal.fire('Error', 'Failed to move to the next stop. Please try again later.', 'error');
+  //         }
+  //       } catch (error) {
+  //         Swal.fire('Error', 'Error updating the stop. Please try again later.', 'error');
+  //       }
+  //     }
+  //   });
+  // };
+
+
+  
+
   const handleChangeStop = (stopIndex) => {
+    // Ensure the selected stop is not a previous stop
     if (stopIndex <= currentStop) {
       Swal.fire({
         title: 'Action Not Allowed',
@@ -80,9 +139,31 @@ const ConductorLandingPage = () => {
       });
       return;
     }
-
+  
+    // Prevent skipping stops and going directly to the end stop
+    if (stopIndex > currentStop + 1) {
+      Swal.fire({
+        title: 'Action Not Allowed',
+        text: 'You must move through the stops sequentially. Skipping stops is not allowed.',
+        icon: 'error',
+        confirmButtonText: 'Okay',
+      });
+      return;
+    }
+  
+    // Prevent going directly to the end stop without completing the intermediate stops
+    if (stopIndex === busData.stops.length - 1 && currentStop !== busData.stops.length - 2) {
+      Swal.fire({
+        title: 'Action Not Allowed',
+        text: 'You cannot go directly to the last stop. Please complete all intermediate stops first.',
+        icon: 'error',
+        confirmButtonText: 'Okay',
+      });
+      return;
+    }
+  
     const stopOrder = busData.stops[stopIndex].stop_order;
-
+  
     Swal.fire({
       title: 'Are you sure?',
       text: `You are about to move to the next stop: ${busData.stops[stopIndex].stop_name}`,
@@ -99,7 +180,7 @@ const ConductorLandingPage = () => {
             Swal.fire('Error', 'No access token found', 'error');
             return;
           }
-
+  
           const response = await axiosInstance.post("/update-stop/", {
             bus_id: busData.bus.id,
             stop_order: stopOrder - 1,
@@ -108,7 +189,7 @@ const ConductorLandingPage = () => {
               Authorization: `Bearer ${accessToken}`,
             }
           });
-
+  
           if (response.data.success) {
             setCurrentStop(stopIndex);
             updateBusPosition(stopIndex);
@@ -122,6 +203,9 @@ const ConductorLandingPage = () => {
       }
     });
   };
+  
+
+
 
   return (
     <>
@@ -142,20 +226,7 @@ const ConductorLandingPage = () => {
           <p className="text-xl text-gray-700 mt-2">Manage your bus routes and stops efficiently!</p>
         </div>
 
-        {/* <div className="flex justify-center gap-4 mb-8">
-          <button
-            onClick={() => navigate("/conductor-dashboard")}
-            className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
-          >
-            Go to Dashboard
-          </button>
-          <button
-            onClick={handleLogoutClick}
-            className="bg-red-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-red-700 transition duration-300"
-          >
-            Logout
-          </button>
-        </div> */}
+      
 
         <div className="text-center">
           {error && <p className="text-lg text-red-500">{error}</p>}
