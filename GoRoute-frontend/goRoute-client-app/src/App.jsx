@@ -55,6 +55,8 @@ import DashboardConductor from './Pages/Conductor/DashboardConductor';
 import ConductorProtect from './Protect/ConductorProtect';
 import AdminWallet from './Pages/Admin/AdminWallet';
 import BusOwnerTracking from './Pages/Bus_owners/BusOwnerTracking';
+import AdminBusScheduledList from './Pages/Admin/AdminBusScheduledList';
+import BusTrack from './Pages/Admin/BusTrack';
 function App() {
 
 
@@ -102,6 +104,8 @@ function App() {
           <Route path="edit-bus-owner/:id" element={<EditBusOwnerForm />} />
           <Route path="user-creating" element={<UserCreating />} />
           <Route path="admin-wallet" element={<AdminWallet />} />
+          <Route path="admin-bus-scheduled-list" element={<AdminBusScheduledList />} />
+          <Route path="admin-track/:busId" element={<BusTrack />} />
 
 
         </Route>

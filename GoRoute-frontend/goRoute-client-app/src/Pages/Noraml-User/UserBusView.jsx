@@ -15,6 +15,11 @@ const UserBusView = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [price, setPrice] = useState(0);
     const navigate = useNavigate()
+
+    const [userName, setUserName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+
     
 
     console.log(busDetails, 'details');
@@ -123,7 +128,15 @@ const UserBusView = () => {
     };
 
     
-
+    const isFormValid = () => {
+        return (
+          userName.trim() !== "" &&
+          email.includes("@") &&
+          /^\d{10}$/.test(phone)
+        );
+      };
+      
+     
     
 
     // const handleFormSubmit = (e) => {
@@ -793,10 +806,10 @@ const UserBusView = () => {
             )} */}
 
 
-            {isModalOpen && (
+            {/* {isModalOpen && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                        <h2 className="text-xl font-bold mb-4">Booking Form</h2>
+                        <h2 className="text-xl font-bold mb-4">Booking Form Total - {price * selectedSeats.length}</h2>
                         <form onSubmit={handleFormSubmit}>
                             <div className="mb-4">
                                 <label htmlFor="selectedSeats" className="block text-gray-700">
@@ -862,7 +875,101 @@ const UserBusView = () => {
                         </button>
                     </div>
                 </div>
-            )}
+            )} */}
+
+{isModalOpen && (
+  <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+      <h2 className="text-xl font-bold mb-4">
+        Booking Form Total - ₹{price * selectedSeats.length}
+      </h2>
+      <form onSubmit={handleFormSubmit}>
+        <div className="mb-4">
+          <label htmlFor="selectedSeats" className="block text-gray-700">
+            Selected Seats:
+          </label>
+          <input
+            type="text"
+            id="selectedSeats"
+            name="selectedSeats"
+            value={selectedSeats.join(", ")}
+            disabled
+            className="mt-2 p-2 w-full border rounded-lg"
+          />
+        </div>
+
+        {/* Name Field */}
+        <div className="mb-4">
+          <label htmlFor="userName" className="block text-gray-700">
+            Your Name:
+          </label>
+          <input
+            type="text"
+            id="userName"
+            name="userName"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value.trimStart())} // Prevent leading spaces
+            className="mt-2 p-2 w-full border rounded-lg"
+            required
+          />
+          {userName.trim() === "" && (
+            <p className="text-red-500 text-sm mt-1">Name cannot be empty or contain only spaces.</p>
+          )}
+        </div>
+
+        {/* Email Field */}
+        <div className="mb-4">
+          <label htmlFor="email" className="block text-gray-700">
+            Your Email:
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value.trimStart())} // Prevent leading spaces
+            className="mt-2 p-2 w-full border rounded-lg"
+            required
+          />
+        </div>
+
+        {/* Phone Field */}
+        <div className="mb-4">
+          <label htmlFor="phone" className="block text-gray-700">
+            Your Phone Number:
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))} // Allow only numbers
+            className="mt-2 p-2 w-full border rounded-lg"
+            required
+          />
+          {!/^\d{10}$/.test(phone) && phone !== "" && (
+            <p className="text-red-500 text-sm mt-1">Phone number must be exactly 10 digits.</p>
+          )}
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="bg-green-500 text-white py-2 px-4 rounded"
+          disabled={!isFormValid()} // Disable button if form is invalid
+        >
+          Confirm Booking
+        </button>
+      </form>
+
+      {/* Close Modal */}
+      <button className="mt-4 text-red-500" onClick={handleModalClose}>
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
 
 
 

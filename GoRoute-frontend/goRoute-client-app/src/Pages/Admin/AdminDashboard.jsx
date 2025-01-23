@@ -15,6 +15,8 @@ import BusSchedule from "../Bus_owners/BusSchedule";
 import EditBusOwnerForm from "./BusOwner/EditBusOwnerForm";
 import UserCreating from "./User/UserCreating";
 import AdminWallet from "./AdminWallet";
+import AdminBusScheduledList from "./AdminBusScheduledList";
+import BusTrack from "./BusTrack";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -109,6 +111,14 @@ const AdminDashboard = () => {
                   Bus Requests 
                 </a>
               </li>
+              <li>
+                <a
+                  onClick={() => navigate('/admin-home/admin-bus-scheduled-list')} 
+                  className="block py-2 px-4 hover:bg-red-700 rounded-lg transition duration-300"
+                >
+                  Scheduled Bus 
+                </a>
+              </li>
              
             </ul>
           </nav>
@@ -131,6 +141,8 @@ const AdminDashboard = () => {
               <Route path="edit-bus-owner/:id" element={<EditBusOwnerForm />} />
               <Route path="user-creating" element={<UserCreating />} />
               <Route path="admin-wallet" element={<AdminWallet />} />
+              <Route path="admin-bus-scheduled-list" element={<AdminBusScheduledList />} />
+              <Route path="admin-track/:busId" element={<BusTrack />} />
 
             </Routes>
           </div>

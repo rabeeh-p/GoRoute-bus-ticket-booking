@@ -47,11 +47,11 @@ const UserTickets = () => {
 
 
     const handleCancel = (ticketId) => {
-        const accessToken = localStorage.getItem('accessToken');  
+        const accessToken = localStorage.getItem('accessToken');
 
         if (!accessToken) {
             Swal.fire('Error!', 'You need to be logged in to cancel a ticket.', 'error');
-            return;  
+            return;
         }
 
         Swal.fire({
@@ -67,7 +67,7 @@ const UserTickets = () => {
                 axiosInstance
                     .post(`cancel-ticket/${ticketId}/`, {}, {
                         headers: {
-                            'Authorization': `Bearer ${accessToken}`,  
+                            'Authorization': `Bearer ${accessToken}`,
                         },
                     })
                     .then((response) => {
@@ -132,7 +132,7 @@ const UserTickets = () => {
                                     </div>
                                     <div>
                                         <span className="font-medium text-gray-700">Total Amount:</span>
-                                        <p className="text-gray-600">${orderDetails.total_amount}</p>
+                                        <p className="text-gray-600">Rs{orderDetails.total_amount}</p>
                                     </div>
 
                                     <div>
@@ -147,20 +147,18 @@ const UserTickets = () => {
                                         <span className="font-medium text-gray-700">To:</span>
                                         <p className="text-gray-600">{orderDetails.to_city}</p>
                                     </div>
-                                    {/* <div>
-                                        <span className="font-medium text-gray-700">date</span>
-                                        <p>{new Date(orderDetails.date).toLocaleDateString()}</p>
-                                    </div> */}
 
-                                    <div className="text-center py-4">
-                                        <button
-                                            className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition-all"
-                                            onClick={() => navigate(`/profile-dashboard/bus-tracking/${orderDetails.bus_id}`)}
-                                        >
-                                            Watch Live Showing
-                                        </button>
-                                    </div>
 
+
+
+                                </div>
+                                <div className="text-center py-4">
+                                    <button
+                                        className="bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white px-8 py-3 rounded-full shadow-lg hover:scale-105 hover:from-green-600 hover:to-green-800 transition-all duration-300 transform"
+                                        onClick={() => navigate(`/profile-dashboard/bus-tracking/${orderDetails.bus_id}`)}
+                                    >
+                                        Watch Live Tracking
+                                    </button>
                                 </div>
                             </div>
                         )}
@@ -188,7 +186,7 @@ const UserTickets = () => {
                                                     {ticket.seat.seat_number}
                                                 </td>
                                                 <td className="border px-6 py-4 text-gray-800 text-base">
-                                                    ${ticket.amount}
+                                                    Rs{ticket.amount}
                                                 </td>
                                                 <td
                                                     className={`border px-6 py-4 text-base ${ticket.status === 'confirmed'
@@ -198,7 +196,7 @@ const UserTickets = () => {
                                                 >
                                                     {ticket.status}
                                                 </td>
-                                                
+
                                                 <td className="border px-6 py-4">
                                                     {busStarted ? (
                                                         <span className="text-gray-500">Bus has started, cancellation not allowed</span>

@@ -144,7 +144,7 @@ const SignUp = () => {
             Swal.close();  
             Swal.fire({
                 icon: 'success',
-                title: 'Registration Successful',
+                title: 'Otp shared Successful',
                 text: 'You have successfully registered. Redirecting to OTP verification...',
                 timer: 2000,
                 showConfirmButton: false
