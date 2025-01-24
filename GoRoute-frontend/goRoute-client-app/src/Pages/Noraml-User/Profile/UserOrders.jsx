@@ -37,7 +37,7 @@ const UserOrders = () => {
     return (
         <div className="bg-gray-100 p-4 sm:p-6 md:p-8 min-h-screen">
             <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-                <h1 className="text-center text-3xl font-semibold text-red-600 p-4">Your Orders</h1>
+                <h1 className="text-center text-3xl font-semibold text-red-600 p-4">My Booking</h1>
                 
                 {loading ? (
                     <div className="text-center text-gray-500">Loading orders...</div>
@@ -68,7 +68,7 @@ const UserOrders = () => {
                         </tbody>
                     </table>
                 ) : (
-                    <div className="text-center text-gray-500">You have no orders yet.</div>
+                    <div className="text-center text-gray-500">You have no booking yet.</div>
                 )}
             </div>
         </div>

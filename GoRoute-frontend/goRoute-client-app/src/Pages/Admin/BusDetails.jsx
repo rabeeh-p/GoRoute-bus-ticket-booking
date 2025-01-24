@@ -50,7 +50,7 @@ const BusDetails = () => {
                     <div>
                         <h3 className="text-xl font-medium text-gray-700">Bus Number:</h3>
                         <p className="text-lg text-gray-600">{busDetails.bus_number}</p>
-                    </div>
+                    </div>  
                     <div>
                         <h3 className="text-xl font-medium text-gray-700">Owner Name:</h3>
                         <p className="text-lg text-gray-600">{busDetails.bus_owner_name}</p>
