@@ -443,9 +443,7 @@ class AcceptBusOwnerView(APIView):
 
 
 class LogoutView(APIView):
-    """
-    Handle logout: Invalidate the refresh token, delete cookies and session data.
-    """
+    
     def post(self, request, *args, **kwargs):
 
         print("logout is working")
@@ -576,11 +574,10 @@ class CreateUserByAdmin(APIView):
 
 
 class AdminScheduledBusListView(APIView):
-    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can access
+    permission_classes = [IsAuthenticated]   
 
     def get(self, request):
         try:
-            # Fetch all scheduled buses
             scheduled_buses = ScheduledBus.objects.all().order_by('scheduled_date')
             serializer = ScheduledBusSerializer(scheduled_buses, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)

@@ -999,6 +999,8 @@ class PaymentSuccessAPIView(APIView):
                     date=order.date
                 )
 
+
+
                 ticket_amount = Decimal(order.amount) / Decimal(len(seat_numbers))
                 ticket = Ticket.objects.create(
                     order=order,
@@ -1013,13 +1015,13 @@ class PaymentSuccessAPIView(APIView):
             order.amount = total_amount
             order.save()
 
-            # Credit amounts to admin and bus owner wallets
             super_admin = CustomUser.objects.filter(role='super_admin').first()
             if super_admin:
                 admin_wallet, _ = Wallet.objects.get_or_create(user=super_admin)
 
-                admin_credit = total_amount * Decimal('0.05')  # Admin gets 5%
+                admin_credit = total_amount * Decimal('0.05')  
                 admin_wallet.credit(admin_credit)
+                
 
                 Transaction.objects.create(
                     wallet=admin_wallet,
@@ -1031,7 +1033,7 @@ class PaymentSuccessAPIView(APIView):
                 bus_owner = CustomUser.objects.get(id=order.bus.bus_owner_id)
                 bus_owner_wallet, _ = Wallet.objects.get_or_create(user=bus_owner)
 
-                bus_owner_credit = total_amount * Decimal('0.95')  # Bus owner gets 95%
+                bus_owner_credit = total_amount * Decimal('0.95')   
                 bus_owner_wallet.credit(bus_owner_credit)
 
                 Transaction.objects.create(

@@ -549,7 +549,7 @@ class ScheduleBusView(APIView):
                 description=bus.description,
                 started=False,
                 bus_owner_id=bus.bus_owner.user.id,
-                current_stop=stops.first().stop_name,  # Set initial current stop
+                current_stop=stops.first().stop_name,   
                 stop_number=stops.first().stop_order-1,
             )
 
