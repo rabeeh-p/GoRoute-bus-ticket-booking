@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../../Components/Normal/Navbar';
-import { Calendar, Clock, IndianRupee, MapPin, Star,Bus } from 'lucide-react';
+import { Calendar, Clock, IndianRupee, MapPin, Star, Bus  } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { FaBusAlt, FaTag } from 'react-icons/fa';
 
 const TripBooking = () => {
     const [buses, setBuses] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [busTypeFilter, setBusTypeFilter] = useState("");
+    const [seatTypeFilter, setSeatTypeFilter] = useState("");
 
     const navigate = useNavigate('')
 
@@ -44,6 +45,32 @@ const TripBooking = () => {
             fetchBuses();
         }
     }, [from, to, date]);
+
+
+    const handleBusTypeChange = (e) => {
+        setBusTypeFilter(e.target.value);  
+        console.log("Selected Bus Type:", e.target.value);
+    };
+
+    const handleSeatTypeChange = (e) => {
+        setSeatTypeFilter(e.target.value);  
+        console.log("Selected Seat Type:", e.target.value);
+    };
+
+    const filteredBuses = Array.isArray(buses.buses)
+        ? buses.buses.filter((bus) => {
+            const busTypeMatch = !busTypeFilter || bus.bus_type.toLowerCase() === busTypeFilter;
+            const seatTypeMatch = !seatTypeFilter || bus.seat_type.toLowerCase() === seatTypeFilter;
+            return busTypeMatch && seatTypeMatch;
+        })
+        : [];
+
+
+
+
+
+
+
 
     return (
         <div>
@@ -92,41 +119,52 @@ const TripBooking = () => {
                             <h2 className="text-lg font-semibold">Filters</h2>
                         </div>
 
+
                         <div className="space-y-4">
+                            {/* Bus Type Filter */}
                             <div>
                                 <h3 className="font-medium mb-2">Bus Type</h3>
                                 <div className="space-y-2">
-                                    {["AC Sleeper", "AC Seater", "Non-AC Sleeper", "Non-AC Seater"].map((type) => (
+                                    {["AC", "Non_AC"].map((type) => (
                                         <label key={type} className="flex items-center gap-2">
                                             <input
-                                                type="checkbox"
-                                                name="busType"
-                                                value={type}
-                                                className="rounded text-red-500 focus:ring-red-500"
+                                                type="radio"
+                                                name="busType"  
+                                                value={type.toLowerCase()}
+                                                onChange={handleBusTypeChange}  
+                                                className="text-red-500 focus:ring-red-500"
                                             />
-                                            {type}
+                                            {type.replace("_", " ")}
                                         </label>
                                     ))}
                                 </div>
                             </div>
 
                             <div>
-                                <h3 className="font-medium mb-2">Departure Time</h3>
+                                <h3 className="font-medium mb-2">Seat Type</h3>
                                 <div className="space-y-2">
-                                    {[{ label: "Morning (6 AM - 12 PM)", value: "morning" }, { label: "Afternoon (12 PM - 6 PM)", value: "afternoon" }, { label: "Night (6 PM - 6 AM)", value: "night" }].map((time) => (
-                                        <label key={time.value} className="flex items-center gap-2">
+                                    {[
+                                        { label: "Sleeper", value: "full_sleeper" },
+                                        { label: "Semi-Sleeper", value: "semi-sleeper" },
+                                        { label: "Standard", value: "standard" },
+                                    ].map((seat) => (
+                                        <label key={seat.value} className="flex items-center gap-2">
                                             <input
                                                 type="radio"
-                                                name="departure"
-                                                value={time.value}
+                                                name="seatType" 
+                                                value={seat.value.toLowerCase()}
+                                                onChange={handleSeatTypeChange}  
                                                 className="text-red-500 focus:ring-red-500"
                                             />
-                                            {time.label}
+                                            {seat.label}
                                         </label>
                                     ))}
                                 </div>
                             </div>
                         </div>
+
+
+
                     </div>
 
                     <div className="md:col-span-3">
@@ -135,105 +173,31 @@ const TripBooking = () => {
                                 <h2 className="text-xl font-semibold text-gray-800">
                                     Available Buses
                                 </h2>
+
                                 <div className="text-sm text-gray-600">
-                                    {loading ? 'Loading buses...' : `${buses?.buses?.length || 0} buses found`}
+                                    {loading
+                                        ? "Loading buses..."
+                                        : `${filteredBuses?.length || 0} buses found`}
                                 </div>
+
                             </div>
                         </div>
 
                         {error && <div className="text-red-500">{error}</div>}
 
-                        {/* <div className="space-y-4">
-                            {Array.isArray(buses.buses) && buses.buses.length > 0 ? (
-                                buses.buses.map((bus) => (
-                                    <div
-                                        key={bus.bus_number}
-                                        className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-                                    >
-                                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 
 
-                                            <div className="flex-1">
-                                                {bus.bus_owner_logo ? (
-                                                    <img
-                                                        src={`http://127.0.0.1:8000/${bus.bus_owner_logo}`}
-                                                        alt={`${bus.bus_owner_name} logo`}
-                                                        className="mt-2 w-12 h-12 rounded-full object-cover"
-                                                    />
-                                                ) : null}
-                                                <h3 className="text-lg font-semibold text-gray-800">{bus.bus_owner_name}</h3>
-                                                <p className="text-sm text-gray-600">{bus.bus_type}</p>
-                                            </div>
 
-                                             
-                                            <div className="flex-1">
-                                                <p className="text-lg font-medium text-gray-800 flex items-center gap-2">
-                                                     
-                                                    <span className="text-red-500">
-                                                        <FaTag />
-                                                    </span>
-                                                    {bus.name}
-                                                </p>
-                                            </div>
-
-
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <Clock className="w-5 h-5 text-gray-500" />
-                                                    <div>
-                                                        <p className="font-medium">{new Date(bus.scheduled_date).toLocaleString()}</p>
-                                                        <p className="text-sm text-gray-500">Scheduled Date</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex-1">
-                                                <p className="text-sm text-gray-600">Seats Available: {bus.seat_count}</p>
-                                                <div className="flex items-center gap-2">
-                                                    <Star className="w-5 h-5 text-yellow-400" />
-                                                     
-                                                </div>
-                                            </div>
-
-                                            <div className="flex-1 text-center">
-                                                <p className="text-sm text-gray-600">Distance: </p>
-                                                <div className="flex items-center justify-center gap-2">
-                                                    <span className="text-xl font-semibold text-gray-800">{bus.distance_km} km</span>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex-1 text-right">
-                                                <div className="flex items-center justify-end gap-1">
-                                                    <IndianRupee className="w-5 h-5 text-gray-800" />
-                                                    <span className="text-xl font-bold text-gray-800">
-                                                        {bus.price}
-                                                    </span>
-                                                </div>
-                                                <button
-                                                    onClick={() => navigate(`/user-bus-view/${bus.id}`)}
-                                                    className="mt-2 bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition-colors">
-                                                    View
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-gray-500 col-span-3">No buses available.</p>
-                            )}
-                        </div> */}
 
 
                         <div className="space-y-4">
-                            {Array.isArray(buses.buses) && buses.buses.length > 0 ? (
-                                buses.buses.map((bus) => (
+                            {Array.isArray(filteredBuses) && filteredBuses.length > 0 ? (
+                                filteredBuses.map((bus) => (
                                     <div
                                         key={bus.bus_number}
                                         className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
                                     >
                                         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-
-                                            
                                             <div className="flex-1 flex items-center gap-3">
                                                 {bus.bus_owner_logo ? (
                                                     <img
@@ -248,15 +212,10 @@ const TripBooking = () => {
                                                 </div>
                                             </div>
 
-                                            
                                             <div className="flex-1 flex items-center gap-2">
-                                                <span className="text-red-500">
-                                                   
-                                                </span>
                                                 <p className="text-lg font-medium text-gray-800">{bus.name}</p>
                                             </div>
 
-                                           
                                             <div className="flex-1 flex items-center gap-2">
                                                 <Clock className="w-5 h-5 text-gray-500" />
                                                 <div>
@@ -265,19 +224,16 @@ const TripBooking = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Seats Available Section */}
                                             <div className="flex-1 flex items-center gap-2">
                                                 <p className="text-sm text-gray-600">Seats: {bus.seat_count}</p>
                                                 <Star className="w-5 h-5 text-yellow-400" />
                                             </div>
 
-                                            {/* Distance Section */}
                                             <div className="flex-1 text-center">
                                                 <p className="text-sm text-gray-600">Distance:</p>
                                                 <span className="text-xl font-semibold text-gray-800">{bus.distance_km} km</span>
                                             </div>
 
-                                            {/* Price and Button Section */}
                                             <div className="flex-1 text-right">
                                                 <div className="flex items-center justify-end gap-1">
                                                     <IndianRupee className="w-5 h-5 text-gray-800" />
@@ -294,13 +250,9 @@ const TripBooking = () => {
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-gray-500 col-span-3">No buses available.</p>
+                                <p className="text-gray-500">No buses available.</p>
                             )}
                         </div>
-
-
-
-
 
 
 
