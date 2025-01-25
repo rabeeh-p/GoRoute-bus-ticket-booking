@@ -72,3 +72,35 @@ class WalletSerializer(serializers.ModelSerializer):
 
 
 
+
+
+
+
+
+# class ScheduledStopSerializer2(serializers.ModelSerializer):
+#     class Meta:
+#         model = ScheduledStop
+#         fields = ['stop_name', 'arrival_time', 'departure_time', 'distance_km']
+
+class ScheduledBusDetailSerializer2(serializers.ModelSerializer):
+    first_stop = serializers.SerializerMethodField()
+    last_stop = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ScheduledBus
+        fields = ['bus_number', 'bus_owner_name', 'route', 'scheduled_date', 'status', 'seat_count', 'first_stop', 'last_stop']
+
+    def get_first_stop(self, obj):
+        first_stop = obj.stops.order_by('stop_order').first()
+        if first_stop:
+            return ScheduledStopSerializer(first_stop).data
+        return None
+
+    def get_last_stop(self, obj):
+        last_stop = obj.stops.order_by('stop_order').last()
+        if last_stop:
+            return ScheduledStopSerializer(last_stop).data
+        return None
+
+
+

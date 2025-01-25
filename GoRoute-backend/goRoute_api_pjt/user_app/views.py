@@ -36,6 +36,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
 from rest_framework.exceptions import NotFound
+from rest_framework.generics import ListAPIView
 # Create your views here.
 
 
@@ -982,6 +983,8 @@ class PaymentSuccessAPIView(APIView):
             order.status = 'confirmed'
             order.save()
 
+            
+
             seat_numbers = order.selected_seats
             if not seat_numbers:
                 return JsonResponse({'error': 'No seats specified in the order.'}, status=400)
@@ -1042,6 +1045,34 @@ class PaymentSuccessAPIView(APIView):
                     transaction_type='credit',
                     description=f"Bus owner credited with 95% of the total booking amount: {bus_owner_credit:.2f}"
                 )
+
+            
+            # Send email confirmation
+            user_email = order.email
+            seat_details = "\n".join([f"Seat Number: {ticket.seat.seat_number}, Status: {ticket.status}" for ticket in booked_seats])
+            email_subject = "Your Ticket Booking Confirmation"
+            email_message = f"""
+            Dear {order.name},
+
+            Your booking has been confirmed. Below are your ticket details:
+
+            Seats:
+            {seat_details}
+
+            Total Amount: {total_amount}
+
+            Thank you for booking with us!
+
+            Best Regards,
+            The GoRoute Team
+            """
+
+            send_mail(
+                subject=email_subject,
+                message=email_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user_email],
+            )
 
             return JsonResponse({
                 'message': 'Payment successful and order confirmed.',
@@ -1223,5 +1254,9 @@ class BusTrackingAPIView(APIView):
 
 
 
+
+class ScheduledBusListView(ListAPIView):
+    queryset = ScheduledBus.objects.all()   
+    serializer_class = ScheduledBusDetailSerializer2 
 
 

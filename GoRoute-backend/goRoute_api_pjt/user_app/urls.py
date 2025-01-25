@@ -32,6 +32,7 @@ urlpatterns = [
 
 
     path('bus-tracking/<int:bus_id>/', BusTrackingAPIView.as_view(), name='bus_tracking'),
+    path('scheduled_buses/', ScheduledBusListView.as_view(), name='scheduled_bus_list'),
 
 
 
