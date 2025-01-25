@@ -20,7 +20,7 @@ const UserBusView = () => {
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
 
-    
+
 
     console.log(busDetails, 'details');
     console.log(logo, 'logo');
@@ -35,25 +35,25 @@ const UserBusView = () => {
 
     useEffect(() => {
         console.log('Bus ID:', busId);
-        
+
 
         // const socket = new WebSocket(`ws://127.0.0.1:8000/ws/seats/${busId}/`);
 
-// socket.onopen = () => {
-//     console.log("WebSocket connection established");
-//     // Now you can send messages safely
-// };
+        // socket.onopen = () => {
+        //     console.log("WebSocket connection established");
+        //     // Now you can send messages safely
+        // };
 
-// socket.onerror = (error) => {
-//     console.error("WebSocket error:", error);
-//     // alert("WebSocket connection failed!");
-// };
+        // socket.onerror = (error) => {
+        //     console.error("WebSocket error:", error);
+        //     // alert("WebSocket connection failed!");
+        // };
 
-// socket.onclose = (event) => {
-//     console.log("WebSocket closed:", event);
-// };
+        // socket.onclose = (event) => {
+        //     console.log("WebSocket closed:", event);
+        // };
 
-        
+
         axios
             .get(`http://127.0.0.1:8000/bus-details/${busId}/`, {
                 params: {
@@ -68,7 +68,7 @@ const UserBusView = () => {
 
                 setBusDetails(response.data.bus);
                 setPrice(response.data.total_price)
-                
+
                 setBookedSeats(response.data.booked_seats);
                 setLogo(response.data.bus_log)
             })
@@ -79,36 +79,36 @@ const UserBusView = () => {
     }, [busId]);
 
 
-// useEffect(() => {
-//     console.log('Bus ID:', busId);
+    // useEffect(() => {
+    //     console.log('Bus ID:', busId);
 
-//     // Create WebSocket connection.
-//     // const socket = io(`http://127.0.0.1:8000/ws/seats/${busId}`, {
-//     //     query: { busId, from_city: from, to_city: to, date: date }
-//     // });
-//     const socket = new WebSocket(`ws://127.0.0.1:8000/ws/seats/${busId}/?from_city=${from}&to_city=${to}&date=${date}`);
+    //     // Create WebSocket connection.
+    //     // const socket = io(`http://127.0.0.1:8000/ws/seats/${busId}`, {
+    //     //     query: { busId, from_city: from, to_city: to, date: date }
+    //     // });
+    //     const socket = new WebSocket(`ws://127.0.0.1:8000/ws/seats/${busId}/?from_city=${from}&to_city=${to}&date=${date}`);
 
 
-//     // Listen for messages from the server.
-//     socket.on('bus_details', (data) => {
-//         console.log(data, 'real-time data');
-//         setBusDetails(data.bus);
-//         setPrice(data.total_price);
-//         setBookedSeats(data.booked_seats);
-//         setLogo(data.bus_log);
-//     });
+    //     // Listen for messages from the server.
+    //     socket.on('bus_details', (data) => {
+    //         console.log(data, 'real-time data');
+    //         setBusDetails(data.bus);
+    //         setPrice(data.total_price);
+    //         setBookedSeats(data.booked_seats);
+    //         setLogo(data.bus_log);
+    //     });
 
-//     // Handle errors
-//     socket.onopen ('error', (err) => {
-//         console.error("Error from WebSocket:", err);
-//         setError("Could not fetch bus details.");
-//     });
+    //     // Handle errors
+    //     socket.onopen ('error', (err) => {
+    //         console.error("Error from WebSocket:", err);
+    //         setError("Could not fetch bus details.");
+    //     });
 
-//     // Cleanup on component unmount.
-//     return () => {
-//         socket.disconnect();
-//     };
-// }, [busId, from, to, date]);
+    //     // Cleanup on component unmount.
+    //     return () => {
+    //         socket.disconnect();
+    //     };
+    // }, [busId, from, to, date]);
 
 
     const handleBookNowClick = () => {
@@ -120,24 +120,24 @@ const UserBusView = () => {
             setIsModalOpen(true);
         }
 
-          
+
     };
 
     const handleModalClose = () => {
         setIsModalOpen(false);
     };
 
-    
+
     const isFormValid = () => {
         return (
-          userName.trim() !== "" &&
-          email.includes("@") &&
-          /^\d{10}$/.test(phone)
+            userName.trim() !== "" &&
+            email.includes("@") &&
+            /^\d{10}$/.test(phone)
         );
-      };
-      
-     
-    
+    };
+
+
+
 
     // const handleFormSubmit = (e) => {
     //     e.preventDefault();
@@ -151,8 +151,8 @@ const UserBusView = () => {
     //     const pricePerPerson = price;  
     //     const totalAmount = pricePerPerson * selectedSeats.length;
     //     console.log(totalAmount,'tottelllllllllll');
-        
-    
+
+
     //     const formData = {
     //         bus_id: busId,
     //         seat_numbers: selectedSeats,
@@ -165,7 +165,7 @@ const UserBusView = () => {
     //         total_amount: totalAmount,
     //         pricePerPerson:pricePerPerson,
     //     };
-    
+
     //     Swal.fire({
     //         title: 'Do you want to simulate a successful payment?',
     //         icon: 'question',
@@ -187,16 +187,16 @@ const UserBusView = () => {
     //                         order_id: response.data.razorpay_order_id,
     //                         handler: function (paymentResponse) {
     //                             console.log("Payment Response:", paymentResponse);   
-    
+
     //                             const paymentId = paymentResponse.razorpay_payment_id;
     //                             const orderId = response.data.razorpay_order_id;  
     //                             const signature = paymentResponse.razorpay_signature;
-    
+
     //                             if (!paymentId || !orderId || !signature) {
     //                                 Swal.fire("Error", "Missing payment details in the response.", "error");
     //                                 return;
     //                             }
-    
+
     //                             axios.post('http://127.0.0.1:8000/payment-success/', {
     //                                 payment_id: paymentId,
     //                                 order_id: orderId,
@@ -231,7 +231,7 @@ const UserBusView = () => {
     //         }
     //     });
     // };
-    
+
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -240,12 +240,12 @@ const UserBusView = () => {
             navigate('/login');
             return;
         }
-    
+
         const searchParams = JSON.parse(localStorage.getItem('searchParams'));
         const { from, to, date } = searchParams;
         const pricePerPerson = price;
         const totalAmount = pricePerPerson * selectedSeats.length;
-    
+
 
 
 
@@ -262,7 +262,7 @@ const UserBusView = () => {
             total_amount: totalAmount,
             pricePerPerson: pricePerPerson,
         };
-    
+
         Swal.fire({
             title: 'Do you want to simulate a successful payment?',
             icon: 'question',
@@ -274,76 +274,76 @@ const UserBusView = () => {
                 axios.post('http://127.0.0.1:8000/seat-booking/', formData, {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 })
-                .then((response) => {
-                    if (response.data.message) {
-                        const options = {
-                            key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-                            amount: totalAmount * 100,
-                            currency: "INR",
-                            name: "Bus Booking",
-                            description: "Test Transaction",
-                            order_id: response.data.razorpay_order_id,
-                            handler: function (paymentResponse) {
-                                Swal.fire({
-                                    title: 'Processing Payment...',
-                                    html: '<strong>Please wait while we verify your payment.</strong>',
-                                    allowOutsideClick: false,
-                                    showCancelButton: false,
-                                    didOpen: () => {
-                                        Swal.showLoading();
-                                    },
-                                });
-    
-                                const paymentId = paymentResponse.razorpay_payment_id;
-                                const orderId = response.data.razorpay_order_id;
-                                const signature = paymentResponse.razorpay_signature;
-    
-                                if (!paymentId || !orderId || !signature) {
-                                    Swal.close();  
-                                    Swal.fire("Error", "Missing payment details in the response.", "error");
-                                    return;
-                                }
-    
-                                axios.post('http://127.0.0.1:8000/payment-success/', {
-                                    payment_id: paymentId,
-                                    order_id: orderId,
-                                    signature: signature
-                                })
-                                .then((paymentResponseBackend) => {
-                                    Swal.close();  
-                                    Swal.fire("Success!", "Payment completed successfully.", "success");
-                                    window.location.reload();
-                                })
-                                .catch((err) => {
-                                    Swal.close();  
-                                    console.error("Payment verification error:", err.response.data);
-                                    Swal.fire("Error!", "Payment verification failed.", "error");
-                                });
-                            },
-                            prefill: {
-                                name: e.target.userName.value,
-                                email: e.target.email.value,
-                                contact: e.target.phone.value,
-                            },
-                            theme: { color: "#3399cc" },
-                        };
-                        const rzp = new Razorpay(options);
-                        rzp.open();
-                    } else {
-                        Swal.fire("Error", "Order creation failed.", "error");
-                    }
-                })
-                .catch((error) => {
-                    Swal.fire("Error", "Failed to connect to the server.", "error");
-                });
+                    .then((response) => {
+                        if (response.data.message) {
+                            const options = {
+                                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                                amount: totalAmount * 100,
+                                currency: "INR",
+                                name: "Bus Booking",
+                                description: "Test Transaction",
+                                order_id: response.data.razorpay_order_id,
+                                handler: function (paymentResponse) {
+                                    Swal.fire({
+                                        title: 'Processing Payment...',
+                                        html: '<strong>Please wait while we verify your payment.</strong>',
+                                        allowOutsideClick: false,
+                                        showCancelButton: false,
+                                        didOpen: () => {
+                                            Swal.showLoading();
+                                        },
+                                    });
+
+                                    const paymentId = paymentResponse.razorpay_payment_id;
+                                    const orderId = response.data.razorpay_order_id;
+                                    const signature = paymentResponse.razorpay_signature;
+
+                                    if (!paymentId || !orderId || !signature) {
+                                        Swal.close();
+                                        Swal.fire("Error", "Missing payment details in the response.", "error");
+                                        return;
+                                    }
+
+                                    axios.post('http://127.0.0.1:8000/payment-success/', {
+                                        payment_id: paymentId,
+                                        order_id: orderId,
+                                        signature: signature
+                                    })
+                                        .then((paymentResponseBackend) => {
+                                            Swal.close();
+                                            Swal.fire("Success!", "Payment completed successfully.", "success");
+                                            window.location.reload();
+                                        })
+                                        .catch((err) => {
+                                            Swal.close();
+                                            console.error("Payment verification error:", err.response.data);
+                                            Swal.fire("Error!", "Payment verification failed.", "error");
+                                        });
+                                },
+                                prefill: {
+                                    name: e.target.userName.value,
+                                    email: e.target.email.value,
+                                    contact: e.target.phone.value,
+                                },
+                                theme: { color: "#3399cc" },
+                            };
+                            const rzp = new Razorpay(options);
+                            rzp.open();
+                        } else {
+                            Swal.fire("Error", "Order creation failed.", "error");
+                        }
+                    })
+                    .catch((error) => {
+                        Swal.fire("Error", "Failed to connect to the server.", "error");
+                    });
             } else {
                 Swal.fire("Payment Failed", "The payment was not successful. No seats have been booked.", "error");
             }
         });
     };
-    
-    
-    
+
+
+
 
 
 
@@ -573,27 +573,14 @@ const UserBusView = () => {
 
 
             <div className="container mx-auto mt-16 p-6 bg-white rounded-lg shadow-lg">
-                {/* Bus Details Section */}
-                {/* <div className="bg-gray-50 p-6 rounded-lg shadow mb-6">
-                    <h2 className="text-3xl font-semibold text-gray-800 mb-4">{busDetails.bus_owner_name}</h2>
-                    <p className="text-gray-700 mb-2"><span className="font-medium">Bus Name:</span> {busDetails.name}</p>
-                    <p className="text-gray-700 mb-2"><span className="font-medium">Bus Number:</span> {busDetails.bus_number}</p>
-                    <p className="text-gray-700 mb-2"><span className="font-medium">Bus Type:</span> {busDetails.bus_type}</p>
-                    <p className="text-gray-700 mb-2"><span className="font-medium">Route:</span> {busDetails.route}</p>
-                    <p className="text-gray-700 mb-2"><span className="font-medium">Seat Type:</span> {busDetails.seat_type}</p>
-                    <p className="text-gray-700 mb-2">
-                        <span className="font-medium">Scheduled Date:</span> {new Date(busDetails.scheduled_date).toLocaleString()}
-                    </p>
-                    <p className="text-gray-700 mb-2"><span className="font-medium">Seats Available:</span> {busDetails.seat_count}</p>
-                </div> */}
+
                 <div className="bg-gray-50 p-6 rounded-lg shadow mb-6 flex flex-col lg:flex-row justify-between">
                     <div className="w-full lg:w-1/2 mb-4 lg:mb-0">
                         <h2 className="text-3xl font-semibold text-gray-800 mb-4 flex items-center">
-                            {/* Add the logo image here */}
                             <img
-                                src={`http://127.0.0.1:8000/${logo}`}  
+                                src={`http://127.0.0.1:8000/${logo}`}
                                 alt="Bus Owner Logo"
-                                className="w-12 h-12 rounded-full mr-4" 
+                                className="w-12 h-12 rounded-full mr-4"
                             />
                             {busDetails.bus_owner_name}
                         </h2>
@@ -611,12 +598,6 @@ const UserBusView = () => {
                         <p className="text-gray-700 mb-2"><span className="font-medium">Price:</span> {price}</p>
                     </div>
                 </div>
-
-
-
-
-
-
 
                 <div className="bg-white rounded-lg shadow-md p-4 mb-6">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -686,70 +667,19 @@ const UserBusView = () => {
                 )}
             </div>
 
-            {/* Modal for Booking Form */}
-            {/* {isModalOpen && (
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
-                <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                    <h2 className="text-xl font-bold mb-4">Booking Form</h2>
-                    <form onSubmit={handleFormSubmit}>
-                        <div className="mb-4">
-                            <label htmlFor="selectedSeats" className="block text-gray-700">
-                                Selected Seats:
-                            </label>
-                            <input
-                                type="text"
-                                id="selectedSeats"
-                                name="selectedSeats"
-                                value={selectedSeats.join(", ")}
-                                disabled
-                                className="mt-2 p-2 w-full border rounded-lg"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="userName" className="block text-gray-700">
-                                Your Name:
-                            </label>
-                            <input
-                                type="text"
-                                id="userName"
-                                name="userName"
-                                className="mt-2 p-2 w-full border rounded-lg"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="email" className="block text-gray-700">
-                                Your Email:
-                            </label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                className="mt-2 p-2 w-full border rounded-lg"
-                                required
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            className="bg-green-500 text-white py-2 px-4 rounded"
-                        >
-                            Confirm Booking
-                        </button>
-                    </form>
-                    <button
-                        className="mt-4 text-red-500"
-                        onClick={handleModalClose}
-                    >
-                        Close
-                    </button>
-                </div>
-            </div>
-        )} */}
 
-            {/* {isModalOpen && (
+
+
+
+
+
+
+            {isModalOpen && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                        <h2 className="text-xl font-bold mb-4">Booking Form</h2>
+                        <h2 className="text-xl font-bold mb-4">
+                            Booking Form Total - ₹{price * selectedSeats.length}
+                        </h2>
                         <form onSubmit={handleFormSubmit}>
                             <div className="mb-4">
                                 <label htmlFor="selectedSeats" className="block text-gray-700">
@@ -759,11 +689,13 @@ const UserBusView = () => {
                                     type="text"
                                     id="selectedSeats"
                                     name="selectedSeats"
-                                    value={selectedSeats.join(", ")} // Array of selected seats
+                                    value={selectedSeats.join(", ")}
                                     disabled
                                     className="mt-2 p-2 w-full border rounded-lg"
                                 />
                             </div>
+
+                            {/* Name Field */}
                             <div className="mb-4">
                                 <label htmlFor="userName" className="block text-gray-700">
                                     Your Name:
@@ -772,10 +704,17 @@ const UserBusView = () => {
                                     type="text"
                                     id="userName"
                                     name="userName"
+                                    value={userName}
+                                    onChange={(e) => setUserName(e.target.value.trimStart())}  
                                     className="mt-2 p-2 w-full border rounded-lg"
                                     required
                                 />
+                                {userName.trim() === "" && (
+                                    <p className="text-red-500 text-sm mt-1">Name cannot be empty or contain only spaces.</p>
+                                )}
                             </div>
+
+                            {/* Email Field */}
                             <div className="mb-4">
                                 <label htmlFor="email" className="block text-gray-700">
                                     Your Email:
@@ -784,70 +723,14 @@ const UserBusView = () => {
                                     type="email"
                                     id="email"
                                     name="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value.trimStart())}  
                                     className="mt-2 p-2 w-full border rounded-lg"
                                     required
                                 />
                             </div>
-                            <button
-                                type="submit"
-                                className="bg-green-500 text-white py-2 px-4 rounded"
-                            >
-                                Confirm Booking
-                            </button>
-                        </form>
-                        <button
-                            className="mt-4 text-red-500"
-                            onClick={handleModalClose}
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
-            )} */}
 
-
-            {/* {isModalOpen && (
-                <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                        <h2 className="text-xl font-bold mb-4">Booking Form Total - {price * selectedSeats.length}</h2>
-                        <form onSubmit={handleFormSubmit}>
-                            <div className="mb-4">
-                                <label htmlFor="selectedSeats" className="block text-gray-700">
-                                    Selected Seats:
-                                </label>
-                                <input
-                                    type="text"
-                                    id="selectedSeats"
-                                    name="selectedSeats"
-                                    value={selectedSeats.join(", ")}  
-                                    disabled
-                                    className="mt-2 p-2 w-full border rounded-lg"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="userName" className="block text-gray-700">
-                                    Your Name:
-                                </label>
-                                <input
-                                    type="text"
-                                    id="userName"
-                                    name="userName"
-                                    className="mt-2 p-2 w-full border rounded-lg"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="email" className="block text-gray-700">
-                                    Your Email:
-                                </label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    className="mt-2 p-2 w-full border rounded-lg"
-                                    required
-                                />
-                            </div>
+                            {/* Phone Field */}
                             <div className="mb-4">
                                 <label htmlFor="phone" className="block text-gray-700">
                                     Your Phone Number:
@@ -856,119 +739,33 @@ const UserBusView = () => {
                                     type="tel"
                                     id="phone"
                                     name="phone"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}  
                                     className="mt-2 p-2 w-full border rounded-lg"
                                     required
                                 />
+                                {!/^\d{10}$/.test(phone) && phone !== "" && (
+                                    <p className="text-red-500 text-sm mt-1">Phone number must be exactly 10 digits.</p>
+                                )}
                             </div>
+
+                            {/* Submit Button */}
                             <button
                                 type="submit"
                                 className="bg-green-500 text-white py-2 px-4 rounded"
+                                disabled={!isFormValid()}  
                             >
                                 Confirm Booking
                             </button>
                         </form>
-                        <button
-                            className="mt-4 text-red-500"
-                            onClick={handleModalClose}
-                        >
+
+                        {/* Close Modal */}
+                        <button className="mt-4 text-red-500" onClick={handleModalClose}>
                             Close
                         </button>
                     </div>
                 </div>
-            )} */}
-
-{isModalOpen && (
-  <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-      <h2 className="text-xl font-bold mb-4">
-        Booking Form Total - ₹{price * selectedSeats.length}
-      </h2>
-      <form onSubmit={handleFormSubmit}>
-        <div className="mb-4">
-          <label htmlFor="selectedSeats" className="block text-gray-700">
-            Selected Seats:
-          </label>
-          <input
-            type="text"
-            id="selectedSeats"
-            name="selectedSeats"
-            value={selectedSeats.join(", ")}
-            disabled
-            className="mt-2 p-2 w-full border rounded-lg"
-          />
-        </div>
-
-        {/* Name Field */}
-        <div className="mb-4">
-          <label htmlFor="userName" className="block text-gray-700">
-            Your Name:
-          </label>
-          <input
-            type="text"
-            id="userName"
-            name="userName"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value.trimStart())} // Prevent leading spaces
-            className="mt-2 p-2 w-full border rounded-lg"
-            required
-          />
-          {userName.trim() === "" && (
-            <p className="text-red-500 text-sm mt-1">Name cannot be empty or contain only spaces.</p>
-          )}
-        </div>
-
-        {/* Email Field */}
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700">
-            Your Email:
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value.trimStart())} // Prevent leading spaces
-            className="mt-2 p-2 w-full border rounded-lg"
-            required
-          />
-        </div>
-
-        {/* Phone Field */}
-        <div className="mb-4">
-          <label htmlFor="phone" className="block text-gray-700">
-            Your Phone Number:
-          </label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))} // Allow only numbers
-            className="mt-2 p-2 w-full border rounded-lg"
-            required
-          />
-          {!/^\d{10}$/.test(phone) && phone !== "" && (
-            <p className="text-red-500 text-sm mt-1">Phone number must be exactly 10 digits.</p>
-          )}
-        </div>
-
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="bg-green-500 text-white py-2 px-4 rounded"
-          disabled={!isFormValid()} // Disable button if form is invalid
-        >
-          Confirm Booking
-        </button>
-      </form>
-
-      {/* Close Modal */}
-      <button className="mt-4 text-red-500" onClick={handleModalClose}>
-        Close
-      </button>
-    </div>
-  </div>
-)}
+            )}
 
 
 
