@@ -1071,7 +1071,19 @@ class BusOwnerTrackingAPIView(APIView):
 
 
 
+class OrderStatsView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
+    def get(self, request):
+        current_bus_owner_id = request.user.id
+        
+        owned_buses = ScheduledBus.objects.filter(bus_owner_id=current_bus_owner_id)
+        
+        orders = Order.objects.filter(bus__in=owned_buses)
+        
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
 
 
 
