@@ -1,39 +1,35 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../../Components/Normal/Navbar'
-import Features from '../../Components/Normal/Features'
-import SearchForm from '../../Components/Normal/SearchForm'
-import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import Navbar from '../../Components/Normal/Navbar';
+import Features from '../../Components/Normal/Features';
+import SearchForm from '../../Components/Normal/SearchForm';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const [routes, setRoutes] = useState([]);
   const [uniqueRoutes, setUniqueRoutes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate=useNavigate('')
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get("http://127.0.0.1:8000/scheduled_buses/")
       .then((response) => {
         const fetchedRoutes = response.data;
 
-        const filteredRoutes = fetchedRoutes.filter((route) => {
-          return route.first_stop.stop_name !== route.last_stop.stop_name;
-        });
+        const seenRoutes = new Set();
+        const uniqueRoutes = fetchedRoutes.filter((route) => {
+          const routeKey = `${route.first_stop.stop_name}-${route.last_stop.stop_name}-${route.scheduled_date.split('T')[0]}`;
 
-        const seenDates = new Set();
-        const uniqueRoutesWithDates = filteredRoutes.filter((route) => {
-          const scheduledDate = route.scheduled_date.split('T')[0];  
-
-          if (seenDates.has(scheduledDate)) {
-            return false;
+          if (seenRoutes.has(routeKey)) {
+            return false;   
           }
 
-          seenDates.add(scheduledDate);
+          seenRoutes.add(routeKey);   
           return true;
         });
 
         setRoutes(fetchedRoutes);
-        setUniqueRoutes(uniqueRoutesWithDates);
+        setUniqueRoutes(uniqueRoutes);  
         setLoading(false);
       })
       .catch((error) => {
@@ -50,19 +46,17 @@ const Home = () => {
       month: "long",
       day: "numeric",
     });
-
   };
 
   const handleViewSchedule = (route) => {
     localStorage.setItem('searchParams', JSON.stringify({
       from: route.first_stop.stop_name, 
       to: route.last_stop.stop_name, 
-      date: route.scheduled_date.split('T')[0]  
+      date: route.scheduled_date.split('T')[0]
     }));
 
     navigate('/trip-booking');
   };
-
 
   return (
     <div className="min-h-screen bg-gray-100">
