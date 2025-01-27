@@ -9,6 +9,7 @@ const menuItems = [
   { icon: FaTicketAlt, text: 'My Tickets', path: '/profile-dashboard/orders'  },
   { icon: FaWallet, text: 'Home',path: '/'  },
   { icon: FaWallet, text: 'Wallet', path: 'wallet'},
+  { icon: FaWallet, text: 'chat', path: 'chat'},
   // { icon: FaHistory, text: 'Travel History' },
   { icon: FaSignOutAlt, text: 'Logout', path: '#', action: 'logout' },
 ];

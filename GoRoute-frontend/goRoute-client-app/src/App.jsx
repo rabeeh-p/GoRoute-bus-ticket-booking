@@ -57,6 +57,7 @@ import AdminWallet from './Pages/Admin/AdminWallet';
 import BusOwnerTracking from './Pages/Bus_owners/BusOwnerTracking';
 import AdminBusScheduledList from './Pages/Admin/AdminBusScheduledList';
 import BusTrack from './Pages/Admin/BusTrack';
+import Chat from './Pages/Noraml-User/Profile/Chat';
 function App() {
 
 
@@ -82,6 +83,7 @@ function App() {
           <Route path="profile-edit" element={<UserProfileEdit />} />
           <Route path="wallet" element={<Wallet />} />
           <Route path="bus-tracking/:busId" element={<BusTracking />} />
+          <Route path="chat" element={<Chat />} />
         </Route>
 
 
