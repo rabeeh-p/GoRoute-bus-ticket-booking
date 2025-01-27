@@ -1260,3 +1260,8 @@ class ScheduledBusListView(ListAPIView):
     serializer_class = ScheduledBusDetailSerializer2 
 
 
+
+
+
+
+
