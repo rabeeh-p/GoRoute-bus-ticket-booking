@@ -1,9 +1,53 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import io from 'socket.io-client';
 
 function ChatApp() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [newMessage, setNewMessage] = useState('');
   const [selectedPerson, setSelectedPerson] = useState(null);
+
+
+  const [message, setMessage] = useState('');
+  const [messages1, setMessages] = useState([]);
+  const [socket, setSocket] = useState(null);
+
+
+
+//   useEffect(() => {
+//     // const socketInstance = io('ws://localhost:8000/ws/chat/');  
+//     const socketInstance = new WebSocket('ws://localhost:8000/ws/chat/'); 
+//     setSocket(socketInstance);
+
+//     socketInstance.on('message', (data) => {
+//         setMessages((prevMessages) => [...prevMessages, data.message]);
+//     });
+
+//     return () => {
+//         socketInstance.disconnect();
+//     };
+// }, []);
+
+useEffect(() => {
+    const socketInstance = new WebSocket('ws://localhost:8000/ws/chat/'); 
+    setSocket(socketInstance);
+
+    // Add event listener for 'message' event
+    socketInstance.addEventListener('message', (event) => {
+        const data = JSON.parse(event.data); // Assuming data is in JSON format
+        setMessages((prevMessages) => [...prevMessages, data.message]);
+    });
+
+    // Cleanup on component unmount
+    return () => {
+        socketInstance.close(); // Proper way to disconnect WebSocket
+    };
+}, []);
+
+
+
+
+
+
 
   const chatPeople = [
     { id: 1, name: 'John Doe', unreadCount: 2, time: '10:15 AM', lastMessage: 'Hey, how are you?' },
