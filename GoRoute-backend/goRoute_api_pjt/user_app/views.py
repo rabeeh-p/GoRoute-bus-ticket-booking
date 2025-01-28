@@ -37,6 +37,9 @@ from django.utils.html import strip_tags
 
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from rest_framework.exceptions import ValidationError
 # Create your views here.
 
 
@@ -1258,6 +1261,64 @@ class BusTrackingAPIView(APIView):
 class ScheduledBusListView(ListAPIView):
     queryset = ScheduledBus.objects.all()   
     serializer_class = ScheduledBusDetailSerializer2 
+
+
+
+
+class ForgotPasswordCheckView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        print('check is working')
+        username = request.data.get('username')
+
+        if not username:
+            return Response({"error": "Username is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = get_user_model().objects.get(username=username)
+        except get_user_model().DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if user.role not in ['normal_user', 'bus_owner']:
+            return Response({"error": "Password reset is not allowed for this user role."}, status=status.HTTP_403_FORBIDDEN)
+
+        return Response({"message": "Username is valid and allowed to change the password."}, status=status.HTTP_200_OK)
+
+
+
+
+
+class ForgotPasswordUpdateView(APIView):
+   
+
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        new_password = request.data.get('new_password')
+
+        if not username or not new_password:
+            return Response({"error": "Username and new password are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = get_user_model().objects.get(username=username)
+        except get_user_model().DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if user.role not in ['normal_user', 'bus_owner']:
+            return Response({"error": "Password reset is not allowed for this user role."}, status=status.HTTP_403_FORBIDDEN)
+
+        if len(new_password) < 5:
+            return Response({"error": "Password must be at least 5 characters long."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response({"message": "Password updated successfully."}, status=status.HTTP_200_OK)
+
+
+
+
+
+
 
 
 

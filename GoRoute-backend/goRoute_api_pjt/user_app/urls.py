@@ -28,6 +28,10 @@ urlpatterns = [
 
     path('api/wallet/', WalletAPIView.as_view(), name='wallet-api'),
     path('cancel-ticket/<int:ticket_id>/', CancelTicketAPIView.as_view(), name='cancel_ticket'),
+
+
+    path('forgot-password-check-user/', ForgotPasswordCheckView.as_view(), name='forgot-password-check'),
+    path('forgot-password-update/user/', ForgotPasswordUpdateView.as_view(), name='forgot-password-update'),
     
 
 

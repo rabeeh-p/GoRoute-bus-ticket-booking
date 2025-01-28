@@ -11,6 +11,8 @@ from .serializers import *
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 # Create your views here.
 
 
@@ -129,6 +131,75 @@ class UpdateCurrentStop(APIView):
         
         stops = ScheduledStop.objects.filter(scheduled_bus=bus).order_by('stop_order')
         return stops
+
+
+
+
+
+# class ForgotPasswordCheckView(APIView):
+#     def post(self, request, *args, **kwargs):
+#         serializer = UsernameCheckSerializer(data=request.data)
+#         if serializer.is_valid():
+#             username = serializer.validated_data['username']
+#             try:
+#                 user = get_user_model().objects.get(username=username)
+#                 return Response({"message": "Username exists, proceed to reset password."}, status=status.HTTP_200_OK)
+#             except get_user_model().DoesNotExist:
+#                 return Response({"error": "Username not found."}, status=status.HTTP_400_BAD_REQUEST)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class ForgotPasswordCheckView(APIView):
+    def post(self, request, *args, **kwargs):
+        # Assuming you're using a serializer for validating the username
+        serializer = UsernameCheckSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            
+            try:
+                # Get the user from the database
+                user = get_user_model().objects.get(username=username)
+                
+                # Check if the user is a conductor
+                if user.role != 'conductor':
+                    return Response({"error": "You are not conductor."}, status=status.HTTP_403_FORBIDDEN)
+                
+                # Proceed if the user is a conductor
+                return Response({"message": "Username exists, proceed to reset password."}, status=status.HTTP_200_OK)
+            
+            except get_user_model().DoesNotExist:
+                return Response({"error": "Username not found."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # If the serializer data is not valid
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class ForgotPasswordUpdateView(APIView):
+    def post(self, request, *args, **kwargs):
+        print('updations is wokring')
+        serializer = PasswordResetSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            new_password = serializer.validated_data['new_password']
+            confirm_password = serializer.validated_data['confirm_password']
+
+            if new_password != confirm_password:
+                return Response({"error": "Passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                user = get_user_model().objects.get(username=username)
+                user.password = make_password(new_password)  # Hash the new password
+                user.save()
+                return Response({"message": "Password updated successfully."}, status=status.HTTP_200_OK)
+            except get_user_model().DoesNotExist:
+                return Response({"error": "Username not found."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 
