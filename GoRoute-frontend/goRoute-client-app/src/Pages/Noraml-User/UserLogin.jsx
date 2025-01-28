@@ -13,84 +13,16 @@ const UserLogin = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-    //     console.log(username, 'user');
-    //     console.log(password, 'pass');
-
-
-    //     if (!username || !password) {
-    //         setError('Please fill in all fields');
-    //     } else {
-    //         axios
-    //             .post('http://127.0.0.1:8000/login/', { username, password })
-    //             .then((response) => {
-    //                 const { access, userType } = response.data;
-
-    //                 if (access) {
-    //                     dispatch(setToken({ access }));
-    //                     dispatch(setUserType(userType));
-
-    //                     localStorage.setItem('accessToken', access);
-    //                     localStorage.setItem('userType', userType);
-
-    //                     if (userType === 'bus_owner') {
-    //                         navigate('/busowner-dashboard/busowner-dashboard2');
-    //                     } else if (userType === 'normal_user') {
-    //                         navigate('/');
-    //                     }
-    //                 } else {
-    //                     setError('Login failed');
-    //                 }
-    //             })
-    //             .catch((error) => {
-    //                 if (error.response && error.response.data.error) {
-    //                     setError(error.response.data.error);
-    //                 } else {
-    //                     setError('Something went wrong. Please try again later.');
-    //                 }
-    //                 console.error(error);
-    //             });
-
-    //         setError('');
-    //         // setUsername('');
-    //         // setPassword('');
-    //     }
 
 
 
-    // }
-
-   
-    
-    // const handleGoogleLogin = async (response) => {
-    //     const idToken = response.credential;
-    //     console.log(idToken); // Log the token to verify it's valid
-     
-    //     try {
-    //         const res = await axios.post("http://127.0.0.1:8000/google-login/", { token: idToken });
-    //         if (res.status === 200) {
-    //             console.log("Google login successful:", res.data);
-    //             // Handle successful login (dispatching state, redirect, etc.)
-    //         } else {
-    //             console.error("Google login failed:", res.data.error);
-    //         }
-    //     } catch (error) {
-    //         console.error("Error during Google login:", error.response ? error.response.data : error);
-    //         // Show an error message to the user
-    //     }
-    // };
-    
-
-
-    
 
 
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(username, 'user');
         console.log(password, 'pass');
-    
+
         if (!username || !password) {
             setError('Please fill in all fields');
         } else {
@@ -99,16 +31,16 @@ const UserLogin = () => {
                 .then((response) => {
                     const { access, userType } = response.data;
 
-                    console.log(response.data,'dataaaaaaaaa');
-                    
-    
+                    console.log(response.data, 'dataaaaaaaaa');
+
+
                     if (access) {
                         dispatch(setToken({ access }));
                         dispatch(setUserType(userType));
-    
+
                         localStorage.setItem('accessToken', access);
                         localStorage.setItem('userType', userType);
-    
+
                         if (userType === 'bus_owner') {
                             navigate('/busowner-dashboard/busowner-dashboard2');
                         } else if (userType === 'normal_user') {
@@ -120,40 +52,44 @@ const UserLogin = () => {
                 })
                 .catch((error) => {
                     if (error.response && error.response.data.error) {
-                        setError(error.response.data.error);  
+                        setError(error.response.data.error);
                     } else {
                         setError('Something went wrong. Please try again later.');
                     }
                     console.error(error);
                 });
-    
+
             setError('');
         }
     }
-    
+
+    const handleForgotPassword = () => {
+        navigate('/forgot-user');   
+      };
+
 
 
     const handleGoogleLogin = async (response) => {
         const idToken = response.credential;
-        console.log(idToken);  
-    
+        console.log(idToken);
+
         try {
             const res = await axios.post("http://127.0.0.1:8000/google-login/", { token: idToken });
             if (res.status === 200) {
                 console.log("Google login successful:", res.data);
-    
+
                 dispatch(setToken({ token: res.data.tokens.access }));
                 dispatch(setUserType({ userType: 'normal_user' }));
 
-                console.log('acces token',res.data.tokens.access);
-                console.log('type',res.data.user.user_type);
-                
-    
+                console.log('acces token', res.data.tokens.access);
+                console.log('type', res.data.user.user_type);
+
+
                 localStorage.setItem("accessToken", res.data.tokens.access);
                 localStorage.setItem("refresh_token", res.data.tokens.refresh);
-                localStorage.setItem("userType",'normal_user' );
-    
-                navigate('/')  
+                localStorage.setItem("userType", 'normal_user');
+
+                navigate('/')
             } else {
                 console.error("Google login failed:", res.data.error);
             }
@@ -161,8 +97,8 @@ const UserLogin = () => {
             console.error("Error during Google login:", error.response ? error.response.data : error);
         }
     };
-   
-    
+
+
 
     return (
         <div>
@@ -217,6 +153,16 @@ const UserLogin = () => {
                                     Sign in
                                 </button>
                             </div>
+                            <div className="mb-4 text-right">
+                                <button
+                                    type="button"
+                                    onClick={handleForgotPassword}
+
+                                    className="text-sm text-red-600 hover:text-red-700 focus:outline-none"
+                                >
+                                    Forgot Password?
+                                </button>
+                            </div>
                         </form>
 
                         <div className="mt-6">
@@ -236,8 +182,8 @@ const UserLogin = () => {
                                     onError={() => console.log('Google login failed')}
                                     useOneTap
                                     clientId="95471622345-6mrooku1asdkjvraoqdr18k4jfo5gakf.apps.googleusercontent.com"
-                                    // redirectUri="http://localhost:3000/callback"
-                                    // redirectUri="http://localhost:5173/"
+                                // redirectUri="http://localhost:3000/callback"
+                                // redirectUri="http://localhost:5173/"
                                 />
 
                                 {/* Register Button */}

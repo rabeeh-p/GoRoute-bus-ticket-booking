@@ -58,6 +58,8 @@ import BusOwnerTracking from './Pages/Bus_owners/BusOwnerTracking';
 import AdminBusScheduledList from './Pages/Admin/AdminBusScheduledList';
 import BusTrack from './Pages/Admin/BusTrack';
 import Chat from './Pages/Noraml-User/Profile/Chat';
+import ForgotPasswordConductor from './Pages/Conductor/ForgotPasswordConductor';
+import ForgotPasswordUser from './Pages/Noraml-User/ForgotPasswordUser';
 function App() {
 
 
@@ -69,6 +71,9 @@ function App() {
         <Route path="/signUp" element={<LoggedInProtect> <SignUp />    </LoggedInProtect> } />
         <Route path="/otp" element={ <LoggedInProtect> <OTPVerification />     </LoggedInProtect>} />
         <Route path="/b-signup" element={<LoggedInProtect>  <BSignUp />   </LoggedInProtect>  } />
+
+        <Route path="/forgot-user" element={<ForgotPasswordUser />} />
+        
 
         
         <Route path="/" element={<HomeProtect> <Home /></HomeProtect>} />
@@ -115,6 +120,7 @@ function App() {
         <Route path="/users-list" element={<UsersList />} />
 
         <Route path="/conductor-login" element={<ConductorLogin />    } />
+        <Route path="/conductor-forgot" element={<ForgotPasswordConductor />    } />
         <Route path="/conductor-home" element={<ConductorProtect> <ConductorLandingPage /> </ConductorProtect>  } />
         <Route path="/conductor-dashboard" element={<ConductorProtect>   <DashboardConductor /> </ConductorProtect> } />
 

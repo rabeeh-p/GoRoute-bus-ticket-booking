@@ -23,26 +23,28 @@ const Dashboard = () => {
     <div className="text-gray-800 p-6">
       <h1 className="text-3xl font-bold mb-6">Welcome to the Admin Panel</h1>
       
+     
       <div className="mb-6">
-        <button 
-          onClick={() => setFilterType('weekly')} 
-          className="px-4 py-2 bg-blue-500 text-white rounded mr-2"
-        >
-          Weekly
-        </button>
-        <button 
-          onClick={() => setFilterType('monthly')} 
-          className="px-4 py-2 bg-blue-500 text-white rounded mr-2"
-        >
-          Monthly
-        </button>
-        <button 
-          onClick={() => setFilterType('yearly')} 
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Yearly
-        </button>
-      </div>
+  <button 
+    onClick={() => setFilterType('weekly')} 
+    className="px-4 py-2 bg-red-600 text-white rounded mr-2"
+  >
+    Weekly
+  </button>
+  <button 
+    onClick={() => setFilterType('monthly')} 
+    className="px-4 py-2 bg-red-600 text-white rounded mr-2"
+  >
+    Monthly
+  </button>
+  <button 
+    onClick={() => setFilterType('yearly')} 
+    className="px-4 py-2 bg-red-600 text-white rounded"
+  >
+    Yearly
+  </button>
+</div>
+
       
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Scheduled Bus Graph</h2>
