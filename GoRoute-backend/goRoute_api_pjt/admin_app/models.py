@@ -350,3 +350,18 @@ class ConductorScheduledBus(models.Model):
     def __str__(self):
         return f"Conductor {self.conductor.user.username} on Bus {self.scheduled_bus.bus_number} - {self.shift_date or 'No Date'}"
 
+
+
+
+class ChatRoom(models.Model):
+    name = models.CharField(max_length=255)
+
+
+
+
+class Message(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+

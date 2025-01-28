@@ -29,6 +29,7 @@ urlpatterns = [
     path('bus-owner-details/<int:id>/', BusOwnerDetailView.as_view(), name='bus-owner-details'),
     path('accept-bus-owner/<int:id>/', AcceptBusOwnerView.as_view(), name='accept-bus-owner'),
     path('busowner-dashboard/scheduled-buses-adminOnly/', AdminScheduledBusListView.as_view(), name='admin-scheduled-buses'),
+    path('scheduled-bus-data/', ScheduledBusDataView.as_view(), name='scheduled-bus-data'),
 
 
     # REQUESTS

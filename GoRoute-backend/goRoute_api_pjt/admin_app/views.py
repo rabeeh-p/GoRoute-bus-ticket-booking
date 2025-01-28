@@ -22,6 +22,9 @@ from rest_framework.exceptions import NotFound
 from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser
 import json
+from django.views import View
+from collections import defaultdict
+
 
 
 # Create your views here.
@@ -586,4 +589,51 @@ class AdminScheduledBusListView(APIView):
                 {"detail": "An error occurred while fetching the bus schedule."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+
+
+
+
+class ScheduledBusDataView(View):
+    def get(self, request):
+        filter_type = request.GET.get('filter_type', 'weekly')   
+        
+        current_date = timezone.now()
+        
+        if filter_type == 'weekly':
+            start_date = current_date - timedelta(weeks=1)
+        elif filter_type == 'monthly':
+            start_date = current_date - timedelta(weeks=4)   
+        elif filter_type == 'yearly':
+            start_date = current_date - timedelta(weeks=52)  # 
+        else:
+            start_date = current_date
+
+        buses = ScheduledBus.objects.filter(
+            scheduled_date__gte=start_date, 
+            status='active'
+        )
+        
+        chart_data = []
+        for bus in buses:
+            chart_data.append({
+                'bus': bus.bus_number,
+                'bus_owner': bus.bus_owner_name,
+                'scheduled_date': bus.scheduled_date.strftime('%Y-%m-%d %I:%M %p'),
+                'route': bus.route,
+                'seat_count': bus.seat_count,
+            })
+
+        return JsonResponse(chart_data, safe=False)
+
+
+
+
+
+
+
+
+
+
 
