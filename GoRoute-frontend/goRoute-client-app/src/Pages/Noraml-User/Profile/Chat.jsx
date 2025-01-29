@@ -10,10 +10,12 @@ function ChatApp() {
   const [newMessage, setNewMessage] = useState('');
   const [firstUser, setFirstUser] = useState(null);
   const [secondUser, setSecondUser] = useState(null);
+  const [socket, setSocket] = useState(null);
 
   console.log(messages,'message');
   console.log(firstUser,'first');
   console.log(secondUser,'second');
+  console.log(socket,'socket');
   
 
   useEffect(() => {
@@ -76,6 +78,7 @@ function ChatApp() {
     }
   }, [selectedPerson]);
   
+ 
 
 
 
