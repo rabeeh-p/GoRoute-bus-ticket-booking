@@ -11,6 +11,11 @@ function ChatApp() {
   const [firstUser, setFirstUser] = useState(null);
   const [secondUser, setSecondUser] = useState(null);
 
+  console.log(messages,'message');
+  console.log(firstUser,'first');
+  console.log(secondUser,'second');
+  
+
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
@@ -31,6 +36,7 @@ function ChatApp() {
       });
   }, []);  
 
+ 
   useEffect(() => {
     if (selectedPerson) {
       const accessToken = localStorage.getItem('accessToken');
@@ -41,22 +47,37 @@ function ChatApp() {
         },
       })
         .then(response => {
+          console.log('Fetched messages:', response.data.messages);  
+          
           setMessages(prevMessages => ({
             ...prevMessages,
             [selectedPerson.id]: response.data.messages,  
           }));
+  
           if (response.data.messages.length > 0) {
             const user1 = response.data.messages[0].user;
-            const user2 = response.data.messages[1]?.user || null;  
-            setFirstUser(user1);
-            setSecondUser(user2);
+            
+            const uniqueUsers = [...new Set(response.data.messages.map(msg => msg.user))];
+  
+            console.log('Unique Users:', uniqueUsers);  
+  
+            const user2 = uniqueUsers.find(user => user !== user1) || null;
+  
+            console.log(user1, 'first');
+            console.log(user2, 'second');
+  
+            setFirstUser(user2);
+            setSecondUser(user1);
           }
         })
         .catch(error => {
           console.error('Error fetching messages:', error);
         });
     }
-  }, [selectedPerson]);  
+  }, [selectedPerson]);
+  
+
+
 
   const handleSendMessage = () => {
     if (newMessage.trim() === '') return;  

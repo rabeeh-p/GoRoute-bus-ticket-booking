@@ -8,10 +8,9 @@ const ChatConductor = () => {
   const [messages, setMessages] = useState([]);
   const [chatPeople, setChatPeople] = useState([]);
   const [error, setError] = useState('');
+  const [firstUser, setFirstUser] = useState('');
+  const [secondUser, setSecondUser] = useState('');
 
-  console.log(selectedPerson, 'person');
-
-  // Fetch normal users when component mounts
   useEffect(() => {
     const fetchChatPeople = async () => {
       const accessToken = localStorage.getItem('accessToken');
@@ -21,24 +20,27 @@ const ChatConductor = () => {
       }
 
       try {
-        const response = await axios.get('http://localhost:8000/api/chat/people/');
-        console.log(response.data);   
-
+        const response = await axios.get('http://localhost:8000/api/chat/people/',{ 
+            headers: { 
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'multipart/form-data' 
+            }
+        });
         if (response.data && Array.isArray(response.data.chatPeople)) {
           setChatPeople(response.data.chatPeople);
         } else {
           console.error('Chat people data is missing or malformed');
-          setChatPeople([]);   
+          setChatPeople([]);
         }
       } catch (error) {
         console.error('Error fetching chat people:', error);
-        setChatPeople([]);   
+        setChatPeople([]);
       }
     };
 
     fetchChatPeople();
 
-    if (selectedPerson && selectedPerson.id) {  
+    if (selectedPerson && selectedPerson.id) {
       const fetchMessages = async () => {
         try {
           const accessToken = localStorage.getItem('accessToken');
@@ -56,9 +58,8 @@ const ChatConductor = () => {
               },
             }
           );
-          console.log(response.data,'data');
-          
-          setMessages(response.data);   
+          setMessages(response.data);
+          setFirstUser(response.data[0]?.user);  
         } catch (error) {
           console.error('Error fetching messages:', error);
         }
@@ -66,7 +67,7 @@ const ChatConductor = () => {
 
       fetchMessages();
     }
-  }, [selectedPerson]);   
+  }, [selectedPerson]);
 
   const handleSendMessage = async () => {
     if (newMessage.trim() && selectedPerson) {
@@ -86,7 +87,7 @@ const ChatConductor = () => {
 
         const response = await axios.post(
           `http://localhost:8000/api/chatroom/${selectedPerson.id}/messages/`,
-          { message: newMessage },  
+          { message: newMessage },
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -96,7 +97,7 @@ const ChatConductor = () => {
         );
 
         setMessages((prevMessages) => [...prevMessages, response.data]);
-        setNewMessage('');  
+        setNewMessage('');
       } catch (error) {
         console.error('Error sending message:', error);
       }
@@ -105,7 +106,7 @@ const ChatConductor = () => {
 
   const handleUserSelection = (person) => {
     setSelectedPerson(person);
-    setMessages([]);  
+    setMessages([]);
   };
 
   return (
@@ -160,26 +161,29 @@ const ChatConductor = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-          {Array.isArray(messages) && messages.length > 0 ? (
-            messages.map((message, index) => (
-              <div
-                key={index}   
-                className={`flex ${message.user === 'conductor' ? 'justify-end' : 'justify-start'} mb-4`}
-              >
-                <div
-                  className={`max-w-[60%] p-3 rounded-lg ${
-                    message.user === 'conductor' ? 'bg-blue-100 text-blue-800' : 'bg-gray-200 text-gray-800'
-                  }`}
-                >
-                  <p>{message.message}</p>
-                  <span className="text-xs text-gray-500 mt-2 block text-right">{message.timestamp}</span>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div>No messages yet.</div>  
-          )}
+  {Array.isArray(messages) && messages.length > 0 ? (
+    messages.map((message, index) => (
+      <div
+        key={index}
+        className={`flex ${message.user === firstUser ? 'justify-end' : 'justify-start'} mb-4`}
+      >
+        <div
+          className={`max-w-[60%] p-3 rounded-lg ${
+            message.user === firstUser
+              ? 'bg-blue-100 text-blue-800'   
+              : 'bg-gray-200 text-gray-800'  
+          }`}
+        >
+          <p>{message.message}</p>
+          <span className="text-xs text-gray-500 mt-2 block text-right">{message.timestamp}</span>
         </div>
+      </div>
+    ))
+  ) : (
+    <div>No messages yet.</div>
+  )}
+</div>
+
 
         <div className="p-4 bg-white border-t flex items-center space-x-3">
           <input
