@@ -1,95 +1,113 @@
 import { useEffect, useState } from 'react';
-import io from 'socket.io-client';
+import axios from 'axios';
+import axiosInstance from '../../../axios/axios';
 
 function ChatApp() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [newMessage, setNewMessage] = useState('');
   const [selectedPerson, setSelectedPerson] = useState(null);
+  const [chatPeople, setChatPeople] = useState([]);
+  const [messages, setMessages] = useState({});
+  const [newMessage, setNewMessage] = useState('');
+  const [firstUser, setFirstUser] = useState(null);
+  const [secondUser, setSecondUser] = useState(null);
 
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      setError('No access token found');
+      return;
+    }
+    axios.get('http://127.0.0.1:8000/api/conductor-messages/', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(response => {
+        setChatPeople(response.data.conductors);  
+      })
+      .catch(error => {
+        console.error('Error fetching conductors:', error);
+      });
+  }, []);  
 
-  const [message, setMessage] = useState('');
-  const [messages1, setMessages] = useState([]);
-  const [socket, setSocket] = useState(null);
-
-
-
-//   useEffect(() => {
-//     // const socketInstance = io('ws://localhost:8000/ws/chat/');  
-//     const socketInstance = new WebSocket('ws://localhost:8000/ws/chat/'); 
-//     setSocket(socketInstance);
-
-//     socketInstance.on('message', (data) => {
-//         setMessages((prevMessages) => [...prevMessages, data.message]);
-//     });
-
-//     return () => {
-//         socketInstance.disconnect();
-//     };
-// }, []);
-
-useEffect(() => {
-    const socketInstance = new WebSocket('ws://localhost:8000/ws/chat/'); 
-    setSocket(socketInstance);
-
-    // Add event listener for 'message' event
-    socketInstance.addEventListener('message', (event) => {
-        const data = JSON.parse(event.data); // Assuming data is in JSON format
-        setMessages((prevMessages) => [...prevMessages, data.message]);
-    });
-
-    // Cleanup on component unmount
-    return () => {
-        socketInstance.close(); // Proper way to disconnect WebSocket
-    };
-}, []);
-
-
-
-
-
-
-
-  const chatPeople = [
-    { id: 1, name: 'John Doe', unreadCount: 2, time: '10:15 AM', lastMessage: 'Hey, how are you?' },
-    { id: 2, name: 'Jane Smith', unreadCount: 1, time: '9:45 AM', lastMessage: 'Can you help me with this?' },
-  ];
-
-  const messages = [
-    { id: 1, sender: 'user', text: 'Hello!', time: '10:15 AM' },
-    { id: 2, sender: 'support', text: 'Hi, how can I assist you?', time: '10:16 AM' },
-  ];
+  useEffect(() => {
+    if (selectedPerson) {
+      const accessToken = localStorage.getItem('accessToken');
+      axiosInstance.get(`/messages/${selectedPerson.id}/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => {
+          setMessages(prevMessages => ({
+            ...prevMessages,
+            [selectedPerson.id]: response.data.messages,  
+          }));
+          if (response.data.messages.length > 0) {
+            const user1 = response.data.messages[0].user;
+            const user2 = response.data.messages[1]?.user || null;  
+            setFirstUser(user1);
+            setSecondUser(user2);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching messages:', error);
+        });
+    }
+  }, [selectedPerson]);  
 
   const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      setNewMessage('');
-    }
+    if (newMessage.trim() === '') return;  
+    const accessToken = localStorage.getItem('accessToken');
+    const messageData = {
+      message: newMessage,  
+      room_id: selectedPerson.room_id,  
+    };
+
+    axiosInstance.post('/api/send-message/', messageData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        setMessages(prevMessages => ({
+          ...prevMessages,
+          [selectedPerson.id]: [...(prevMessages[selectedPerson.id] || []), response.data.message],
+        }));
+        setNewMessage('');  
+      })
+      .catch(error => {
+        console.error('Error sending message:', error);
+      });
   };
 
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div
-        className={`fixed lg:static top-0 left-0 h-full w-64 bg-white shadow-lg transition-transform duration-300 transform ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
+        className={`fixed lg:static top-0 left-0 h-full w-64 bg-white shadow-lg transition-transform duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:translate-x-0`}
       >
         <div className="p-4 bg-red-500 text-white">
           <h2 className="text-lg font-semibold">Chats</h2>
         </div>
+
         <div className="overflow-y-auto h-[calc(100%-56px)]">
           {chatPeople.map((person) => (
             <div
               key={person.id}
-              className={`p-4 border-b hover:bg-gray-100 cursor-pointer ${
-                person.unreadCount > 0 ? 'bg-red-50' : 'bg-white'
-              }`}
-              onClick={() => setSelectedPerson(person)}  // onClick handler
+              className={`p-4 border-b hover:bg-gray-100 cursor-pointer ${person.unreadCount > 0 ? 'bg-red-50' : 'bg-white'
+                }`}
+              onClick={() => setSelectedPerson(person)}  
             >
               <div className="flex justify-between items-center">
                 <span className="font-semibold">{person.name}</span>
                 <span className="text-sm text-gray-500">{person.time}</span>
               </div>
-              <p className="text-sm text-gray-600">{person.lastMessage}</p>
+
               {person.unreadCount > 0 && (
                 <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 mt-2 inline-block">
                   {person.unreadCount}
@@ -105,7 +123,7 @@ useEffect(() => {
         {/* Header */}
         <div className="bg-red-500 text-white p-4 flex justify-between items-center shadow-md h-[56px]">
           <h2 className="text-lg font-semibold">
-            {selectedPerson ? `${selectedPerson.name} Chat` : 'RedBus Chat Support'}
+            {selectedPerson ? `${selectedPerson.name} Chat` : 'Select a Chat'}
           </h2>
           <button
             className="lg:hidden text-white text-2xl"
@@ -117,41 +135,47 @@ useEffect(() => {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${
-                message.sender === 'user' ? 'justify-end' : 'justify-start'
-              } mb-4`}
-            >
-              <div
-                className={`max-w-[60%] p-3 rounded-lg ${
-                  message.sender === 'user'
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-200 text-gray-800'
-                }`}
-              >
-                <p>{message.text}</p>
-                <span className="text-xs text-gray-500 mt-2 block text-right">
-                  {message.time}
-                </span>
+          {selectedPerson && messages[selectedPerson.id] && messages[selectedPerson.id].length > 0 ? (
+            messages[selectedPerson.id].map((message) => (
+              <div key={message.timestamp} className="mb-4">
+                <div
+                  className={`flex ${message.user === firstUser ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`p-2 rounded-lg max-w-xs break-words ${
+                      message.user === firstUser
+                        ? 'bg-red-500 text-white'   
+                        : 'bg-gray-200 text-gray-800'   
+                    }`}
+                  >
+                    {/* Message content */}
+                    <p>{message.message}</p>
+                  </div>
+                </div>
+                {/* Timestamp */}
+                <div className={`text-sm text-gray-500 ${message.user === firstUser ? 'text-right' : 'text-left'}`}>
+                  {new Date(message.timestamp).toLocaleTimeString()}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="text-center text-gray-500">No messages available</div>
+          )}
         </div>
 
         {/* Message Input */}
         <div className="p-4 bg-white border-t flex items-center space-x-3">
+          {/* Input for new message */}
           <input
             type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring focus:ring-red-200"
+            className="flex-1 p-2 border rounded"
+            placeholder="Type your message"
+            value={newMessage}  
+            onChange={(e) => setNewMessage(e.target.value)}  
           />
           <button
-            onClick={handleSendMessage}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+            className="bg-red-500 text-white px-4 py-2 rounded"
+            onClick={handleSendMessage}  
           >
             Send
           </button>

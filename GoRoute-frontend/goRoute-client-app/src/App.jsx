@@ -60,6 +60,7 @@ import BusTrack from './Pages/Admin/BusTrack';
 import Chat from './Pages/Noraml-User/Profile/Chat';
 import ForgotPasswordConductor from './Pages/Conductor/ForgotPasswordConductor';
 import ForgotPasswordUser from './Pages/Noraml-User/ForgotPasswordUser';
+import ChatConductor from './Pages/Conductor/ChatConductor';
 function App() {
 
 
@@ -118,6 +119,7 @@ function App() {
         </Route>
 
         <Route path="/users-list" element={<UsersList />} />
+        <Route path="/chat-conductor" element={<ChatConductor />} />
 
         <Route path="/conductor-login" element={<ConductorLogin />    } />
         <Route path="/conductor-forgot" element={<ForgotPasswordConductor />    } />
