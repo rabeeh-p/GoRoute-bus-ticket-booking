@@ -41,6 +41,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.exceptions import ValidationError
 from django.views import View
+from channels.layers import get_channel_layer
 # Create your views here.
 
 
@@ -1525,4 +1526,39 @@ class SendMessageAPIView(APIView):
 
 
 
+# class SendMessageAPIView(APIView):
+#     authentication_classes = [JWTAuthentication]
+#     permission_classes = [IsAuthenticated]
 
+#     def post(self, request, *args, **kwargs):
+#         user = request.user
+#         message_text = request.data.get('message')
+#         room_id = request.data.get('room_id')
+
+#         if not message_text or not room_id:
+#             return Response({'error': 'Message text and room_id are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         try:
+#             chat_room = ChatRoom.objects.get(room_id=room_id)
+
+#             if user not in [chat_room.from_user, chat_room.to_user]:
+#                 return Response({'error': 'You are not part of this chat room'}, status=status.HTTP_403_FORBIDDEN)
+
+#             message = Message.objects.create(room=chat_room, user=user, message=message_text)
+#             serializer = MessageSerializer(message)
+
+#             # Send message to WebSocket
+#             channel_layer = get_channel_layer()
+#             async_to_sync(channel_layer.group_send)(
+#                 f"chat_{room_id}",
+#                 {
+#                     "type": "chat_message",
+#                     "message": message_text,
+#                     "user": user.username,
+#                 }
+#             )
+
+#             return Response({'message': serializer.data}, status=status.HTTP_201_CREATED)
+
+#         except ChatRoom.DoesNotExist:
+#             return Response({'error': 'Chat room not found'}, status=status.HTTP_404_NOT_FOUND)

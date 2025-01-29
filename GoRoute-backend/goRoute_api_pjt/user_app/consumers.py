@@ -2,16 +2,16 @@
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
+from channels.db import database_sync_to_async
+
+from .serializers import MessageSerializer
+from admin_app.models import *
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # Get room_name and user_type from the URL
-        print('consumers working')
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.user_type = self.scope['url_route']['kwargs']['user_type']
-
-        # Create the group name (based on room_name)
-        self.room_group_name = f'chat_{self.room_name}'
+        print('connected')
+        self.room_id = self.scope['url_route']['kwargs']['room_id']
+        self.room_group_name = f'chat_{self.room_id}'
 
         # Join the room group
         await self.channel_layer.group_add(
@@ -22,6 +22,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Accept the WebSocket connection
         await self.accept()
 
+        # Send previous messages to the user
+        chat_room = ChatRoom.objects.get(room_id=self.room_id)
+        messages = Message.objects.filter(room=chat_room).order_by('timestamp')
+        serializer = MessageSerializer(messages, many=True)
+        await self.send(text_data=json.dumps({
+            'messages': serializer.data
+        }))
+
     async def disconnect(self, close_code):
         # Leave the room group
         await self.channel_layer.group_discard(
@@ -29,17 +37,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
-    # Receive message from WebSocket
+    # Receive a message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+        message_text = text_data_json['message']
+
+        # Create a new message in the database
+        chat_room = ChatRoom.objects.get(room_id=self.room_id)
+        user = self.scope['user']  # Get the user from the scope
+        message = Message.objects.create(room=chat_room, user=user, message=message_text)
 
         # Send the message to the room group
+        serializer = MessageSerializer(message)
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': message
+                'message': serializer.data
             }
         )
 
@@ -51,11 +65,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'message': message
         }))
-
-
-
-
-
-
 
 

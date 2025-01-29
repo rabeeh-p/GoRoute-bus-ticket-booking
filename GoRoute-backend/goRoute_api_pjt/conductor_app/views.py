@@ -14,6 +14,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
+from django.db import transaction
 # Create your views here.
 
 
@@ -64,19 +65,58 @@ class ConductorLoginView(APIView):
 
 
 
+# class ConductorDashboardView(APIView):
+#     authentication_classes = [JWTAuthentication]
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request, *args, **kwargs):
+#         user = request.user  
+#         conductor = get_object_or_404(Conductor, user=user)
+#         print(user, 'userrrr2')
+
+#         if not conductor.is_active:
+#             return Response({"detail": "Conductor is not active."}, status=status.HTTP_400_BAD_REQUEST)
+
+#         conductor_scheduled_bus = get_object_or_404(ConductorScheduledBus, conductor=conductor)
+
+#         scheduled_bus = conductor_scheduled_bus.scheduled_bus
+
+#         scheduled_stops = ScheduledStop.objects.filter(scheduled_bus=scheduled_bus).order_by('stop_order')
+
+#         bus_data = ScheduledBusSerializer(scheduled_bus)
+#         stops_data = ScheduledStopSerializer(scheduled_stops, many=True)
+
+#         data = {
+#             "bus": bus_data.data,
+#             "current_stop": scheduled_bus.stop_number,   
+#             "stops": stops_data.data
+#         }
+
+#         return Response(data, status=status.HTTP_200_OK)
+   
+
 class ConductorDashboardView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         user = request.user  
+        print('is wokring')
         conductor = get_object_or_404(Conductor, user=user)
         print(user, 'userrrr2')
 
         if not conductor.is_active:
-            return Response({"detail": "Conductor is not active."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Conductor is not active."}, status=status.HTTP_200_OK)
 
-        conductor_scheduled_bus = get_object_or_404(ConductorScheduledBus, conductor=conductor)
+        # Check if the conductor has an assigned bus
+        print('is 0')
+        conductor_scheduled_bus = ConductorScheduledBus.objects.filter(conductor=conductor).first()
+        print('is first')
+        if not conductor_scheduled_bus:
+            print('second')
+            # If no bus assigned, return a response with a custom message and no data
+            return Response({"detail": "You have no bus assigned.", "bus_data": None, "stops": None}, status=status.HTTP_200_OK)
+        print('third')
 
         scheduled_bus = conductor_scheduled_bus.scheduled_bus
 
@@ -92,15 +132,50 @@ class ConductorDashboardView(APIView):
         }
 
         return Response(data, status=status.HTTP_200_OK)
-   
 
 
 
+
+
+
+
+# class UpdateCurrentStop(APIView):
+    
+
+#     def post(self, request, *args, **kwargs):
+#         stop_order = request.data.get('stop_order')
+#         bus_id = request.data.get('bus_id')
+
+#         if not bus_id or stop_order is None:
+#             return Response({"error": "Bus ID and Stop Order are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+#         try:
+#             bus = ScheduledBus.objects.get(id=bus_id)
+#         except ScheduledBus.DoesNotExist:
+#             return Response({"error": "Bus not found."}, status=status.HTTP_404_NOT_FOUND)
+
+#         stops = self.get_stops_for_bus(bus)
+        
+#         if stop_order < 0 or stop_order >= len(stops):
+#             return Response({"error": "Invalid stop order."}, status=status.HTTP_400_BAD_REQUEST)
+
+#         bus.current_stop = stops[stop_order].stop_name   
+#         bus.stop_number=stop_order
+#         bus.save()
+
+#         bus.started = True
+#         bus.save()
+
+#         return Response({"success": "Current stop updated successfully."}, status=status.HTTP_200_OK)
+
+#     def get_stops_for_bus(self, bus):
+        
+#         stops = ScheduledStop.objects.filter(scheduled_bus=bus).order_by('stop_order')
+#         return stops
 
 
 
 class UpdateCurrentStop(APIView):
-    
 
     def post(self, request, *args, **kwargs):
         stop_order = request.data.get('stop_order')
@@ -115,25 +190,46 @@ class UpdateCurrentStop(APIView):
             return Response({"error": "Bus not found."}, status=status.HTTP_404_NOT_FOUND)
 
         stops = self.get_stops_for_bus(bus)
-        
+
         if stop_order < 0 or stop_order >= len(stops):
             return Response({"error": "Invalid stop order."}, status=status.HTTP_400_BAD_REQUEST)
 
-        bus.current_stop = stops[stop_order].stop_name   
-        bus.stop_number=stop_order
+        bus.current_stop = stops[stop_order].stop_name
+        bus.stop_number = stop_order
         bus.save()
 
-        bus.started = True
-        bus.save()
+         
+
+        if stop_order == len(stops) - 1:
+            try:
+                with transaction.atomic():  
+                    bus_model = BusModel.objects.get(bus_number=bus.bus_number)
+                    bus_model.is_active = False
+                    bus_model.Scheduled = False
+                    bus_model.save()
+
+                    bus.stops.all().delete()
+
+                    bus.delete()
+
+                    user = request.user
+                    conductor = Conductor.objects.get(user=user)
+
+                    conductor.is_active = False
+                    conductor.save()
+
+            except BusModel.DoesNotExist:
+                return Response({"error": "Bus model with the given bus number not found."}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({"error": f"An error occurred: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+
+        
 
         return Response({"success": "Current stop updated successfully."}, status=status.HTTP_200_OK)
 
     def get_stops_for_bus(self, bus):
-        
         stops = ScheduledStop.objects.filter(scheduled_bus=bus).order_by('stop_order')
         return stops
-
-
 
 
 

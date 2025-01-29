@@ -43,10 +43,9 @@ import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-from user_app import consumers
 from django.urls import path
-import re
 from django.urls import re_path
+from user_app.consumers import ChatConsumer
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'goRoute_api_pjt.settings')
 
@@ -54,11 +53,12 @@ application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(
         URLRouter([
-            # path("ws/chat/", consumers.ChatConsumer.as_asgi()),  # WebSocket URL
-            # re_path(r"^ws/chat/(?P<room_name>\w+)/$", consumers.ChatConsumer.as_asgi()),  # Regex URL
-            # re_path(r"ws/chat/(?P<room_name>\w+)/$", consumers.ChatConsumer.as_asgi()),
-            # path('ws/chat/<str:room_name>/', consumers.ChatConsumer.as_asgi()),
-            path('ws/chat/<str:user_type>/<str:room_name>/', consumers.ChatConsumer.as_asgi()),
+           
+            # re_path(r'ws/chat/(?P<room_id>\w+)/$', ChatConsumer.as_asgi()),
+            # path("ws/chat/<int:room_id>/", ChatConsumer.as_asgi()),
+            # re_path(r'ws/chat/(?P<room_id>\w+)/$', ChatConsumer.as_asgi()),
+            # re_path(r'ws/chat/(?P<room_id>[a-f0-9-]+)/$', ChatConsumer.as_asgi()),
+            path('ws/chat/<room_id>/', ChatConsumer.as_asgi())
         ])
     ),
 })
