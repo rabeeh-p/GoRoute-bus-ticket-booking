@@ -1322,25 +1322,62 @@ class ForgotPasswordUpdateView(APIView):
 
 
 
-class ChatPeopleListView(View):
+# class ChatPeopleListView(View):
+#     def get(self, request, *args, **kwargs):
+#         users = CustomUser.objects.filter(role='normal_user')
+
+#         chat_people = [
+#             {
+#                 "id": user.id,
+#                 "name": user.username,   
+#                 "lastMessage": "Some message",   
+#                 "time": "10:30 AM",   
+#                 "unreadCount": 0,   
+#             }
+#             for user in users
+#         ]
+
+#         return JsonResponse({"chatPeople": chat_people})
+
+
+
+class ChatPeopleListView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
-        users = CustomUser.objects.filter(role='normal_user')
+        print("hello")
+        print(request.user, 'con')
+        
+        try:
+            conductor = request.user.conductor_profile   
+        except Conductor.DoesNotExist:
+            return Response({"error": "User is not a conductor"}, status=400)
+        
+        try:
+            conductor_scheduled_bus = conductor.scheduled_bus.scheduled_bus
+        except ConductorScheduledBus.DoesNotExist:
+            return Response({"error": "Conductor has no assigned scheduled bus"}, status=400)
 
-        chat_people = [
-            {
-                "id": user.id,
-                "name": user.username,   
-                "lastMessage": "Some message",   
-                "time": "10:30 AM",   
-                "unreadCount": 0,   
-            }
-            for user in users
-        ]
+        orders = Order.objects.filter(bus=conductor_scheduled_bus, status='confirmed')
+        
+        users_with_orders = NormalUserProfile.objects.filter(orders__in=orders).distinct()
 
-        return JsonResponse({"chatPeople": chat_people})
-    
+        chat_people = []
+        for user in users_with_orders:
+            last_message = "Some message"   
+            last_message_time = "10:30 AM"  
+            unread_count = Ticket.objects.filter(order__user=user, status='confirmed').count()   
+            chat_people.append({
+                # "id": user.id,
+                "id": user.user.id, 
+                "name": user.first_name,   
+                "lastMessage": last_message,
+                "time": last_message_time,
+                "unreadCount": unread_count,
+            })
 
-
+        return Response({"chatPeople": chat_people})
 
     
 

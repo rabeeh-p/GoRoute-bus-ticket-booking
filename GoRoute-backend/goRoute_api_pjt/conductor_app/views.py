@@ -13,6 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
+from django.utils import timezone
 # Create your views here.
 
 
@@ -202,9 +203,70 @@ class ForgotPasswordUpdateView(APIView):
 
 
 
+# class StartJourneyView(APIView):
+#     def post(self, request, *args, **kwargs):
+#         print('psted is working')
+#         bus_id = request.data.get('busId')
+#         try:
+#             # Fetch the ScheduledBus instance using the bus_id
+#             bus = ScheduledBus.objects.get(id=bus_id)
+
+#             # Set the 'started' field to True and save
+#             bus.started = True
+#             bus.save()
+
+#             return Response({'message': 'Journey started successfully.'}, status=status.HTTP_200_OK)
+
+#         except ScheduledBus.DoesNotExist:
+#             return Response({'error': 'Scheduled bus not found for the given bus ID.'}, status=status.HTTP_404_NOT_FOUND)
 
 
+class StartJourneyView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
+    def post(self, request, *args, **kwargs):
+        print('is post is working')
+        bus_id = request.data.get('busId')
+        try:
+            # Fetch the ScheduledBus instance using the bus_id
+            bus = ScheduledBus.objects.get(id=bus_id)
 
+            # Set the 'started' field to True and save
+            bus.started = True
+            bus.save()
 
+            # Fetch the confirmed orders and booked users
+            orders = Order.objects.filter(bus=bus, status='confirmed')
+            users_with_orders = NormalUserProfile.objects.filter(orders__in=orders).distinct()
+
+            # Get conductor information (assuming user is the conductor)
+            conductor = request.user
+
+            # Send message to each booked user
+            for user in users_with_orders:
+                # Check if the chat room exists, if not, create one
+                chat_room, created = ChatRoom.objects.get_or_create(
+                    from_user=conductor,  # The conductor is the sender
+                    to_user=user.user      # The user who booked the ticket
+                )
+
+                # Craft the message for the user
+                message_text = f"Your bus journey has started! The bus number {bus.bus_number} is now on its way."
+
+                # Create and save the message in the database
+                Message.objects.create(
+                    user=conductor,  # The user sending the message (conductor)
+                    room=chat_room,   # The chat room created or fetched
+                    message=message_text,
+                    timestamp=timezone.now()  # The time when the message was sent
+                )
+
+                # Optional: If you need to send messages in a chat system or push notification
+                print(f"Sending message to {user.first_name}: {message_text}")
+
+            return Response({'message': 'Journey started and messages sent to the users in their chat rooms.'}, status=status.HTTP_200_OK)
+
+        except ScheduledBus.DoesNotExist:
+            return Response({'error': 'Scheduled bus not found for the given bus ID.'}, status=status.HTTP_404_NOT_FOUND)
 
