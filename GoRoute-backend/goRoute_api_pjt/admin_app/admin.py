@@ -25,6 +25,11 @@ admin.site.register(StopStatusUpdate)
 
 admin.site.register(Conductor)
 admin.site.register(ConductorScheduledBus)
+admin.site.register(Message)
+
+admin.site.register(ChatRoom)
+
+
 
 
 

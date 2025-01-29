@@ -154,26 +154,15 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'goRoute_api_pjt.wsgi.application'
 ASGI_APPLICATION = 'goRoute_api_pjt.asgi.application'
 
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
-#     },
-# }
-
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],  # Redis on localhost
-        },
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',   
-    },
-}
+
+
+
 
 
 # Database

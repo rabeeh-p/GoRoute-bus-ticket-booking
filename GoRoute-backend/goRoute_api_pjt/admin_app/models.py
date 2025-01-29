@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from decimal import Decimal
+import uuid
 # Create your models here.
 
 
@@ -355,6 +356,11 @@ class ConductorScheduledBus(models.Model):
 
 class ChatRoom(models.Model):
     name = models.CharField(max_length=255)
+    room_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+
+    from_user = models.ForeignKey(CustomUser, related_name='from_rooms', on_delete=models.CASCADE, limit_choices_to={'role': 'conductor'})
+    to_user = models.ForeignKey(CustomUser, related_name='to_rooms', on_delete=models.CASCADE, limit_choices_to={'role': 'normal_user'})
+
 
 
 

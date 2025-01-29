@@ -55,7 +55,10 @@ application = ProtocolTypeRouter({
     "websocket": AuthMiddlewareStack(
         URLRouter([
             # path("ws/chat/", consumers.ChatConsumer.as_asgi()),  # WebSocket URL
-            re_path(r"^ws/chat/(?P<room_name>\w+)/$", consumers.ChatConsumer.as_asgi()),  # Regex URL
+            # re_path(r"^ws/chat/(?P<room_name>\w+)/$", consumers.ChatConsumer.as_asgi()),  # Regex URL
+            # re_path(r"ws/chat/(?P<room_name>\w+)/$", consumers.ChatConsumer.as_asgi()),
+            # path('ws/chat/<str:room_name>/', consumers.ChatConsumer.as_asgi()),
+            path('ws/chat/<str:user_type>/<str:room_name>/', consumers.ChatConsumer.as_asgi()),
         ])
     ),
 })

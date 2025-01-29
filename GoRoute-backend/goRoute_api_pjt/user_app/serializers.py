@@ -104,3 +104,12 @@ class ScheduledBusDetailSerializer2(serializers.ModelSerializer):
 
 
 
+
+class MessageSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()  # Display the username
+    timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")  # Format timestamp
+
+    class Meta:
+        model = Message
+        fields = ['user', 'message', 'timestamp']
+

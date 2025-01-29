@@ -39,5 +39,13 @@ urlpatterns = [
     path('scheduled_buses/', ScheduledBusListView.as_view(), name='scheduled_bus_list'),
 
 
+    path('api/chat/people/', ChatPeopleListView.as_view(), name='chat_people_list'),
+    # path('api/chatroom/<int:room_id>/messages/', MessageAPIView.as_view(), name='get_messages'),  # GET and POST
+    path('api/chatroom/<int:person_id>/messages/', MessageAPIView.as_view(), name='get_messages'),  # GET and POST
+
+    path('api/conductor-messages/', ConductorMessagesView.as_view(), name='conductor-messages'),
+    path('messages/<int:conductor_id>/', MessageListAPIView.as_view(), name='message-list'),
+    path('api/send-message/', SendMessageAPIView.as_view(), name='send-message'),
+
 
 ]

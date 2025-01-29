@@ -40,6 +40,7 @@ from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.exceptions import ValidationError
+from django.views import View
 # Create your views here.
 
 
@@ -1255,9 +1256,6 @@ class BusTrackingAPIView(APIView):
 
 
 
-
-
-
 class ScheduledBusListView(ListAPIView):
     queryset = ScheduledBus.objects.all()   
     serializer_class = ScheduledBusDetailSerializer2 
@@ -1322,6 +1320,171 @@ class ForgotPasswordUpdateView(APIView):
 
 
 
+
+
+class ChatPeopleListView(View):
+    def get(self, request, *args, **kwargs):
+        users = CustomUser.objects.filter(role='normal_user')
+
+        chat_people = [
+            {
+                "id": user.id,
+                "name": user.username,   
+                "lastMessage": "Some message",   
+                "time": "10:30 AM",   
+                "unreadCount": 0,   
+            }
+            for user in users
+        ]
+
+        return JsonResponse({"chatPeople": chat_people})
+    
+
+
+
+    
+
+
+
+class MessageAPIView(APIView):
+    permission_classes = [IsAuthenticated]   
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, person_id, *args, **kwargs):
+        print('GET is working')
+
+        user = request.user
+
+        if user.role != 'conductor':
+            return Response({"error": "Only conductors can access messages."}, status=status.HTTP_403_FORBIDDEN)
+
+        to_user = get_object_or_404(CustomUser, id=person_id)
+
+        room = get_object_or_404(ChatRoom, from_user=user, to_user=to_user)
+
+        messages = Message.objects.filter(room=room).order_by('timestamp')
+
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, person_id, *args, **kwargs):
+        print('POST is working')
+
+        user = request.user
+
+        if user.role != 'conductor':
+            return Response({"error": "Only conductors can send messages."}, status=status.HTTP_403_FORBIDDEN)
+
+        to_user = get_object_or_404(CustomUser, id=person_id)
+
+        room, created = ChatRoom.objects.get_or_create(from_user=user, to_user=to_user)
+
+        message_content = request.data.get('message')   
+
+        if not message_content:
+            return Response({"error": "Message content cannot be empty!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        message = Message.objects.create(user=user, room=room, message=message_content)
+        serializer = MessageSerializer(message)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+
+class ConductorMessagesView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        try:
+            rooms = ChatRoom.objects.filter(to_user=user)
+            print(rooms, 'rooms')
+
+            conductor_list = []
+            for room in rooms:
+                print(room, 'room')
+
+                conductors = Message.objects.filter(room=room).values('user').distinct()
+
+                for conductor_data in conductors:
+                    conductor = CustomUser.objects.get(id=conductor_data['user'])
+
+                    if conductor == user:
+                        continue
+
+                    last_message = Message.objects.filter(
+                        user=conductor, room=room
+                    ).order_by('-timestamp').first()
+
+                    if last_message:
+                        conductor_list.append({
+                            'id': conductor.id,
+                            'name': conductor.username,  
+                            'time': last_message.timestamp.strftime('%I:%M %p'),
+                            'lastMessage': last_message.message,
+                            'room_id': room.room_id
+                        })
+
+            return Response({'conductors': conductor_list})
+
+        except Exception as e:
+            print(f"Error: {str(e)}")   
+            return Response({'error': str(e)}, status=500)
+
+
+
+
+class MessageListAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]   
+
+    def get(self, request, conductor_id, *args, **kwargs):
+        print('list working')
+        user = request.user
+
+        try:
+            chat_room = ChatRoom.objects.get(from_user_id=conductor_id, to_user=user)
+
+            messages = Message.objects.filter(room=chat_room).order_by('timestamp')
+
+            serializer = MessageSerializer(messages, many=True)
+            return Response({'messages': serializer.data}, status=status.HTTP_200_OK)
+
+        except ChatRoom.DoesNotExist:
+            return Response({'error': 'Chat room not found for this conductor'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+
+class SendMessageAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        print('post is wring ')
+        user = request.user
+        message_text = request.data.get('message')
+        room_id = request.data.get('room_id')
+
+        if not message_text or not room_id:
+            return Response({'error': 'Message text and room_id are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            chat_room = ChatRoom.objects.get(room_id=room_id)
+
+            if user not in [chat_room.from_user, chat_room.to_user]:
+                return Response({'error': 'You are not part of this chat room'}, status=status.HTTP_403_FORBIDDEN)
+
+            message = Message.objects.create(room=chat_room, user=user, message=message_text)
+
+            serializer = MessageSerializer(message)
+            return Response({'message': serializer.data}, status=status.HTTP_201_CREATED)
+
+        except ChatRoom.DoesNotExist:
+            return Response({'error': 'Chat room not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 
