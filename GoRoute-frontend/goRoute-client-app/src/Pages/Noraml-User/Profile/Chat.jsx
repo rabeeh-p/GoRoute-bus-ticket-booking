@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import axiosInstance from '../../../axios/axios';
 
@@ -13,6 +13,7 @@ function ChatApp() {
   const [socket, setSocket] = useState(null);
   const [roomId, setRoomId] = useState('');
   const [userid, setUserId] = useState('');
+  const messagesEndRef = useRef(null);
 
   console.log(messages, 'message');
   console.log(firstUser, 'first');
@@ -34,9 +35,9 @@ function ChatApp() {
         },
       })
       .then((response) => {
-        console.log(response.data,'new dataaaaa is first');
+        console.log(response.data, 'new dataaaaa is first');
         setUserId(response.data.currentUser.id)
-        
+
         setChatPeople(response.data.conductors);
       })
       .catch((error) => {
@@ -44,73 +45,10 @@ function ChatApp() {
       });
   }, []);
 
-  // useEffect(() => {
-  //   if (selectedPerson) {
-  //     const accessToken = localStorage.getItem('accessToken');
-  //     axiosInstance
-  //       .get(`/messages/${selectedPerson.id}/`, {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //           'Content-Type': 'application/json',
-  //         },
-  //       })
-  //       .then((response) => {
-  //         console.log('Fetched messages:', response.data.chat_room.room_id);
-  //         setRoomId(response.data.chat_room.room_id);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-  //         setMessages((prevMessages) => ({
-  //           ...prevMessages,
-  //           [selectedPerson.id]: response.data.messages,
-  //         }));
-
-  //         if (response.data.messages.length > 0) {
-  //           const user1 = response.data.messages[0].user;
-
-  //           const uniqueUsers = [...new Set(response.data.messages.map((msg) => msg.user))];
-
-  //           console.log('Unique Users:', uniqueUsers);
-
-  //           const user2 = uniqueUsers.find((user) => user !== user1) || null;
-
-  //           console.log(user1, 'first');
-  //           console.log(user2, 'second');
-
-  //           setFirstUser(user2);
-  //           setSecondUser(user1);
-  //         }
-
-  //         // WebSocket connection for real-time messaging
-  //         const socketConnection = new WebSocket(
-  //           `ws://127.0.0.1:8000/ws/${roomId}/`
-  //         );
-  //         // const ws = new WebSocket(`ws://127.0.0.1:8000/ws/${roomId2}/`);
-
-  //         socketConnection.onopen = () => {
-  //           console.log('WebSocket connection established');
-  //         };
-
-  //         socketConnection.onmessage = function (event) {
-  //           const data = JSON.parse(event.data);
-  //           console.log('New message:', data);
-
-  //           setMessages((prevMessages) => ({
-  //             ...prevMessages,
-  //             [selectedPerson.id]: [...(prevMessages[selectedPerson.id] || []), data],
-  //           }));
-  //         };
-
-  //         setSocket(socketConnection);
-
-  //         // Cleanup WebSocket connection on component unmount or when `selectedPerson` changes
-  //         return () => {
-  //           socketConnection.close();
-  //         };
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error fetching messages:', error);
-  //       });
-  //   }
-  // }, [selectedPerson, roomId]);
 
 
   useEffect(() => {
@@ -126,23 +64,23 @@ function ChatApp() {
         .then((response) => {
           console.log('Fetched messages:', response.data.chat_room.room_id);
           setRoomId(response.data.chat_room.room_id);
-  
+
           setMessages((prevMessages) => ({
             ...prevMessages,
             [selectedPerson.id]: response.data.messages,
           }));
-  
+
           if (response.data.messages.length > 0) {
             const user1 = response.data.messages[0].user;
             const uniqueUsers = [...new Set(response.data.messages.map((msg) => msg.user))];
-  
+
             console.log('Unique Users:', uniqueUsers);
-  
+
             const user2 = uniqueUsers.find((user) => user !== user1) || null;
-  
+
             console.log(user1, 'first');
             console.log(user2, 'second');
-  
+
             setFirstUser(user2);
             setSecondUser(user1);
           }
@@ -157,25 +95,24 @@ function ChatApp() {
 
   useEffect(() => {
     if (roomId) {
-      // Establish WebSocket connection only if roomId is available
       const socketConnection = new WebSocket(`ws://127.0.0.1:8000/ws/${roomId}/`);
-  
+
       socketConnection.onopen = () => {
         console.log('WebSocket connection established');
       };
-  
+
       socketConnection.onmessage = function (event) {
         const data = JSON.parse(event.data);
         console.log('New message:', data);
-  
+
         setMessages((prevMessages) => ({
           ...prevMessages,
           [selectedPerson.id]: [...(prevMessages[selectedPerson.id] || []), data],
         }));
       };
-  
+
       setSocket(socketConnection);
-  
+
       // Cleanup WebSocket connection on component unmount or when roomId changes
       return () => {
         socketConnection.close();
@@ -197,13 +134,13 @@ function ChatApp() {
     socket.send(JSON.stringify(messageData));
 
     // Update messages state locally after sending
-    setMessages((prevMessages) => ({
-      ...prevMessages,
-      [selectedPerson.id]: [
-        ...(prevMessages[selectedPerson.id] || []),
-        { message: newMessage, user: firstUser, timestamp: new Date() },
-      ],
-    }));
+    // setMessages((prevMessages) => ({
+    //   ...prevMessages,
+    //   [selectedPerson.id]: [
+    //     ...(prevMessages[selectedPerson.id] || []),
+    //     { message: newMessage, user: firstUser, timestamp: new Date() },
+    //   ],
+    // }));
 
     setNewMessage('');
   };
@@ -212,9 +149,8 @@ function ChatApp() {
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div
-        className={`fixed lg:static top-0 left-0 h-full w-64 bg-white shadow-lg transition-transform duration-300 transform ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
+        className={`fixed lg:static top-0 left-0 h-full w-64 bg-white shadow-lg transition-transform duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:translate-x-0`}
       >
         <div className="p-4 bg-red-500 text-white">
           <h2 className="text-lg font-semibold">Chats</h2>
@@ -224,14 +160,13 @@ function ChatApp() {
           {chatPeople.map((person) => (
             <div
               key={person.id}
-              className={`p-4 border-b hover:bg-gray-100 cursor-pointer ${
-                person.unreadCount > 0 ? 'bg-red-50' : 'bg-white'
-              }`}
+              className={`p-4 border-b hover:bg-gray-100 cursor-pointer ${person.unreadCount > 0 ? 'bg-red-50' : 'bg-white'
+                }`}
               onClick={() => setSelectedPerson(person)}
             >
               <div className="flex justify-between items-center">
                 <span className="font-semibold">{person.name}</span>
-                <span className="text-sm text-gray-500">{person.time}</span>
+                {/* <span className="text-sm text-gray-500">{person.time}</span> */}
               </div>
 
               {person.unreadCount > 0 && (
@@ -259,20 +194,21 @@ function ChatApp() {
           </button>
         </div>
 
-        {/* Messages */}
+
+
+
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
           {selectedPerson && messages[selectedPerson.id] && messages[selectedPerson.id].length > 0 ? (
             messages[selectedPerson.id].map((message) => (
               <div key={message.timestamp} className="mb-4">
                 <div
-                  className={`flex ${message.user === firstUser ? 'justify-end' : 'justify-start'}`}
+                  className={`flex ${message.user === firstUser ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`p-2 rounded-lg max-w-xs break-words ${
-                      message.user === firstUser
-                        ? 'bg-red-500 text-white'
-                        : 'bg-gray-200 text-gray-800'
-                    }`}
+                    className={`p-2 rounded-lg max-w-xs break-words ${message.user === firstUser
+                        ? "bg-red-500 text-white" // Sent messages - RedBus red
+                        : "bg-gray-200 text-gray-800" // Received messages - Light gray
+                      }`}
                   >
                     {/* Message content */}
                     <p>{message.message}</p>
@@ -280,18 +216,22 @@ function ChatApp() {
                 </div>
                 {/* Timestamp */}
                 <div
-                  className={`text-sm text-gray-500 ${
-                    message.user === firstUser ? 'text-right' : 'text-left'
-                  }`}
+                  className={`text-sm text-gray-500 ${message.user === firstUser ? "text-right" : "text-left"
+                    }`}
                 >
-                  {new Date(message.timestamp).toLocaleTimeString()}
+                  {/* {new Date(message.timestamp).toLocaleTimeString()} */}
                 </div>
               </div>
             ))
           ) : (
             <div className="text-center text-gray-500">No messages available</div>
           )}
+          {/* Invisible div to track the bottom */}
+          <div ref={messagesEndRef}></div>
         </div>
+
+
+
 
         {/* Message Input */}
         <div className="p-4 bg-white border-t flex items-center space-x-3">
