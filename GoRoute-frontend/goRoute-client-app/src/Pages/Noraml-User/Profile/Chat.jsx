@@ -11,12 +11,14 @@ function ChatApp() {
   const [firstUser, setFirstUser] = useState(null);
   const [secondUser, setSecondUser] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [roomId, setRoomId] = useState('');
+  const [userid, setUserId] = useState('');
 
-  console.log(messages,'message');
-  console.log(firstUser,'first');
-  console.log(secondUser,'second');
-  console.log(socket,'socket');
-  
+  console.log(messages, 'message');
+  console.log(firstUser, 'first');
+  console.log(secondUser, 'second');
+  console.log(socket, 'socket');
+  console.log(roomId, 'room id');
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -24,46 +26,119 @@ function ChatApp() {
       setError('No access token found');
       return;
     }
-    axios.get('http://127.0.0.1:8000/api/conductor-messages/', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'multipart/form-data',
-      },
-    })
-      .then(response => {
-        setChatPeople(response.data.conductors);  
+    axios
+      .get('http://127.0.0.1:8000/api/conductor-messages/', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
       })
-      .catch(error => {
+      .then((response) => {
+        console.log(response.data,'new dataaaaa is first');
+        setUserId(response.data.currentUser.id)
+        
+        setChatPeople(response.data.conductors);
+      })
+      .catch((error) => {
         console.error('Error fetching conductors:', error);
       });
-  }, []);  
+  }, []);
 
- 
+  // useEffect(() => {
+  //   if (selectedPerson) {
+  //     const accessToken = localStorage.getItem('accessToken');
+  //     axiosInstance
+  //       .get(`/messages/${selectedPerson.id}/`, {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //           'Content-Type': 'application/json',
+  //         },
+  //       })
+  //       .then((response) => {
+  //         console.log('Fetched messages:', response.data.chat_room.room_id);
+  //         setRoomId(response.data.chat_room.room_id);
+
+  //         setMessages((prevMessages) => ({
+  //           ...prevMessages,
+  //           [selectedPerson.id]: response.data.messages,
+  //         }));
+
+  //         if (response.data.messages.length > 0) {
+  //           const user1 = response.data.messages[0].user;
+
+  //           const uniqueUsers = [...new Set(response.data.messages.map((msg) => msg.user))];
+
+  //           console.log('Unique Users:', uniqueUsers);
+
+  //           const user2 = uniqueUsers.find((user) => user !== user1) || null;
+
+  //           console.log(user1, 'first');
+  //           console.log(user2, 'second');
+
+  //           setFirstUser(user2);
+  //           setSecondUser(user1);
+  //         }
+
+  //         // WebSocket connection for real-time messaging
+  //         const socketConnection = new WebSocket(
+  //           `ws://127.0.0.1:8000/ws/${roomId}/`
+  //         );
+  //         // const ws = new WebSocket(`ws://127.0.0.1:8000/ws/${roomId2}/`);
+
+  //         socketConnection.onopen = () => {
+  //           console.log('WebSocket connection established');
+  //         };
+
+  //         socketConnection.onmessage = function (event) {
+  //           const data = JSON.parse(event.data);
+  //           console.log('New message:', data);
+
+  //           setMessages((prevMessages) => ({
+  //             ...prevMessages,
+  //             [selectedPerson.id]: [...(prevMessages[selectedPerson.id] || []), data],
+  //           }));
+  //         };
+
+  //         setSocket(socketConnection);
+
+  //         // Cleanup WebSocket connection on component unmount or when `selectedPerson` changes
+  //         return () => {
+  //           socketConnection.close();
+  //         };
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error fetching messages:', error);
+  //       });
+  //   }
+  // }, [selectedPerson, roomId]);
+
+
   useEffect(() => {
     if (selectedPerson) {
       const accessToken = localStorage.getItem('accessToken');
-      axiosInstance.get(`/messages/${selectedPerson.id}/`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => {
-          console.log('Fetched messages:', response.data.messages);  
-          
-          setMessages(prevMessages => ({
+      axiosInstance
+        .get(`/messages/${selectedPerson.id}/`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        })
+        .then((response) => {
+          console.log('Fetched messages:', response.data.chat_room.room_id);
+          setRoomId(response.data.chat_room.room_id);
+  
+          setMessages((prevMessages) => ({
             ...prevMessages,
-            [selectedPerson.id]: response.data.messages,  
+            [selectedPerson.id]: response.data.messages,
           }));
   
           if (response.data.messages.length > 0) {
             const user1 = response.data.messages[0].user;
-            
-            const uniqueUsers = [...new Set(response.data.messages.map(msg => msg.user))];
+            const uniqueUsers = [...new Set(response.data.messages.map((msg) => msg.user))];
   
-            console.log('Unique Users:', uniqueUsers);  
+            console.log('Unique Users:', uniqueUsers);
   
-            const user2 = uniqueUsers.find(user => user !== user1) || null;
+            const user2 = uniqueUsers.find((user) => user !== user1) || null;
   
             console.log(user1, 'first');
             console.log(user2, 'second');
@@ -72,48 +147,74 @@ function ChatApp() {
             setSecondUser(user1);
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error fetching messages:', error);
         });
     }
   }, [selectedPerson]);
-  
- 
 
+
+
+  useEffect(() => {
+    if (roomId) {
+      // Establish WebSocket connection only if roomId is available
+      const socketConnection = new WebSocket(`ws://127.0.0.1:8000/ws/${roomId}/`);
+  
+      socketConnection.onopen = () => {
+        console.log('WebSocket connection established');
+      };
+  
+      socketConnection.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        console.log('New message:', data);
+  
+        setMessages((prevMessages) => ({
+          ...prevMessages,
+          [selectedPerson.id]: [...(prevMessages[selectedPerson.id] || []), data],
+        }));
+      };
+  
+      setSocket(socketConnection);
+  
+      // Cleanup WebSocket connection on component unmount or when roomId changes
+      return () => {
+        socketConnection.close();
+      };
+    }
+  }, [roomId]);
 
 
   const handleSendMessage = () => {
-    if (newMessage.trim() === '') return;  
-    const accessToken = localStorage.getItem('accessToken');
+    if (newMessage.trim() === '' || !socket) return;
+
     const messageData = {
-      message: newMessage,  
-      room_id: selectedPerson.room_id,  
+      message: newMessage,
+      user_id: userid, // Assuming `firstUser` is the logged-in user
+      room_id: roomId,
     };
 
-    axiosInstance.post('/api/send-message/', messageData, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(response => {
-        setMessages(prevMessages => ({
-          ...prevMessages,
-          [selectedPerson.id]: [...(prevMessages[selectedPerson.id] || []), response.data.message],
-        }));
-        setNewMessage('');  
-      })
-      .catch(error => {
-        console.error('Error sending message:', error);
-      });
+    // Sending message via WebSocket
+    socket.send(JSON.stringify(messageData));
+
+    // Update messages state locally after sending
+    setMessages((prevMessages) => ({
+      ...prevMessages,
+      [selectedPerson.id]: [
+        ...(prevMessages[selectedPerson.id] || []),
+        { message: newMessage, user: firstUser, timestamp: new Date() },
+      ],
+    }));
+
+    setNewMessage('');
   };
 
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div
-        className={`fixed lg:static top-0 left-0 h-full w-64 bg-white shadow-lg transition-transform duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } lg:translate-x-0`}
+        className={`fixed lg:static top-0 left-0 h-full w-64 bg-white shadow-lg transition-transform duration-300 transform ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0`}
       >
         <div className="p-4 bg-red-500 text-white">
           <h2 className="text-lg font-semibold">Chats</h2>
@@ -123,9 +224,10 @@ function ChatApp() {
           {chatPeople.map((person) => (
             <div
               key={person.id}
-              className={`p-4 border-b hover:bg-gray-100 cursor-pointer ${person.unreadCount > 0 ? 'bg-red-50' : 'bg-white'
-                }`}
-              onClick={() => setSelectedPerson(person)}  
+              className={`p-4 border-b hover:bg-gray-100 cursor-pointer ${
+                person.unreadCount > 0 ? 'bg-red-50' : 'bg-white'
+              }`}
+              onClick={() => setSelectedPerson(person)}
             >
               <div className="flex justify-between items-center">
                 <span className="font-semibold">{person.name}</span>
@@ -168,8 +270,8 @@ function ChatApp() {
                   <div
                     className={`p-2 rounded-lg max-w-xs break-words ${
                       message.user === firstUser
-                        ? 'bg-red-500 text-white'   
-                        : 'bg-gray-200 text-gray-800'   
+                        ? 'bg-red-500 text-white'
+                        : 'bg-gray-200 text-gray-800'
                     }`}
                   >
                     {/* Message content */}
@@ -177,7 +279,11 @@ function ChatApp() {
                   </div>
                 </div>
                 {/* Timestamp */}
-                <div className={`text-sm text-gray-500 ${message.user === firstUser ? 'text-right' : 'text-left'}`}>
+                <div
+                  className={`text-sm text-gray-500 ${
+                    message.user === firstUser ? 'text-right' : 'text-left'
+                  }`}
+                >
                   {new Date(message.timestamp).toLocaleTimeString()}
                 </div>
               </div>
@@ -194,12 +300,12 @@ function ChatApp() {
             type="text"
             className="flex-1 p-2 border rounded"
             placeholder="Type your message"
-            value={newMessage}  
-            onChange={(e) => setNewMessage(e.target.value)}  
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
           />
           <button
             className="bg-red-500 text-white px-4 py-2 rounded"
-            onClick={handleSendMessage}  
+            onClick={handleSendMessage}
           >
             Send
           </button>
