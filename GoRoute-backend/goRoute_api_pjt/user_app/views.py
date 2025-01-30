@@ -1351,6 +1351,10 @@ class ChatPeopleListView(APIView):
         print(request.user, 'con')
         
         try:
+            current_user_id = request.user.id  # current user's ID
+            current_user_name = request.user.first_name 
+            print(current_user_id,'id')
+            # print(current_user_name,'name')
             conductor = request.user.conductor_profile   
         except Conductor.DoesNotExist:
             return Response({"error": "User is not a conductor"}, status=400)
@@ -1378,7 +1382,9 @@ class ChatPeopleListView(APIView):
                 "unreadCount": unread_count,
             })
 
-        return Response({"chatPeople": chat_people})
+        return Response({"chatPeople": chat_people,"currentUser": {
+                "id": current_user_id,
+            },})
 
     
 
@@ -1387,6 +1393,23 @@ class ChatPeopleListView(APIView):
 class MessageAPIView(APIView):
     permission_classes = [IsAuthenticated]   
     authentication_classes = [JWTAuthentication]
+
+    # def get(self, request, person_id, *args, **kwargs):
+    #     print('GET is working')
+
+    #     user = request.user
+
+    #     if user.role != 'conductor':
+    #         return Response({"error": "Only conductors can access messages."}, status=status.HTTP_403_FORBIDDEN)
+
+    #     to_user = get_object_or_404(CustomUser, id=person_id)
+
+    #     room = get_object_or_404(ChatRoom, from_user=user, to_user=to_user)
+
+    #     messages = Message.objects.filter(room=room).order_by('timestamp')
+
+    #     serializer = MessageSerializer(messages, many=True)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get(self, request, person_id, *args, **kwargs):
         print('GET is working')
@@ -1402,9 +1425,18 @@ class MessageAPIView(APIView):
 
         messages = Message.objects.filter(room=room).order_by('timestamp')
 
-        serializer = MessageSerializer(messages, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # Serialize messages
+        message_serializer = MessageSerializer(messages, many=True)
 
+        # Serialize chat room details
+        chat_room_serializer = ChatRoomSerializer(room)
+
+        return Response({
+            'chat_room': chat_room_serializer.data,  # Room details
+            'messages': message_serializer.data,  # Messages
+        }, status=status.HTTP_200_OK)
+    
+    
     def post(self, request, person_id, *args, **kwargs):
         print('POST is working')
 
@@ -1438,6 +1470,8 @@ class ConductorMessagesView(APIView):
         user = request.user
 
         try:
+            user = request.user
+            current_user_id = user.id 
             rooms = ChatRoom.objects.filter(to_user=user)
             print(rooms, 'rooms')
 
@@ -1465,14 +1499,38 @@ class ConductorMessagesView(APIView):
                             'lastMessage': last_message.message,
                             'room_id': room.room_id
                         })
+                        
 
-            return Response({'conductors': conductor_list})
+            return Response({'conductors': conductor_list,'currentUser': {'id': current_user_id},})
 
         except Exception as e:
             print(f"Error: {str(e)}")   
             return Response({'error': str(e)}, status=500)
 
 
+
+
+# class MessageListAPIView(APIView):
+#     authentication_classes = [JWTAuthentication]
+#     permission_classes = [IsAuthenticated]   
+
+#     def get(self, request, conductor_id, *args, **kwargs):
+#         print('list working')
+#         user = request.user
+
+#         try:
+#             chat_room = ChatRoom.objects.get(from_user_id=conductor_id, to_user=user)
+#             print(chat_room,'room')
+
+#             messages = Message.objects.filter(room=chat_room).order_by('timestamp')
+#             # chat_room_serializer = ChatRoomSerializer(chat_room)
+
+#             serializer = MessageSerializer(messages, many=True)
+#             return Response({'messages': serializer.data}, status=status.HTTP_200_OK)
+
+#         except ChatRoom.DoesNotExist:
+#             return Response({'error': 'Chat room not found for this conductor'}, status=status.HTTP_404_NOT_FOUND)
+        
 
 
 class MessageListAPIView(APIView):
@@ -1485,15 +1543,34 @@ class MessageListAPIView(APIView):
 
         try:
             chat_room = ChatRoom.objects.get(from_user_id=conductor_id, to_user=user)
+            print(chat_room, 'room')
 
             messages = Message.objects.filter(room=chat_room).order_by('timestamp')
 
-            serializer = MessageSerializer(messages, many=True)
-            return Response({'messages': serializer.data}, status=status.HTTP_200_OK)
+            # Serialize messages
+            message_serializer = MessageSerializer(messages, many=True)
+
+            # Serialize chat room details (assuming ChatRoomSerializer exists)
+            chat_room_serializer = ChatRoomSerializer(chat_room)
+
+            return Response({
+                'chat_room': chat_room_serializer.data,  # Room details
+                'messages': message_serializer.data,  # Messages
+            }, status=status.HTTP_200_OK)
 
         except ChatRoom.DoesNotExist:
             return Response({'error': 'Chat room not found for this conductor'}, status=status.HTTP_404_NOT_FOUND)
-        
+
+
+
+
+
+
+
+
+
+
+
 
 
 
