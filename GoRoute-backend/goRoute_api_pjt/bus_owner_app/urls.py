@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import *
 urlpatterns = [
-    # path('', )
+    
     path('bus-owner-detail/', BusOwnerProfileView.as_view()),
     path('bus-owner/routes/', RouteCreateView.as_view(), name='create_route'),
     path('routes/my_routes/', RouteByOwnerView.as_view(), name='route-by-owner'),
@@ -19,7 +19,7 @@ urlpatterns = [
     path('bus-list/', BusListView.as_view(), name='bus-list'),
     path('add-bus/', AddBusView.as_view(), name='add_bus'),
     path('api/bus/<int:bus_id>/', BusDetailView.as_view(), name='bus-detail'),
-    # path('bus', BusDetailView.as_view(), name='bus-detail'),
+     
 
 
     # SCHEDULING
@@ -30,6 +30,7 @@ urlpatterns = [
     path('busowner-dashboard/completed-buses/', CompletedBusListView.as_view(), name='completed-buses-list'),
     path('scheduled-buses/<int:busId>/', ScheduledBusDetailView.as_view(), name='scheduled-bus-detail'),
 
+    # REGISTER CONDUCTOR
     path('register_conductor/', ConductorRegistrationAPIView.as_view(), name='register_conductor'),
     path('conductors/', BusOwnerConductorsAPIView.as_view(), name='bus-owner-conductors'),
 

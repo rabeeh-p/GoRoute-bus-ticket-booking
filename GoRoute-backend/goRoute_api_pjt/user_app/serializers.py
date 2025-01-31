@@ -77,10 +77,6 @@ class WalletSerializer(serializers.ModelSerializer):
 
 
 
-# class ScheduledStopSerializer2(serializers.ModelSerializer):
-#     class Meta:
-#         model = ScheduledStop
-#         fields = ['stop_name', 'arrival_time', 'departure_time', 'distance_km']
 
 class ScheduledBusDetailSerializer2(serializers.ModelSerializer):
     first_stop = serializers.SerializerMethodField()
@@ -106,8 +102,8 @@ class ScheduledBusDetailSerializer2(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()  # Display the username
-    timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")  # Format timestamp
+    user = serializers.StringRelatedField()   
+    timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")   
 
     class Meta:
         model = Message

@@ -144,7 +144,7 @@ class BusOwnerSerializerProfileUpdate(serializers.ModelSerializer):
 
 
 class ConductorRegistrationSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(write_only=True)  # For creating the user
+    username = serializers.CharField(write_only=True)   
     password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -152,16 +152,13 @@ class ConductorRegistrationSerializer(serializers.ModelSerializer):
         fields = ['username', 'password', 'license_number', 'phone_number', 'hired_date','name']
 
     def create(self, validated_data):
-        # Extract user-related data
         username = validated_data.pop('username')
         password = validated_data.pop('password')
 
-        # Create the user with the conductor role
         user = CustomUser.objects.create_user(
             username=username, password=password, role='conductor'
         )
 
-        # Create the conductor
         conductor = Conductor.objects.create(user=user, **validated_data)
         return conductor
     
@@ -170,10 +167,6 @@ class ConductorRegistrationSerializer(serializers.ModelSerializer):
 
 
 
-# class ConductorSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Conductor
-#         fields = ['id', 'user', 'license_number', 'phone_number', 'hired_date', 'travels','name','is_active']
 
 
 
