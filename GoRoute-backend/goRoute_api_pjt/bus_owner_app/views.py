@@ -596,6 +596,99 @@ class ScheduleBusView(APIView):
 
 
 
+class RestartScheduledBusView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, bus_id):
+        try:
+            print('restart is working')
+            scheduled_bus = ScheduledBus.objects.get(id=bus_id)
+            print(scheduled_bus,'bus')
+
+            # if not scheduled_bus.started:
+            #     return Response({"error": "The bus has not started yet, cannot restart"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Get conductor_id and scheduled_date from request data
+            conductor_id = request.data.get('conductor_id')
+            scheduled_date = request.data.get('scheduled_date')
+
+            # Check if scheduled_date is provided and is valid
+            if not scheduled_date:
+                return Response({"error": "New schedule date is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                scheduled_date = datetime.fromisoformat(scheduled_date).date()
+
+                if scheduled_date <= datetime.now().date():
+                    return Response({"error": "Scheduled date must be in the future"}, status=status.HTTP_400_BAD_REQUEST)
+
+            except ValueError:
+                return Response({"error": "Invalid date format. Please use a valid ISO 8601 format (e.g., YYYY-MM-DD)"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Reset the bus state to initial conditions
+            scheduled_bus.started = False
+            scheduled_bus.current_stop = None
+            scheduled_bus.stop_number = 0
+            scheduled_bus.scheduled_date = scheduled_date
+            scheduled_bus.save()
+
+            # Handle conductor assignment
+            if conductor_id:
+                try:
+                    conductor = Conductor.objects.get(id=conductor_id)
+                    conductor.is_active = True
+                    conductor.save()
+                    # Optionally create an association (if needed)
+                    ConductorScheduledBus.objects.create(conductor=conductor, scheduled_bus=scheduled_bus)
+                except Conductor.DoesNotExist:
+                    return Response({"error": f"Conductor with ID {conductor_id} not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            return Response({
+                "message": "Bus restarted successfully",
+                "scheduled_bus_id": scheduled_bus.id,
+            }, status=status.HTTP_200_OK)
+
+        except ScheduledBus.DoesNotExist:
+            return Response({"error": "Scheduled bus not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+
+class CompletedBusListView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            bus_owner = BusOwnerModel.objects.get(user=request.user)
+        except BusOwnerModel.DoesNotExist:
+            return Response({"detail": "Bus Owner profile not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        travel_name = bus_owner.travel_name
+        completed_buses = ScheduledBus.objects.filter(bus_owner_name=travel_name, status='completed')
+
+        if not completed_buses.exists():
+            return Response({"detail": "No completed buses found for this bus owner."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ScheduledBusSerializer(completed_buses, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+
+
 class ScheduledBusListView(APIView):
     
     permission_classes = [IsAuthenticated]

@@ -1258,7 +1258,8 @@ class BusTrackingAPIView(APIView):
 
 
 class ScheduledBusListView(ListAPIView):
-    queryset = ScheduledBus.objects.all()   
+    # queryset = ScheduledBus.objects.all()
+    queryset = ScheduledBus.objects.filter(started=False)   
     serializer_class = ScheduledBusDetailSerializer2 
 
 

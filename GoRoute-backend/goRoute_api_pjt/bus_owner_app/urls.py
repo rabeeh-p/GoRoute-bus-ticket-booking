@@ -24,8 +24,10 @@ urlpatterns = [
 
     # SCHEDULING
     path('schedule-bus/<int:bus_id>/', ScheduleBusView.as_view(), name='schedule-bus'),
+    path('reschedule-bus/<int:bus_id>/', RestartScheduledBusView.as_view(), name='reschedule-bus'),
 
     path('busowner-dashboard/scheduled-buses/', ScheduledBusListView.as_view(), name='scheduled-buses-list'),
+    path('busowner-dashboard/completed-buses/', CompletedBusListView.as_view(), name='completed-buses-list'),
     path('scheduled-buses/<int:busId>/', ScheduledBusDetailView.as_view(), name='scheduled-bus-detail'),
 
     path('register_conductor/', ConductorRegistrationAPIView.as_view(), name='register_conductor'),
