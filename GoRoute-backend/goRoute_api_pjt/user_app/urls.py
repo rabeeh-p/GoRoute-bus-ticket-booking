@@ -48,4 +48,8 @@ urlpatterns = [
     path('api/send-message/', SendMessageAPIView.as_view(), name='send-message'),
 
 
+
+    path('api/user-dashboard/', UserDashboardAPIView.as_view(), name='user-dashboard'),
+
+
 ]

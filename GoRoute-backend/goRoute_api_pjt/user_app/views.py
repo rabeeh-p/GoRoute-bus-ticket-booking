@@ -1314,7 +1314,8 @@ class BusTrackingAPIView(APIView):
 
 class ScheduledBusListView(ListAPIView):
     # queryset = ScheduledBus.objects.all()
-    queryset = ScheduledBus.objects.filter(started=False)   
+    # queryset = ScheduledBus.objects.filter(started=False) 
+    queryset = ScheduledBus.objects.filter(started=False, scheduled_date__gte=now())   
     serializer_class = ScheduledBusDetailSerializer2 
 
 
@@ -1695,3 +1696,51 @@ class SendMessageAPIView(APIView):
 
 #         except ChatRoom.DoesNotExist:
 #             return Response({'error': 'Chat room not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+
+class UserDashboardAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        print('get is working')
+
+        user = request.user  
+        
+        try:
+            normal_user_profile = user.profile   
+        except NormalUserProfile.DoesNotExist:
+            return Response({"error": "User profile not found"}, status=400)
+
+        wallet = get_object_or_404(Wallet, user=user)
+        wallet_balance = wallet.balance
+
+        active_tickets_count = Ticket.objects.filter(order__user=normal_user_profile, status='confirmed').count()
+        total_trips = Ticket.objects.filter(order__user=normal_user_profile, status='completed').count()
+
+        recent_bookings = Order.objects.filter(user=normal_user_profile).order_by('-created_at')[:5]
+
+        bookings_data = [
+            {
+                'from': booking.from_city,
+                'to': booking.to_city,
+                'date': booking.date.strftime('%Y-%m-%d'),
+                'status': booking.status.capitalize()
+            }
+            for booking in recent_bookings
+        ]
+
+        data = {
+            'stats': [
+                {'title': 'Active Tickets', 'value': active_tickets_count},
+                {'title': 'Wallet Balance', 'value': f'₹{wallet_balance}'},
+                {'title': 'Total Trips', 'value': total_trips},
+            ],
+            'recentBookings': bookings_data
+        }
+
+        return Response(data)
+
