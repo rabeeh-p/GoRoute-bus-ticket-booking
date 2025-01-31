@@ -75,7 +75,7 @@ const UserTickets = () => {
                         if (data.success) {
                             Swal.fire(
                                 'Cancelled!',
-                                `Your ticket has been cancelled. Refund of $${data.refund_amount} issued.`,
+                                `Your ticket has been cancelled. Refund of Rs${data.refund_amount} issued.`,
                                 'success'
                             );
                             setTimeout(() => {

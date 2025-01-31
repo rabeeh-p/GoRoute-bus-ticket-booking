@@ -48,7 +48,7 @@ const BusWallet = () => {
           transition={{ duration: 0.5 }}
           className="text-center text-3xl font-bold text-red-600 mb-8"
         >
-          RedBus Wallet
+           Wallet
         </motion.h2>
 
         {error ? (
