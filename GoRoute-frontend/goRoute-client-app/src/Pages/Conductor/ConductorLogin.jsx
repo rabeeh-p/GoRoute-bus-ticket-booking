@@ -61,7 +61,7 @@ const ConductorLogin = () => {
   };
 
   const handleForgotPassword = () => {
-    navigate('/conductor-forgot');  // Redirect to forgot password page
+    navigate('/conductor-forgot');  
   };
 
   return (

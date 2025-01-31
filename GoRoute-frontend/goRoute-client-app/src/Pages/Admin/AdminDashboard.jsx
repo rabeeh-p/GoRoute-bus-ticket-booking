@@ -20,7 +20,7 @@ import BusTrack from "./BusTrack";
 const AdminDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false); // State to manage sidebar visibility
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(clearUserData());
@@ -59,9 +59,8 @@ const AdminDashboard = () => {
       <div className="flex flex-1">
         {/* Sidebar */}
         <aside
-          className={`${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } lg:translate-x-0 lg:w-64 fixed lg:static inset-y-0 bg-gradient-to-r from-red-600 to-red-800 text-white transition-transform duration-300 z-20`}
+          className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+            } lg:translate-x-0 lg:w-64 fixed lg:static inset-y-0 bg-gradient-to-r from-red-600 to-red-800 text-white transition-transform duration-300 z-20`}
         >
           <div className="p-6 text-center">
             <h2 className="text-2xl font-bold">Admin Panel</h2>
@@ -131,26 +130,26 @@ const AdminDashboard = () => {
         </aside>
 
 
-{/* Main Content */}
-<main className="flex-1 p-6 lg:ml-12">
-  <div className="text-gray-800">
-    <Routes>
-      <Route path="users-list" element={<UsersList />} />
-      <Route path="dashboard" element={<Dashboard />} />
-      <Route path="user-details/:id" element={<UserDetails />} />
-      <Route path="busowners-list" element={<BusOwnersList />} />
-      <Route path="request-busowner" element={<RequestBusOwner />} />
-      <Route path="busowner-details/:id" element={<BusOwnerDetails />} />
-      <Route path="bus-requests/" element={<AdminBusRequests />} />
-      <Route path="bus-details/:busId" element={<BusDetails />} />
-      <Route path="edit-bus-owner/:id" element={<EditBusOwnerForm />} />
-      <Route path="user-creating" element={<UserCreating />} />
-      <Route path="admin-wallet" element={<AdminWallet />} />
-      <Route path="admin-bus-scheduled-list" element={<AdminBusScheduledList />} />
-      <Route path="admin-track/:busId" element={<BusTrack />} />
-    </Routes>
-  </div>
-</main>
+        {/* Main Content */}
+        <main className="flex-1 p-6 lg:ml-12">
+          <div className="text-gray-800">
+            <Routes>
+              <Route path="users-list" element={<UsersList />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="user-details/:id" element={<UserDetails />} />
+              <Route path="busowners-list" element={<BusOwnersList />} />
+              <Route path="request-busowner" element={<RequestBusOwner />} />
+              <Route path="busowner-details/:id" element={<BusOwnerDetails />} />
+              <Route path="bus-requests/" element={<AdminBusRequests />} />
+              <Route path="bus-details/:busId" element={<BusDetails />} />
+              <Route path="edit-bus-owner/:id" element={<EditBusOwnerForm />} />
+              <Route path="user-creating" element={<UserCreating />} />
+              <Route path="admin-wallet" element={<AdminWallet />} />
+              <Route path="admin-bus-scheduled-list" element={<AdminBusScheduledList />} />
+              <Route path="admin-track/:busId" element={<BusTrack />} />
+            </Routes>
+          </div>
+        </main>
 
 
       </div>

@@ -30,11 +30,7 @@ const OwnerProfile = () => {
             .then(response => {
                 const ownerData = response.data;
                 
-                // if (!ownerData.is_approved) {
-                //     handleLogout();
-                //     setError('Your account is not approved. Please contact support.');
-                //     return;
-                // }
+                 
 
                 if (!ownerData.is_approved) {
                     Swal.fire({

@@ -68,7 +68,6 @@ const ForgotPasswordUser = () => {
       return;
     }
 
-    // Validate the password
     const passwordError = validatePassword(newPassword);
     if (passwordError) {
       setError(passwordError);

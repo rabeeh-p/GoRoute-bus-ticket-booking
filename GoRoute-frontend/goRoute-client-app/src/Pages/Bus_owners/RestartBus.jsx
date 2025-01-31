@@ -69,8 +69,8 @@ const RestartBus = () => {
   
       if (response.status === 200) {
         alert("Bus restarted successfully");
-        setSelectedConductor('');  // Reset conductor selection
-        setNewScheduleDate('');    // Reset schedule date
+        setSelectedConductor('');   
+        setNewScheduleDate('');     
       }
     } catch (err) {
       console.error("Error restarting bus:", err);

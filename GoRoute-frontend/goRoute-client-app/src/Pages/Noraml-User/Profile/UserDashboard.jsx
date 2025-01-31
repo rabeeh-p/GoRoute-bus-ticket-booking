@@ -34,7 +34,7 @@ const UserDashboard = () => {
                     { icon: FaHistory, title: 'Total Trips', value: data.stats[2]?.value ?? 0 },
                 ]);
 
-                setRecentBookings(data.recentBookings || []); // Ensure it's an array
+                setRecentBookings(data.recentBookings || []);  
             } catch (error) {
                 setError('Failed to load dashboard data');
             } finally {

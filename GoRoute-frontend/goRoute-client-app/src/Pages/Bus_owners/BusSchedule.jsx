@@ -18,7 +18,7 @@ const BusSchedule = () => {
   const [error, setError] = useState(null);
   const { handleLogout } = useLogout();
   const [conductors, setConductors] = useState([]);
-  const [selectedConductor, setSelectedConductor] = useState(null);  // State to store selected conductor
+  const [selectedConductor, setSelectedConductor] = useState(null);   
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -27,7 +27,6 @@ const BusSchedule = () => {
       return;
     }
 
-    // Fetch bus details
     axiosInstance.get(`/buses/${busId}/`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -42,7 +41,6 @@ const BusSchedule = () => {
       setLoading(false);
     });
 
-    // Fetch routes
     axiosInstance.get('/routes/my_routes/schedule-time/', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -60,7 +58,6 @@ const BusSchedule = () => {
       }
     });
 
-    // Fetch conductors
     axiosInstance.get('/conductors/', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -96,7 +93,7 @@ const BusSchedule = () => {
       route_id: selectedRoute.id,
       scheduled_date: scheduledDate,
       status: status,
-      conductor_id: selectedConductor.id,  // Add selected conductor to payload
+      conductor_id: selectedConductor.id,   
     };
   
     axiosInstance.post(`/schedule-bus/${busId}/`, payload, {

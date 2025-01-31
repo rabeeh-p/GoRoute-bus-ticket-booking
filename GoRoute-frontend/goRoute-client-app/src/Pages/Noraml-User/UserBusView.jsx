@@ -37,21 +37,6 @@ const UserBusView = () => {
         console.log('Bus ID:', busId);
 
 
-        // const socket = new WebSocket(`ws://127.0.0.1:8000/ws/seats/${busId}/`);
-
-        // socket.onopen = () => {
-        //     console.log("WebSocket connection established");
-        //     // Now you can send messages safely
-        // };
-
-        // socket.onerror = (error) => {
-        //     console.error("WebSocket error:", error);
-        //     // alert("WebSocket connection failed!");
-        // };
-
-        // socket.onclose = (event) => {
-        //     console.log("WebSocket closed:", event);
-        // };
 
 
         axios
@@ -78,38 +63,7 @@ const UserBusView = () => {
             });
     }, [busId]);
 
-
-    // useEffect(() => {
-    //     console.log('Bus ID:', busId);
-
-    //     // Create WebSocket connection.
-    //     // const socket = io(`http://127.0.0.1:8000/ws/seats/${busId}`, {
-    //     //     query: { busId, from_city: from, to_city: to, date: date }
-    //     // });
-    //     const socket = new WebSocket(`ws://127.0.0.1:8000/ws/seats/${busId}/?from_city=${from}&to_city=${to}&date=${date}`);
-
-
-    //     // Listen for messages from the server.
-    //     socket.on('bus_details', (data) => {
-    //         console.log(data, 'real-time data');
-    //         setBusDetails(data.bus);
-    //         setPrice(data.total_price);
-    //         setBookedSeats(data.booked_seats);
-    //         setLogo(data.bus_log);
-    //     });
-
-    //     // Handle errors
-    //     socket.onopen ('error', (err) => {
-    //         console.error("Error from WebSocket:", err);
-    //         setError("Could not fetch bus details.");
-    //     });
-
-    //     // Cleanup on component unmount.
-    //     return () => {
-    //         socket.disconnect();
-    //     };
-    // }, [busId, from, to, date]);
-
+ 
 
     const handleBookNowClick = () => {
         const userType = localStorage.getItem('userType');
@@ -139,99 +93,7 @@ const UserBusView = () => {
 
 
 
-    // const handleFormSubmit = (e) => {
-    //     e.preventDefault();
-    //     const accessToken = localStorage.getItem('accessToken');
-    //     if (!accessToken) {
-    //         navigate('/login');
-    //         return;
-    //     }
-    //     const searchParams = JSON.parse(localStorage.getItem('searchParams'));
-    //     const { from, to, date } = searchParams;
-    //     const pricePerPerson = price;  
-    //     const totalAmount = pricePerPerson * selectedSeats.length;
-    //     console.log(totalAmount,'tottelllllllllll');
-
-
-    //     const formData = {
-    //         bus_id: busId,
-    //         seat_numbers: selectedSeats,
-    //         userName: e.target.userName.value,
-    //         email: e.target.email.value,
-    //         phone: e.target.phone.value,
-    //         to: to,
-    //         from: from,
-    //         date: date,
-    //         total_amount: totalAmount,
-    //         pricePerPerson:pricePerPerson,
-    //     };
-
-    //     Swal.fire({
-    //         title: 'Do you want to simulate a successful payment?',
-    //         icon: 'question',
-    //         showCancelButton: true,
-    //         confirmButtonText: 'Yes, Proceed with Success',
-    //         cancelButtonText: 'No, Simulate Failure'
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             axios.post('http://127.0.0.1:8000/seat-booking/', formData, {
-    //                 headers: { Authorization: `Bearer ${accessToken}` },
-    //             }).then((response) => {
-    //                 if (response.data.message) {
-    //                     const options = {
-    //                         key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
-    //                         amount: totalAmount  * 100,  
-    //                         currency: "INR",
-    //                         name: "Bus Booking",
-    //                         description: "Test Transaction",
-    //                         order_id: response.data.razorpay_order_id,
-    //                         handler: function (paymentResponse) {
-    //                             console.log("Payment Response:", paymentResponse);   
-
-    //                             const paymentId = paymentResponse.razorpay_payment_id;
-    //                             const orderId = response.data.razorpay_order_id;  
-    //                             const signature = paymentResponse.razorpay_signature;
-
-    //                             if (!paymentId || !orderId || !signature) {
-    //                                 Swal.fire("Error", "Missing payment details in the response.", "error");
-    //                                 return;
-    //                             }
-
-    //                             axios.post('http://127.0.0.1:8000/payment-success/', {
-    //                                 payment_id: paymentId,
-    //                                 order_id: orderId,
-    //                                 signature: signature
-    //                             })
-    //                             .then((paymentResponseBackend) => {
-    //                                 Swal.fire("Success!", "Payment completed successfully.", "success");
-    //                                 window.location.reload();
-    //                             })
-    //                             .catch((err) => {
-    //                                 console.error("Payment verification error:", err.response.data);
-    //                                 Swal.fire("Error!", "Payment verification failed.", "error");
-    //                             });
-    //                         },
-    //                         prefill: {
-    //                             name: e.target.userName.value,
-    //                             email: e.target.email.value,
-    //                             contact: e.target.phone.value,
-    //                         },
-    //                         theme: { color: "#3399cc" },
-    //                     };
-    //                     const rzp = new Razorpay(options);
-    //                     rzp.open();
-    //                 } else {
-    //                     Swal.fire("Error", "Order creation failed.", "error");
-    //                 }
-    //             }).catch((error) => {
-    //                 Swal.fire("Error", "Failed to connect to the server.", "error");
-    //             });
-    //         } else {
-    //             Swal.fire("Payment Failed", "The payment was not successful. No seats have been booked.", "error");
-    //         }
-    //     });
-    // };
-
+    
 
     const handleFormSubmit = (e) => {
         e.preventDefault();

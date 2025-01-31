@@ -22,49 +22,11 @@ const ConductorRegistrationForm = () => {
         }));
     };
 
-    // Validate input fields
-    // const validateForm = () => {
-    //     const { username, password, license_number, phone_number, hired_date, name } = formData;
-
-    //     // Check for empty fields or fields with spaces
-    //     if (!username.trim() || !password.trim() || !license_number.trim() || !phone_number.trim() || !name.trim()) {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Validation Error',
-    //             text: 'Please fill in all the fields without leading/trailing spaces!',
-    //         });
-    //         return false;
-    //     }
-
-    //     // Validate phone number format (should be numeric)
-    //     const phoneRegex = /^[0-9]{10}$/;
-    //     if (!phoneRegex.test(phone_number)) {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Invalid Phone Number',
-    //             text: 'Phone number must be 10 digits.',
-    //         });
-    //         return false;
-    //     }
-
-    //     // Validate license number (if needed, add your own regex for the format)
-    //     const licenseRegex = /^[A-Za-z0-9]+$/;  // Example: alphanumeric license numbers
-    //     if (!licenseRegex.test(license_number)) {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Invalid License Number',
-    //             text: 'License number must be alphanumeric.',
-    //         });
-    //         return false;
-    //     }
-
-    //     return true;
-    // };
+   
 
     const validateForm = () => {
         const { username, password, license_number, phone_number, hired_date, name } = formData;
     
-        // Check for empty fields or fields with spaces
         if (!username.trim() || !password.trim() || !license_number.trim() || !phone_number.trim() || !name.trim()) {
             Swal.fire({
                 icon: 'error',
@@ -74,7 +36,6 @@ const ConductorRegistrationForm = () => {
             return false;
         }
     
-        // Validate phone number format (should be numeric)
         const phoneRegex = /^[0-9]{10}$/;
         if (!phoneRegex.test(phone_number)) {
             Swal.fire({
@@ -85,8 +46,7 @@ const ConductorRegistrationForm = () => {
             return false;
         }
     
-        // Validate license number (if needed, add your own regex for the format)
-        const licenseRegex = /^[A-Za-z0-9]+$/; // Example: alphanumeric license numbers
+        const licenseRegex = /^[A-Za-z0-9]+$/;  
         if (!licenseRegex.test(license_number)) {
             Swal.fire({
                 icon: 'error',
@@ -96,12 +56,10 @@ const ConductorRegistrationForm = () => {
             return false;
         }
     
-        // Validate hired_date to ensure it is not in the future
         if (hired_date) {
             const selectedDate = new Date(hired_date);
             const today = new Date();
     
-            // Set today's time to 00:00:00 to ensure only date comparison
             today.setHours(0, 0, 0, 0);
     
             if (selectedDate > today) {
@@ -140,7 +98,6 @@ const ConductorRegistrationForm = () => {
                 },
             });
 
-            // Show success alert
             Swal.fire({
                 icon: 'success',
                 title: 'Success',
@@ -156,7 +113,6 @@ const ConductorRegistrationForm = () => {
             });
 
         } catch (error) {
-            // Show error alert
             Swal.fire({
                 icon: 'error',
                 title: 'Registration Error',

@@ -113,7 +113,6 @@ function ChatApp() {
 
       setSocket(socketConnection);
 
-      // Cleanup WebSocket connection on component unmount or when roomId changes
       return () => {
         socketConnection.close();
       };
@@ -126,21 +125,13 @@ function ChatApp() {
 
     const messageData = {
       message: newMessage,
-      user_id: userid, // Assuming `firstUser` is the logged-in user
+      user_id: userid,  
       room_id: roomId,
     };
 
-    // Sending message via WebSocket
     socket.send(JSON.stringify(messageData));
 
-    // Update messages state locally after sending
-    // setMessages((prevMessages) => ({
-    //   ...prevMessages,
-    //   [selectedPerson.id]: [
-    //     ...(prevMessages[selectedPerson.id] || []),
-    //     { message: newMessage, user: firstUser, timestamp: new Date() },
-    //   ],
-    // }));
+    
 
     setNewMessage('');
   };
@@ -206,8 +197,8 @@ function ChatApp() {
                 >
                   <div
                     className={`p-2 rounded-lg max-w-xs break-words ${message.user === firstUser
-                        ? "bg-red-500 text-white" // Sent messages - RedBus red
-                        : "bg-gray-200 text-gray-800" // Received messages - Light gray
+                        ? "bg-red-500 text-white"  
+                        : "bg-gray-200 text-gray-800"  
                       }`}
                   >
                     {/* Message content */}
@@ -226,16 +217,13 @@ function ChatApp() {
           ) : (
             <div className="text-center text-gray-500">No messages available</div>
           )}
-          {/* Invisible div to track the bottom */}
           <div ref={messagesEndRef}></div>
         </div>
 
 
 
 
-        {/* Message Input */}
         <div className="p-4 bg-white border-t flex items-center space-x-3">
-          {/* Input for new message */}
           <input
             type="text"
             className="flex-1 p-2 border rounded"

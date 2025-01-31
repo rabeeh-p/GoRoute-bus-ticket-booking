@@ -79,14 +79,7 @@ const CompletedBuses = () => {
                   <td className="px-4 py-2 text-sm">{bus.bus_type}</td>
                   <td className="px-4 py-2 text-sm">{bus.seat_count}</td>
                   <td className="px-4 py-2 text-sm">{new Date(bus.scheduled_date).toLocaleString()}</td>
-                  {/* <td className="px-4 py-2 text-sm">
-                    <button 
-                      onClick={() => navigate(`/busowner-dashboard/restart-bus/${bus.id}`)} 
-                      className="bg-red-500 text-white px-4 py-1 rounded-md hover:bg-red-700 transition"
-                    >
-                      Restart
-                    </button>
-                  </td> */}
+                   
                 </tr>
               ))
             )}

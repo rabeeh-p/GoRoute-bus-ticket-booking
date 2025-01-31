@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../../axios/axios"; // Make sure this path matches your project structure
+import axiosInstance from "../../axios/axios";  
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);

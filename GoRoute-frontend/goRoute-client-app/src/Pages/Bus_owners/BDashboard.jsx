@@ -69,7 +69,7 @@ const BDashboard = () => {
       <div style={{ padding: '20px', backgroundColor: '#fff8f0', minHeight: '100vh' }}>
         <h1 style={{ textAlign: 'center', color: '#d32f2f', marginBottom: '10px' }}> Dashboard</h1>
 
-        {/* Filter buttons */}
+        
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <button
             onClick={() => handleFilterChange('weekly')}

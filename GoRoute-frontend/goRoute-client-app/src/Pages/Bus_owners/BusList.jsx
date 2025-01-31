@@ -40,7 +40,6 @@ const BusList = () => {
         setError('Failed to fetch bus data');
         setLoading(false);
       }
-      // setError('Failed to fetch bus data');
     });
 
     return () => {

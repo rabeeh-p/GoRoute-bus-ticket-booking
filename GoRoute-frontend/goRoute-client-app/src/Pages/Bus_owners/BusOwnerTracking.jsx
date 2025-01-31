@@ -8,7 +8,7 @@ const BusOwnerTracking = () => {
   const [loading, setLoading] = useState(true);
   const [currentStopIndex, setCurrentStopIndex] = useState(0);
   const [busPosition, setBusPosition] = useState(0);
-  const [busStarted, setBusStarted] = useState(false); // Track if the bus has started
+  const [busStarted, setBusStarted] = useState(false);  
   const { busId } = useParams();
 
   useEffect(() => {

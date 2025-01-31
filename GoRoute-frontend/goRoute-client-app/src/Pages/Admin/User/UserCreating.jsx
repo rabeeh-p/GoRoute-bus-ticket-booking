@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, Calendar, Lock } from 'lucide-react';
 import axios from 'axios';
-import Swal from 'sweetalert2';  // Import SweetAlert
+import Swal from 'sweetalert2';   
 
 const UserCreating = () => {
   const [formData, setFormData] = useState({
@@ -34,26 +34,22 @@ const UserCreating = () => {
     } else {
       console.log('Form submitted successfully:', formData);
 
-      // API call for form submission
       axios
         .post('http://127.0.0.1:8000/admin-create-user/', formData)
         .then((response) => {
           console.log('User created successfully:', response.data);
 
-          // Show SweetAlert success message
           Swal.fire({
             icon: 'success',
             title: 'User Created Successfully!',
             text: 'The new user has been successfully created.',
           });
 
-          // Navigate to another page after successful submission
           navigate('/admin-home/users-list');
         })
         .catch((error) => {
           console.error('There was an error creating the user:', error);
 
-          // Show SweetAlert error message
           Swal.fire({
             icon: 'error',
             title: 'Error!',
@@ -66,7 +62,6 @@ const UserCreating = () => {
   const validateForm = () => {
     const newErrors = {};
   
-    // Trim values to avoid spaces before or after input
     const trimmedData = {
       username: formData.username.trim(),
       first_name: formData.first_name.trim(),
@@ -86,13 +81,11 @@ const UserCreating = () => {
     if (trimmedData.password !== trimmedData.confirmPassword) 
       newErrors.confirmPassword = 'Passwords do not match';
   
-    // Email validation (simple regex for basic email format check)
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     if (trimmedData.email && !emailRegex.test(trimmedData.email)) {
       newErrors.email = 'Invalid email format';
     }
   
-    // Phone number validation (basic example with length check)
     if (trimmedData.phone_number && trimmedData.phone_number.length < 10) {
       newErrors.phone_number = 'Phone number should be at least 10 digits';
     }

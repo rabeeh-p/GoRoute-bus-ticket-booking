@@ -75,42 +75,7 @@ const SignUp = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-
-    //     if (!validateForm()) {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Validation Error',
-    //             text: 'Please fix the errors before submitting.',
-    //         });
-    //         return;
-    //     }
-
-    //     const { confirmPassword, ...dataToSend } = formData;
-
-    //     try {
-    //         const response = await axios.post('http://127.0.0.1:8000/register/', dataToSend);
-    //         Swal.fire({
-    //             icon: 'success',
-    //             title: 'Registration Successful',
-    //             text: 'You have successfully registered. Redirecting to OTP verification...',
-    //             timer: 2000,
-    //             showConfirmButton: false
-    //         });
-
-    //         localStorage.setItem('userData', JSON.stringify(dataToSend));
-    //         setTimeout(() => navigate('/otp'), 2000);
-    //     } catch (error) {
-    //         console.error('Error during registration:', error);
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Registration Failed',
-    //             text: 'An error occurred during registration. Please try again later.',
-    //         });
-    //     }
-    // };
-
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
 
