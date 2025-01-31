@@ -118,6 +118,12 @@ export default function Sidebar() {
                             <span className="mx-3">Conductor List</span>
                         </a>
                     </li>
+                    <li onClick={() => navigate('/busowner-dashboard/completed-buses')}>
+                        <a className="flex items-center px-6 py-3 hover:bg-red-800">
+                            <Users className="h-5 w-5" />  {/* Updated icon */}
+                            <span className="mx-3">Route completed buses</span>
+                        </a>
+                    </li>
                 </ul>
 
                 {/* Logout */}

@@ -61,6 +61,8 @@ import Chat from './Pages/Noraml-User/Profile/Chat';
 import ForgotPasswordConductor from './Pages/Conductor/ForgotPasswordConductor';
 import ForgotPasswordUser from './Pages/Noraml-User/ForgotPasswordUser';
 import ChatConductor from './Pages/Conductor/ChatConductor';
+import CompletedBuses from './Pages/Bus_owners/CompletedBuses';
+import RestartBus from './Pages/Bus_owners/RestartBus';
 function App() {
 
 
@@ -146,6 +148,8 @@ function App() {
           <Route path="conductor-registration" element={<ConductorRegistrationForm />} />
           <Route path="conductor-list" element={<ConductorsList />} />
           <Route path="bus-owner-tracking/:busId" element={<BusOwnerTracking />} />
+          <Route path="completed-buses" element={<CompletedBuses />} />
+          <Route path="restart-bus/:busId" element={<RestartBus />} />
         </Route>
       </Routes>
 

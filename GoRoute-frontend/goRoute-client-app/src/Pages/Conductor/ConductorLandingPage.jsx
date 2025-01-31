@@ -173,6 +173,9 @@ const ConductorLandingPage = () => {
             setCurrentStop(stopIndex);
             updateBusPosition(stopIndex);
             Swal.fire('Success', 'Successfully moved to the next stop!', 'success');
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
           } else {
             Swal.fire('Error', 'Failed to move to the next stop. Please try again later.', 'error');
           }
