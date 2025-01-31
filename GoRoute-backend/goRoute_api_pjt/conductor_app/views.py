@@ -261,6 +261,10 @@ class UpdateCurrentStop(APIView):
                     bus.status = 'completed'
                     bus.save()
 
+
+                    tickets = Ticket.objects.filter(order__bus=bus, status='confirmed')
+                    tickets.update(status='completed')
+
                     user = request.user
                     conductor = Conductor.objects.get(user=user)
 

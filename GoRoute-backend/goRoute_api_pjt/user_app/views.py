@@ -1167,22 +1167,65 @@ class CancelTicketAPIView(APIView):
     authentication_classes = [JWTAuthentication]
 
    
+    # def post(self, request, ticket_id):
+    #     try:
+    #         ticket = Ticket.objects.select_related('order__user', 'seat').get(id=ticket_id)
+
+    #         if ticket.status == 'cancelled':
+    #             return Response({'success': False, 'message': 'Ticket is already cancelled.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    #         ticket.status = 'cancelled'
+    #         ticket.related_data = f"Cancelled on {timezone.now()}"   
+    #         ticket.save()
+
+    #         wallet, _ = Wallet.objects.get_or_create(user=request.user)
+
+    #         refund_amount = Decimal(str(ticket.amount))  
+    #         wallet.balance += refund_amount
+    #         wallet.save() 
+
+    #         Transaction.objects.create(
+    #             wallet=wallet,
+    #             amount=refund_amount,
+    #             transaction_type='credit',
+    #             description=f"Refund for cancelled ticket (Seat: {ticket.seat.seat_number})"
+    #         )
+
+    #         # if ticket.seat:
+    #         #     ticket.seat.status = 'available'   
+    #         #     ticket.seat.save()  
+    #         if ticket.seat:
+    #             ticket.seat.delete()
+
+    #         return Response({
+    #             'success': True,
+    #             'message': 'Ticket cancelled successfully, refund issued, and seat released.',
+    #             'refund_amount': str(refund_amount),   
+    #             'wallet_balance': str(wallet.balance)   
+    #         }, status=status.HTTP_200_OK)
+
+    #     except Ticket.DoesNotExist:
+    #         return Response({'success': False, 'message': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
+    #     except Exception as e:
+    #         return Response({'success': False, 'message': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
     def post(self, request, ticket_id):
         try:
-            ticket = Ticket.objects.select_related('order__user', 'seat').get(id=ticket_id)
+            ticket = Ticket.objects.select_related('order__user', 'order__bus', 'seat').get(id=ticket_id)
 
             if ticket.status == 'cancelled':
                 return Response({'success': False, 'message': 'Ticket is already cancelled.'}, status=status.HTTP_400_BAD_REQUEST)
 
             ticket.status = 'cancelled'
-            ticket.related_data = f"Cancelled on {timezone.now()}"   
+            ticket.related_data = f"Cancelled on {timezone.now()}"
             ticket.save()
 
+            # User refund process
             wallet, _ = Wallet.objects.get_or_create(user=request.user)
-
             refund_amount = Decimal(str(ticket.amount))  
             wallet.balance += refund_amount
-            wallet.save() 
+            wallet.save()
 
             Transaction.objects.create(
                 wallet=wallet,
@@ -1191,25 +1234,37 @@ class CancelTicketAPIView(APIView):
                 description=f"Refund for cancelled ticket (Seat: {ticket.seat.seat_number})"
             )
 
-            # if ticket.seat:
-            #     ticket.seat.status = 'available'   
-            #     ticket.seat.save()  
+            # Bus owner debit process
+            bus = ticket.order.bus
+            if bus.bus_owner_id:
+                bus_owner = CustomUser.objects.get(id=bus.bus_owner_id)
+                bus_owner_wallet, _ = Wallet.objects.get_or_create(user=bus_owner)
+                debit_amount = Decimal(str(ticket.amount))  
+                bus_owner_wallet.balance -= debit_amount
+                bus_owner_wallet.save()
+
+                Transaction.objects.create(
+                    wallet=bus_owner_wallet,
+                    amount=debit_amount,
+                    transaction_type='debit',
+                    description=f"Debit for cancelled ticket (Seat: {ticket.seat.seat_number})"
+                )
+
             if ticket.seat:
                 ticket.seat.delete()
 
             return Response({
                 'success': True,
-                'message': 'Ticket cancelled successfully, refund issued, and seat released.',
-                'refund_amount': str(refund_amount),   
-                'wallet_balance': str(wallet.balance)   
+                'message': 'Ticket cancelled successfully, refund issued, seat released, and bus owner debited.',
+                'refund_amount': str(refund_amount),
+                'wallet_balance': str(wallet.balance),
+                'bus_owner_wallet_balance': str(bus_owner_wallet.balance) if bus_owner_wallet else 'Not available'
             }, status=status.HTTP_200_OK)
 
         except Ticket.DoesNotExist:
             return Response({'success': False, 'message': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'success': False, 'message': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 
 
 

@@ -244,7 +244,7 @@ class Ticket(models.Model):
     seat = models.ForeignKey(Seat, on_delete=models.CASCADE, related_name='tickets')
     status = models.CharField(
         max_length=20,
-        choices=[ ('confirmed', 'Confirmed'), ('cancelled', 'Cancelled')],
+        choices=[ ('confirmed', 'Confirmed'), ('cancelled', 'Cancelled'),('completed', 'Completed')],
         default='issued'
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
