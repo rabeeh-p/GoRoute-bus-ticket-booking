@@ -1709,13 +1709,21 @@ class UserDashboardAPIView(APIView):
         print('get is working')
 
         user = request.user  
+        print('get is working2')
         
         try:
             normal_user_profile = user.profile   
+            print('get is working3')
         except NormalUserProfile.DoesNotExist:
+            print('get is working4')
             return Response({"error": "User profile not found"}, status=400)
 
-        wallet = get_object_or_404(Wallet, user=user)
+        # wallet = get_object_or_404(Wallet, user=user)
+        # wallet, created = Wallet.objects.get_or_create(user=user)
+        wallet, created = Wallet.objects.get_or_create(user=user, defaults={'balance': 0})
+        if created:
+            print('New wallet created')
+            wallet.save() 
         wallet_balance = wallet.balance
 
         active_tickets_count = Ticket.objects.filter(order__user=normal_user_profile, status='confirmed').count()
