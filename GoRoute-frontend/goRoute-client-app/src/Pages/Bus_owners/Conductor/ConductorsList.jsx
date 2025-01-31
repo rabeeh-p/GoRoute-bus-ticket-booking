@@ -88,7 +88,7 @@ const ConductorsList = () => {
                         </li>
                     ))
                 ) : (
-                    <p className="text-center text-gray-600">No conductors found.</p>
+                    <p className="text-center text-gray-600">No conductors here.</p>
                 )}
             </ul>
         </div>
