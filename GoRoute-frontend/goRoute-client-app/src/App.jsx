@@ -121,7 +121,7 @@ function App() {
         </Route>
 
         <Route path="/users-list" element={<UsersList />} />
-        <Route path="/chat-conductor" element={<ChatConductor />} />
+        <Route path="/chat-conductor" element={<ConductorProtect>  <ChatConductor />    </ConductorProtect>} />
 
         <Route path="/conductor-login" element={<ConductorLogin />    } />
         <Route path="/conductor-forgot" element={<ForgotPasswordConductor />    } />
