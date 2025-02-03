@@ -120,21 +120,25 @@ function ChatApp() {
   }, [roomId]);
 
 
+ 
   const handleSendMessage = () => {
     if (newMessage.trim() === '' || !socket) return;
 
+    const timestamp = new Date().toISOString();  // Generate the timestamp in ISO format
+
     const messageData = {
       message: newMessage,
-      user_id: userid,  
+      user_id: userid,
       room_id: roomId,
+      timestamp: timestamp,  // Include the timestamp
     };
 
     socket.send(JSON.stringify(messageData));
 
-    
-
     setNewMessage('');
   };
+
+
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -197,8 +201,8 @@ function ChatApp() {
                 >
                   <div
                     className={`p-2 rounded-lg max-w-xs break-words ${message.user === firstUser
-                        ? "bg-red-500 text-white"  
-                        : "bg-gray-200 text-gray-800"  
+                      ? "bg-red-500 text-white"
+                      : "bg-gray-200 text-gray-800"
                       }`}
                   >
                     {/* Message content */}
@@ -210,8 +214,21 @@ function ChatApp() {
                   className={`text-sm text-gray-500 ${message.user === firstUser ? "text-right" : "text-left"
                     }`}
                 >
-                  {/* {new Date(message.timestamp).toLocaleTimeString()} */}
+                  {/* {new Date(message.timestamp).toLocaleTimeString()}
+                   */}
+
+
+                  {new Date(message.timestamp).toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: true,  // 12-hour format
+                  })}
+
+
+
                 </div>
+
               </div>
             ))
           ) : (

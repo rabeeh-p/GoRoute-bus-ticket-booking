@@ -13,10 +13,7 @@ const ChatConductor = () => {
   const [currentUserId, setCurrentUserId] = useState('');
   const messagesEndRef = useRef(null);
 
-
   const [firstUser, setFirstUser] = useState('');
-
-
 
   useEffect(() => {
     const fetchChatPeople = async () => {
@@ -48,11 +45,9 @@ const ChatConductor = () => {
           headers: { Authorization: `Bearer ${accessToken}` }
         });
         setRoomId(response.data.chat_room.room_id);
-        console.log(response.data.messages.user, 'mes');
         if (response.data.messages.length > 0) {
           setFirstUser(response.data.messages[0].user);
         }
-
         setMessages(response.data.messages);
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -77,7 +72,8 @@ const ChatConductor = () => {
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !socket) return;
-    socket.send(JSON.stringify({ message: newMessage, user_id: currentUserId }));
+    const timestamp = new Date().toISOString();
+    socket.send(JSON.stringify({ message: newMessage, user_id: currentUserId, timestamp }));
     setNewMessage('');
   };
 
@@ -99,30 +95,30 @@ const ChatConductor = () => {
         </div>
       </div>
 
-      
-
-
+      {/* Chat Content */}
       <div className="flex-1 flex flex-col">
         {/* Chat Header */}
-        <div className="bg-red-500 text-white p-4 shadow-md">
+        <div className="bg-red-500 text-white p-4 shadow-md flex justify-between items-center">
           {selectedPerson ? selectedPerson.name : "Chat"}
+          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden text-white">
+            {isSidebarOpen ? 'Close' : 'Open'} Sidebar
+          </button>
         </div>
 
-        {/* Messages List */}
+        {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
           {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.user === firstUser ? "justify-end" : "justify-start"
-                } mb-4`}
-            >
-              <div
-                className={`max-w-[60%] p-3 rounded-lg ${message.user === firstUser
-                    ? "bg-red-600 text-white" 
-                    : "bg-gray-800 text-white"  
-                  }`}
-              >
+            <div key={index} className={`flex ${message.user === firstUser ? "justify-end" : "justify-start"} mb-4`}>
+              <div className={`max-w-[60%] p-3 rounded-lg ${message.user === firstUser ? "bg-red-600 text-white" : "bg-gray-800 text-white"}`}>
                 <p className="break-words">{message.message}</p>
+                <p className="text-xs text-gray-300">
+                  {new Date(message.timestamp).toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: true,
+                  })}
+                </p>
               </div>
             </div>
           ))}

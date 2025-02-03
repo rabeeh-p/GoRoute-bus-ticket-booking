@@ -48,6 +48,9 @@ const Home = () => {
     });
   };
 
+
+  
+
   const handleViewSchedule = (route) => {
     localStorage.setItem('searchParams', JSON.stringify({
       from: route.first_stop.stop_name, 
