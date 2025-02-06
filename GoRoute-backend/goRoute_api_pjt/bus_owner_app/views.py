@@ -549,8 +549,8 @@ class ScheduledBusListView(APIView):
         if not request.user.is_authenticated:
             return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
         
-        obj = CustomUser.objects.get(id=44)
-        print('objjj',obj)
+        # obj = CustomUser.objects.get(id=44)
+        # print('objjj',obj)
         
         try:
             bus_owner = BusOwnerModel.objects.get(user=request.user)

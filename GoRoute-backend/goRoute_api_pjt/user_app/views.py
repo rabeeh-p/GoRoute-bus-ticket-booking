@@ -456,7 +456,7 @@ class PaymentSuccessAPIView(APIView):
 
             order.status = 'confirmed'
             order.save()
-
+ 
             
 
             seat_numbers = order.selected_seats

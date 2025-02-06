@@ -15,6 +15,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from django.db import transaction
+from django.core.mail import send_mail
+from django.conf import settings
 # Create your views here.
 
 
@@ -135,6 +137,7 @@ class UpdateCurrentStop(APIView):
         bus.current_stop = stops[stop_order].stop_name
         bus.stop_number = stop_order
         bus.save()
+        tickets = Ticket.objects.filter(order__bus=bus, status='confirmed')
 
         if stop_order == len(stops) - 1:
             try:
@@ -158,10 +161,13 @@ class UpdateCurrentStop(APIView):
                     conductor.save()
                     ConductorScheduledBus.objects.filter(conductor=conductor).delete()
 
+
             except BusModel.DoesNotExist:
                 return Response({"error": "Bus model with the given bus number not found."}, status=status.HTTP_404_NOT_FOUND)
             except Exception as e:
                 return Response({"error": f"An error occurred: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        self.send_email_to_ticket_holders(tickets)
 
         return Response({"success": "Current stop updated successfully."}, status=status.HTTP_200_OK)
 
@@ -171,6 +177,34 @@ class UpdateCurrentStop(APIView):
     def get_stops_for_bus(self, bus):
         stops = ScheduledStop.objects.filter(scheduled_bus=bus).order_by('stop_order')
         return stops
+    
+    def send_email_to_ticket_holders(self, tickets):
+        for ticket in tickets:
+            order = ticket.order
+            user_email = order.email
+            seat_details = "\n".join([f"Seat Number: {ticket.seat.seat_number}, Status: {ticket.status}" for ticket in ticket.order.seats.all()])
+            email_subject = "Update on Your Bus Trip: Current Stop Reached"
+            email_message = f"""
+            Dear {order.name},
+
+            The bus {ticket.order.bus.bus_number} has reached a new stop: {ticket.order.bus.current_stop}.
+            Below are your ticket details:
+
+            Seats:
+            {seat_details}
+
+            Thank you for traveling with us!
+
+            Best Regards,
+            The GoRoute Team
+            """
+
+            send_mail(
+                subject=email_subject,
+                message=email_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user_email],
+            )
 
 
 

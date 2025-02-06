@@ -155,13 +155,23 @@ TEMPLATES = [
 ASGI_APPLICATION = 'goRoute_api_pjt.asgi.application'
 
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
     },
 }
 
 
-
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("redis", 6379)],  # For Docker setup
+#         },
+#     },
+# }
 
 
 
@@ -169,14 +179,37 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': "root",        
+#         'USER': "root",       
+#         'PASSWORD': "root",   
+#         'HOST':"db",          
+#         'PORT': config('DB_PORT', default=5432),              
+#     }
+# }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'root',  # Make sure this matches POSTGRES_DB in docker-compose.yml
+#         'USER': 'root',   # Make sure this matches POSTGRES_USER
+#         'PASSWORD': 'root',  # Make sure this matches POSTGRES_PASSWORD
+#         'HOST': 'db',  # This should match the service name in docker-compose
+#         'PORT': '5432',  # PostgreSQL default port
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),        
-        'USER': config('DB_USER'),       
-        'PASSWORD': config('DB_PASSWORD'),   
-        'HOST': config('DB_HOST'),          
-        'PORT': config('DB_PORT', default=5432),              
+        'NAME': 'goroute_pjt',
+        'USER': 'postgres',
+        'PASSWORD': 'admin123',
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
 
