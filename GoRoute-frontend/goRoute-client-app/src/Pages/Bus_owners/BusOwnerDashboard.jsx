@@ -1,5 +1,5 @@
 import React from 'react'
-import Sidebar from '../../Components/BusOwner/SideBar'
+import Sidebar from '../../Components/BusOwner/Sidebar'
 import Header from '../../Components/BusOwner/Header'
 import { Route, Routes } from 'react-router-dom'
 import BDashboard from './BDashboard'
