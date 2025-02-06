@@ -110,6 +110,83 @@ const ConductorLandingPage = () => {
 
 
 
+  // const handleChangeStop = (stopIndex) => {
+  //   if (stopIndex <= currentStop) {
+  //     Swal.fire({
+  //       title: 'Action Not Allowed',
+  //       text: 'You can only move forward to the next stop. You cannot go back to a previous stop.',
+  //       icon: 'error',
+  //       confirmButtonText: 'Okay',
+  //     });
+  //     return;
+  //   }
+
+  //   if (stopIndex > currentStop + 1) {
+  //     Swal.fire({
+  //       title: 'Action Not Allowed',
+  //       text: 'You must move through the stops sequentially. Skipping stops is not allowed.',
+  //       icon: 'error',
+  //       confirmButtonText: 'Okay',
+  //     });
+  //     return;
+  //   }
+
+  //   if (stopIndex === busData.stops.length - 1 && currentStop !== busData.stops.length - 2) {
+  //     Swal.fire({
+  //       title: 'Action Not Allowed',
+  //       text: 'You cannot go directly to the last stop. Please complete all intermediate stops first.',
+  //       icon: 'error',
+  //       confirmButtonText: 'Okay',
+  //     });
+  //     return;
+  //   }
+
+  //   const stopOrder = busData.stops[stopIndex].stop_order;
+
+  //   Swal.fire({
+  //     title: 'Are you sure?',
+  //     text: `You are about to move to the next stop: ${busData.stops[stopIndex].stop_name}`,
+  //     icon: 'warning',
+  //     showCancelButton: true,
+  //     confirmButtonText: 'Yes, move to next stop',
+  //     cancelButtonText: 'Cancel',
+  //     reverseButtons: true,
+  //   }).then(async (result) => {
+  //     if (result.isConfirmed) {
+  //       try {
+  //         const accessToken = localStorage.getItem('accessToken');
+  //         if (!accessToken) {
+  //           Swal.fire('Error', 'No access token found', 'error');
+  //           return;
+  //         }
+
+  //         const response = await axiosInstance.post("/update-stop/", {
+  //           bus_id: busData.bus.id,
+  //           stop_order: stopOrder - 1,
+  //         }, {
+  //           headers: {
+  //             Authorization: `Bearer ${accessToken}`,
+  //           }
+  //         });
+
+  //         if (response.data.success) {
+  //           setCurrentStop(stopIndex);
+  //           updateBusPosition(stopIndex);
+  //           Swal.fire('Success', 'Successfully moved to the next stop!', 'success');
+  //           setTimeout(() => {
+  //             window.location.reload();
+  //           }, 2000);
+  //         } else {
+  //           Swal.fire('Error', 'Failed to move to the next stop. Please try again later.', 'error');
+  //         }
+  //       } catch (error) {
+  //         Swal.fire('Error', 'Error updating the stop. Please try again later.', 'error');
+  //       }
+  //     }
+  //   });
+  // };
+
+
   const handleChangeStop = (stopIndex) => {
     if (stopIndex <= currentStop) {
       Swal.fire({
@@ -120,7 +197,7 @@ const ConductorLandingPage = () => {
       });
       return;
     }
-
+  
     if (stopIndex > currentStop + 1) {
       Swal.fire({
         title: 'Action Not Allowed',
@@ -130,7 +207,7 @@ const ConductorLandingPage = () => {
       });
       return;
     }
-
+  
     if (stopIndex === busData.stops.length - 1 && currentStop !== busData.stops.length - 2) {
       Swal.fire({
         title: 'Action Not Allowed',
@@ -140,9 +217,9 @@ const ConductorLandingPage = () => {
       });
       return;
     }
-
+  
     const stopOrder = busData.stops[stopIndex].stop_order;
-
+  
     Swal.fire({
       title: 'Are you sure?',
       text: `You are about to move to the next stop: ${busData.stops[stopIndex].stop_name}`,
@@ -153,13 +230,25 @@ const ConductorLandingPage = () => {
       reverseButtons: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
+        // Show loading indicator
+        const loadingSwal = Swal.fire({
+          title: 'Loading...',
+          text: 'Moving to the next stop. Please wait.',
+          icon: 'info',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading(); // Show the loading spinner
+          }
+        });
+  
         try {
           const accessToken = localStorage.getItem('accessToken');
           if (!accessToken) {
             Swal.fire('Error', 'No access token found', 'error');
+            loadingSwal.close(); // Close the loading spinner
             return;
           }
-
+  
           const response = await axiosInstance.post("/update-stop/", {
             bus_id: busData.bus.id,
             stop_order: stopOrder - 1,
@@ -168,7 +257,7 @@ const ConductorLandingPage = () => {
               Authorization: `Bearer ${accessToken}`,
             }
           });
-
+  
           if (response.data.success) {
             setCurrentStop(stopIndex);
             updateBusPosition(stopIndex);
@@ -181,10 +270,13 @@ const ConductorLandingPage = () => {
           }
         } catch (error) {
           Swal.fire('Error', 'Error updating the stop. Please try again later.', 'error');
+        } finally {
+          loadingSwal.close(); // Close the loading spinner after the operation
         }
       }
     });
   };
+  
 
   if ((message && message === "You have no bus assigned.") || message === "Conductor is not active.") {
     return (
