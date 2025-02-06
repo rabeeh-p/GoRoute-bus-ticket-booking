@@ -88,7 +88,7 @@ const Home = () => {
       <Features />
 
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-3xl font-bold text-center mb-8">Popular Routes</h2>
+        <h2 className="text-3xl font-bold text-center mb-8">Favorite Routes</h2>
 
         <div className="grid md:grid-cols-3 gap-6">
           {uniqueRoutes.map((route, index) => {
