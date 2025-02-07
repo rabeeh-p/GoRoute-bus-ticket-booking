@@ -5,8 +5,8 @@ services:
     build: .
     volumes: 
       - .:/app
-    # ports:
-    #   - 8080:8080
+      - ./staticfiles:/app/staticfiles
+   
     ports:
       - "8000:8000"
     container_name : web
@@ -14,22 +14,6 @@ services:
       - db
       - redis
     
-
-
-  # db:
-  #   image: postgres:latest
-  #   container_name: goRoute-postgres
-  #   # env_file:
-  #   #   - .env
-  #   environment:
-  #     POSTGRES_USER: ${DB_USER}
-  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
-  #     POSTGRES_DB: ${DB_NAME}
-  #     POSTGRES_HOST_AUTH_METHOD: trust
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
 
   db:
     image: postgres:latest
@@ -50,6 +34,11 @@ services:
 
 volumes:
   postgres_data:
+
+
+
+
+
 
 
 

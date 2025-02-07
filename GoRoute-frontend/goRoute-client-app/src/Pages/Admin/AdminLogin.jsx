@@ -14,8 +14,8 @@ const AdminLogin = () => {
     e.preventDefault();  
 
     try {
-      // const response = await axios.post("http://127.0.0.1:8000/admin-login/", {
-      const response = await axios.post("https://api.goroute.site/admin-login/", {
+      const response = await axios.post("http://127.0.0.1:8000/admin-login/", {
+      // const response = await axios.post("https://api.goroute.site/admin-login/", {
         username,  
         password,
       });
